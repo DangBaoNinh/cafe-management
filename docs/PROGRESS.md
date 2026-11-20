@@ -108,7 +108,9 @@
 - Danh sách và chi tiết chỉ công khai món đang hoạt động, thuộc danh mục đang hoạt động và có ít nhất một size đang bán. Chi tiết ngoài điều kiện trả 404. Giá từ và bảng giá chỉ xét size đang bán. Ảnh dùng đĩa công khai đã cấu hình. UC08 không cần migration.
 - `composer ci:check` đạt Pint, PHPStan và 81 bài SQLite với 656 assertion. Bộ MySQL cô lập đạt 11 bài với 159 assertion. `npm run build` thành công. Brave ở 360 px và 1280 px xác nhận ảnh tải được, giá đúng, phân trang và quay lại giữ bộ lọc, trạng thái rỗng, và không cuộn ngang toàn trang.
 
-### UC09 đã kiểm thử, chờ nghiệm thu
+### UC09 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC09 tại commit `9c50d89`. Nhánh `feature/catalog-search` được tích hợp vào `develop` tại merge commit `2936430`. Pint, PHPStan, 86 test SQLite, 12 test MySQL và bản build đều đạt khi kiểm tra lại trước merge.
 
 - `/menu` hỗ trợ tìm theo tên tối đa 100 ký tự, kết hợp danh mục, khoảng giá VND và sắp xếp theo tên hoặc giá. Khoảng giá gồm cả hai mốc và so với giá rẻ nhất trong các size đang bán. Chỉ món công khai được trả về.
 - Phân trang và liên kết quay về từ trang món giữ bộ lọc hợp lệ. Khách có thể bỏ từng bộ lọc hoặc xóa toàn bộ. Khoảng giá sai, giá âm, kiểu dữ liệu sai và sắp xếp ngoài danh sách trả 422. Trang HTML giữ giá trị đã nhập và hiển thị lỗi tiếng Việt.
@@ -129,5 +131,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC09 chờ nghiệm thu và tích hợp vào `develop`. UC10 đã đủ phụ thuộc để triển khai từ `develop`.
+- UC10 đã đủ phụ thuộc để triển khai từ `develop`.
 - Các module tùy chỉnh đồ uống, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
