@@ -18,7 +18,7 @@
             <flux:button type="submit" variant="primary">Lọc tài khoản</flux:button>
         </form>
 
-        <div class="overflow-x-auto rounded-lg border border-coffee/15 bg-white">
+        <div class="relative overflow-x-auto rounded-lg border border-coffee/15 bg-white">
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-coffee/15">
                     <tr>
