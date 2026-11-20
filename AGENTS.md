@@ -16,7 +16,8 @@ Chỉ đọc phần tài liệu liên quan đến yêu cầu hiện tại.
 
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md) ghi phạm vi và thứ tự các giai đoạn.
 - [Tiến độ](docs/PROGRESS.md) ghi phần đã triển khai, kết quả kiểm tra thực tế và việc còn lại.
-- `docs/BUSINESS_RULES.md` là nơi ghi quy tắc nghiệp vụ dùng chung khi đã được xác nhận.
+- [Sổ công việc](docs/USE_CASE_TASKS.md) chứa mã, trạng thái, phụ thuộc, đặc tả và nhánh của từng UC hoặc nhiệm vụ kỹ thuật.
+- [Quy tắc nghiệp vụ](docs/BUSINESS_RULES.md) là nguồn quy tắc dùng chung. [Phân tích nghiệp vụ](docs/BUSINESS_ANALYSIS.md) ghi phạm vi và quyết định cần xác nhận.
 - [Đặc tả Use Case](docs/use-cases/) mô tả luồng và tiêu chí chấp nhận của từng UC. Dùng [mẫu đặc tả](docs/use-cases/UC_TEMPLATE.md) khi soạn UC mới.
 
 Ưu tiên `$implement-use-case` khi được giao triển khai UC và `$verify-use-case` khi được giao kiểm thử hoặc rà soát UC đã triển khai.
@@ -24,3 +25,11 @@ Chỉ đọc phần tài liệu liên quan đến yêu cầu hiện tại.
 ## Báo cáo cuối nhiệm vụ
 
 Sau mỗi nhiệm vụ phát triển, sửa lỗi, kiểm thử, cấu hình, refactor hoặc rà soát, đọc và áp dụng [`report-task`](.agents/skills/report-task/SKILL.md) để kết thúc bằng báo cáo đúng cấu trúc trong hội thoại. Quy tắc áp dụng cả khi nhiệm vụ hoàn thành một phần hoặc bị chặn. Với nhiệm vụ nhỏ, dùng báo cáo trong hội thoại. Chỉ cập nhật `docs/PROGRESS.md` khi tiến độ dự án thực sự thay đổi.
+
+## Lệnh ngắn cho Use Case
+
+- **Làm UCxx** (ví dụ **Làm UC01** hoặc **Làm UC02**). Tra mã trong sổ công việc. Đọc đặc tả và quy tắc liên quan. Đối chiếu mã, trạng thái và phụ thuộc trên `develop`. Nếu thiếu điều kiện, báo mã việc chặn và dừng trước khi sửa mã. Kiểm tra nhánh, working tree và worktree. Dùng lại nhánh `feature/*` đã chỉ định hoặc tạo từ `develop` nếu chưa có. Bảo toàn thay đổi có sẵn khi đổi checkout. Dùng `implement-use-case` đúng phạm vi. Viết và chạy kiểm thử, dùng `verify-use-case` nếu phù hợp. Kiểm tra diff, cập nhật trạng thái và tiến độ theo kết quả, commit file liên quan, báo cáo theo `report-task` và dừng chờ nghiệm thu.
+- **Kiểm tra UCxx**. Tra tiêu chí nghiệm thu, đối chiếu nhánh và mã, dùng `verify-use-case`, chạy test có thể thực hiện và báo lỗi hoặc phần chưa kiểm chứng. Giữ phạm vi ở rà soát khi người dùng chỉ yêu cầu kiểm tra.
+- **Tiếp tục UCxx**. Đọc trạng thái, tiến độ và báo cáo trước đó. Xác định phần còn thiếu và tiếp tục trên nhánh/worktree hiện có của UC, sau khi kiểm tra thay đổi chưa commit.
+
+Phát triển trên nhánh công việc từ `develop`. Tích hợp vào `develop` theo Git Flow, rồi release về `main`. Đặt `ACCEPTED` sau khi người dùng nghiệm thu và commit UC có trong `develop`. Chỉ merge hoặc push khi người dùng yêu cầu. Đồng bộ bản Word với Markdown khi thay đổi thiết kế quan trọng hoặc có yêu cầu.

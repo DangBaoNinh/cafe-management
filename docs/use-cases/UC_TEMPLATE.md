@@ -2,7 +2,7 @@
 
 ## Thông tin chung
 
-- **Mã Use Case** — `UC-<số>`
+- **Mã Use Case** — `UCxx`
 - **Tên Use Case** — *Tên thể hiện mục tiêu của tác nhân*
 - **Mục tiêu** — *Kết quả tác nhân cần đạt*
 - **Tác nhân** — *Tác nhân chính và tác nhân phụ nếu có*
@@ -41,3 +41,15 @@
 
 - **AC-01** — *Với điều kiện ban đầu cụ thể, khi tác nhân thực hiện hành động thì hệ thống cho kết quả có thể kiểm tra*
 - **AC-02** — *Với dữ liệu sai hoặc thiếu quyền, hệ thống xử lý theo luồng ngoại lệ và bảo toàn dữ liệu*
+
+## Phân quyền và dữ liệu liên quan
+
+- *Nêu quyền sở hữu, vai trò, bảng đọc hoặc ghi và ràng buộc dữ liệu*
+
+## Phụ thuộc
+
+- *Mã UC hoặc TECH cần có trước*
+
+## Kiểm thử dự kiến
+
+- *Dữ liệu, thao tác và kết quả cho luồng chính, ngoại lệ và phân quyền*
