@@ -116,7 +116,9 @@
 - Phân trang và liên kết quay về từ trang món giữ bộ lọc hợp lệ. Khách có thể bỏ từng bộ lọc hoặc xóa toàn bộ. Khoảng giá sai, giá âm, kiểu dữ liệu sai và sắp xếp ngoài danh sách trả 422. Trang HTML giữ giá trị đã nhập và hiển thị lỗi tiếng Việt.
 - `composer ci:check` đạt Pint, PHPStan và 86 test SQLite với 710 assertion. Bộ MySQL cô lập đạt 12 test với 172 assertion. Bộ lọc chỉ phát sinh SELECT trong kiểm thử với tài khoản khách hàng. `npm run build` thành công. Brave ở 360 px và 1280 px xác nhận lọc kết hợp, phân trang, giữ query khi quay lại, bỏ bộ lọc và sửa khoảng giá sai. Các trang thử không cuộn ngang toàn trang.
 
-### UC10 đã kiểm thử, chờ nghiệm thu
+### UC10 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC10 tại commit `0844e5a`. Nhánh `feature/drink-customization` được tích hợp vào `develop` tại merge commit `323f06b`. Pint, PHPStan, 92 test SQLite, 13 test MySQL và bản build đều đạt khi kiểm tra lại trước merge.
 
 - Trang chi tiết món cho phép khách vãng lai và khách hàng chọn size, mức đường/đá cho món hỗ trợ, và topping đang bán được gắn với món. Mặc định là size đang bán rẻ nhất, đường/đá tiêu chuẩn nếu có và chưa chọn topping.
 - Máy chủ tính giá một ly bằng giá size cộng giá các topping. Các mức đường/đá của món pha theo công thức được chuẩn hóa thành `null` và ID topping được sắp xếp. Mỗi cập nhật đọc lại tùy chọn hiện hành, từ chối lựa chọn sai hoặc đã ngừng bán và cho phép làm mới. UC10 chưa ghi giỏ và không cần migration.
@@ -137,5 +139,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC10 chờ nghiệm thu và tích hợp vào `develop` trước khi triển khai UC11.
+- UC11 đã đủ phụ thuộc để triển khai từ `develop`.
 - Các module giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
