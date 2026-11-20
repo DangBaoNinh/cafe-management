@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(fn (User $user): ?bool => $user->is_active ? null : false);
         Gate::define('manage-delivery-addresses', fn (User $user): bool => $user->role === UserRole::Customer);
         Gate::define('manage-cart', fn (User $user): bool => $user->role === UserRole::Customer);
+        Gate::define('view-own-orders', fn (User $user): bool => $user->role === UserRole::Customer);
         Gate::define('access-admin', fn (User $user): bool => $user->role === UserRole::Admin);
         Gate::define('operate-orders', fn (User $user): bool => in_array(
             $user->role,

@@ -7,6 +7,9 @@
             @can('manage-delivery-addresses')
                 <flux:button :href="route('addresses.index')" wire:navigate>Địa chỉ giao hàng</flux:button>
             @endcan
+            @can('view-own-orders')
+                <flux:button :href="route('orders.index')">Đơn của tôi</flux:button>
+            @endcan
         </div>
     </section>
 </x-layouts::app>

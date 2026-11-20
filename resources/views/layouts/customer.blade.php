@@ -18,6 +18,11 @@
                                 @if (request()->routeIs('cart.*')) aria-current="page" @endif
                                 class="hover:underline aria-[current=page]:underline">Giỏ hàng</a>
                         @endcan
+                        @can('view-own-orders')
+                            <a href="{{ route('orders.index') }}"
+                                @if (request()->routeIs('orders.*')) aria-current="page" @endif
+                                class="hover:underline aria-[current=page]:underline">Đơn của tôi</a>
+                        @endcan
                         <a href="{{ route('dashboard') }}" class="hover:underline">Tài khoản</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
