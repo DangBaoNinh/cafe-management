@@ -133,7 +133,9 @@
 - Migration ba bảng giỏ đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 97 bài SQLite với 889 assertion. Bộ MySQL cô lập đạt 14 bài với 200 assertion, gồm ràng buộc một giỏ mỗi khách, số lượng dương và hoàn tác cả dòng lẫn topping khi lỗi. `npm run build` thành công.
 - Trình duyệt với dữ liệu SQLite cô lập xác nhận khách được dẫn tới đăng nhập và quay lại món. Thêm hai ly có topping cho tạm tính 86.000 ₫, cập nhật thành ba ly lên 129.000 ₫, xóa dòng cuối về 0 ₫.
 
-### UC12 đã triển khai cấu hình và xem trước phí
+### UC12 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC12 tại commit `4bce245`. Nhánh `feature/delivery-settings` được tích hợp vào `develop` tại merge commit `56f1a88`. Pint, PHPStan, 101 bài SQLite, 15 bài MySQL và bản build đều đạt khi kiểm tra lại trước merge.
 
 - Admin cập nhật cấu hình duy nhất tại `/admin/delivery-settings`, chọn quận/huyện theo danh mục địa chỉ UC03 và nhập phí cố định từ 0 đến 4.294.967.295 VND. Mặc định tắt giao hàng. Backend từ chối mã sai, mã trùng, danh sách trống khi bật giao và biểu mẫu cũ.
 - Khách xem phí tại `/cart/delivery` theo địa chỉ đã lưu của mình. Khi giao bị tắt hoặc địa chỉ ngoài vùng, khách được hướng dẫn nhận tại quán với phí 0 ₫.
