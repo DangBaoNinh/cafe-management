@@ -13,6 +13,11 @@
                         @if (request()->routeIs('menu.*')) aria-current="true" @endif
                         class="hover:underline aria-[current=true]:underline">Thực đơn</a>
                     @auth
+                        @can('manage-cart')
+                            <a href="{{ route('cart.index') }}"
+                                @if (request()->routeIs('cart.*')) aria-current="page" @endif
+                                class="hover:underline aria-[current=page]:underline">Giỏ hàng</a>
+                        @endcan
                         <a href="{{ route('dashboard') }}" class="hover:underline">Tài khoản</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

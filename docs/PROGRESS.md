@@ -124,6 +124,13 @@
 - Máy chủ tính giá một ly bằng giá size cộng giá các topping. Các mức đường/đá của món pha theo công thức được chuẩn hóa thành `null` và ID topping được sắp xếp. Mỗi cập nhật đọc lại tùy chọn hiện hành, từ chối lựa chọn sai hoặc đã ngừng bán và cho phép làm mới. UC10 chưa ghi giỏ và không cần migration.
 - `composer ci:check` đạt Pint, PHPStan và 92 test SQLite với 758 assertion. Bộ MySQL cô lập đạt 13 test với 183 assertion. `npm run build` thành công. Brave ở 360 px và 1280 px xác nhận giá cập nhật khi đổi size, thêm/bỏ hai topping, đổi đường/đá và làm mới sau khi topping ngừng bán. Trang chi tiết không cuộn ngang toàn trang.
 
+### UC11 đã kiểm chứng, chờ nghiệm thu
+
+- Khách thêm món từ trang chi tiết và quản lý số lượng hoặc xóa dòng tại `/cart`. Mỗi khách có tối đa một giỏ, được tạo ở lần thêm thành công đầu tiên. Cấu hình trùng size, đường, đá và tập topping được gộp dù thứ tự topping khác nhau. Số lượng mỗi dòng từ 1 đến 65.535 theo giới hạn cột lưu trữ.
+- Máy chủ định giá theo size và topping còn bán. Giỏ đánh dấu dòng có cấu hình hết hiệu lực, loại dòng đó khỏi tạm tính và vẫn cho phép xóa. Cập nhật và xóa kiểm tra phiên bản trong giao dịch khóa giỏ, từ chối yêu cầu cũ và kiểm tra dòng thuộc giỏ của khách.
+- Migration ba bảng giỏ đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 97 bài SQLite với 889 assertion. Bộ MySQL cô lập đạt 14 bài với 200 assertion, gồm ràng buộc một giỏ mỗi khách, số lượng dương và hoàn tác cả dòng lẫn topping khi lỗi. `npm run build` thành công.
+- Trình duyệt với dữ liệu SQLite cô lập xác nhận khách được dẫn tới đăng nhập và quay lại món. Thêm hai ly có topping cho tạm tính 86.000 ₫, cập nhật thành ba ly lên 129.000 ₫, xóa dòng cuối về 0 ₫.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -139,5 +146,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC11 đã đủ phụ thuộc để triển khai từ `develop`.
-- Các module giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
+- UC11 chờ nghiệm thu trên `feature/shopping-cart`.
+- Checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
