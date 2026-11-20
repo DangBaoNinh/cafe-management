@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DeliverySettingsController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductOptionController;
@@ -30,6 +31,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::get('delivery-settings', [DeliverySettingsController::class, 'edit'])->name('delivery-settings.edit');
     Route::patch('delivery-settings', [DeliverySettingsController::class, 'update'])->name('delivery-settings.update');
     Route::resource('categories', CategoryController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::resource('coupons', CouponController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     Route::resource('products', ProductController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     Route::resource('toppings', ToppingController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     Route::resource('products.sizes', ProductSizeController::class)->only(['create', 'store', 'edit', 'update'])->scoped();

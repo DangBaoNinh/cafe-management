@@ -142,6 +142,13 @@
 - Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 101 bài SQLite với 986 assertion. Bộ MySQL cô lập đạt 15 bài với 218 assertion, gồm kiểm tra giữ số 0 đầu mã quận, phí biên và từ chối phiên bản cũ. `npm run build` thành công.
 - Dịch vụ tính phí đã sẵn sàng cho UC14. Checkout cần lấy phí hiện hành khi chốt, lưu vào đơn và kiểm thử rằng đổi cấu hình không đổi phí của đơn đã tạo.
 
+### UC13 đã triển khai quản lý mã và tính giảm
+
+- Admin tạo, sửa và tắt mã tại `/admin/coupons`. Code chuẩn hóa chữ hoa và duy nhất. Mốc hiệu lực nhập theo giờ Việt Nam, lưu UTC. Mã có hiệu lực từ thời điểm bắt đầu đến trước thời điểm kết thúc.
+- Hỗ trợ giảm số tiền cố định hoặc phần trăm nguyên từ 1 đến 100, ngưỡng tạm tính, trần giảm cho phần trăm và giới hạn tổng lượt hoặc lượt mỗi khách. Mức giảm phần trăm làm tròn xuống và tiền giảm không vượt tạm tính.
+- Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 106 bài SQLite với 1.098 assertion. Bộ MySQL cô lập đạt 16 bài với 233 assertion, gồm lưu UTC và khóa duy nhất cho code khác hoa/thường. `npm run build` thành công.
+- UC14 sẽ đếm lượt từ đơn còn hiệu lực theo BR10, khóa bản ghi mã trong giao dịch checkout và lưu snapshot vào đơn. Kịch bản hai checkout tranh lượt cuối cần kiểm tra qua luồng đó.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
