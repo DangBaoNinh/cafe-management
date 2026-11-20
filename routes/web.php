@@ -6,9 +6,12 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductOptionController;
 use App\Http\Controllers\Admin\ProductSizeController;
 use App\Http\Controllers\Admin\ToppingController;
+use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'customer.home')->name('home');
+Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
+Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
 
 Route::view('dashboard', 'customer.account')->middleware('auth')->name('dashboard');
 

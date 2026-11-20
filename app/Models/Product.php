@@ -63,6 +63,13 @@ class Product extends Model
         $query->whereHas('category', fn (Builder $category) => $category->active());
     }
 
+    /** @param Builder<Product> $query */
+    #[Scope]
+    protected function visibleInCatalog(Builder $query): void
+    {
+        $query->active()->inActiveCategory()->has('activeSizes');
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {
