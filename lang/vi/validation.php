@@ -7,10 +7,13 @@ return [
     'email' => 'Vui lòng nhập địa chỉ email hợp lệ.',
     'enum' => 'Lựa chọn :attribute không hợp lệ.',
     'in' => 'Lựa chọn :attribute không hợp lệ.',
+    'integer' => 'Trường :attribute phải là số nguyên.',
     'max' => [
+        'numeric' => 'Trường :attribute không được lớn hơn :max.',
         'string' => 'Trường :attribute không được dài quá :max ký tự.',
     ],
     'min' => [
+        'numeric' => 'Trường :attribute phải từ :min trở lên.',
         'string' => 'Trường :attribute phải có ít nhất :min ký tự.',
     ],
     'password' => [

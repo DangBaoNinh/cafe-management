@@ -9,6 +9,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="font-semibold">{{ config('app.name') }} · Quản trị</a>
                 <div class="flex flex-wrap gap-4 text-sm">
                     <a href="{{ route('admin.accounts.index') }}" class="hover:underline">Quản lý tài khoản</a>
+                    <a href="{{ route('admin.categories.index') }}" class="hover:underline">Quản lý danh mục</a>
                     <a href="{{ route('home') }}" class="hover:underline">Về trang chủ</a>
                 </div>
             </nav>
