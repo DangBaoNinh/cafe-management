@@ -116,6 +116,12 @@
 - Phân trang và liên kết quay về từ trang món giữ bộ lọc hợp lệ. Khách có thể bỏ từng bộ lọc hoặc xóa toàn bộ. Khoảng giá sai, giá âm, kiểu dữ liệu sai và sắp xếp ngoài danh sách trả 422. Trang HTML giữ giá trị đã nhập và hiển thị lỗi tiếng Việt.
 - `composer ci:check` đạt Pint, PHPStan và 86 test SQLite với 710 assertion. Bộ MySQL cô lập đạt 12 test với 172 assertion. Bộ lọc chỉ phát sinh SELECT trong kiểm thử với tài khoản khách hàng. `npm run build` thành công. Brave ở 360 px và 1280 px xác nhận lọc kết hợp, phân trang, giữ query khi quay lại, bỏ bộ lọc và sửa khoảng giá sai. Các trang thử không cuộn ngang toàn trang.
 
+### UC10 đã kiểm thử, chờ nghiệm thu
+
+- Trang chi tiết món cho phép khách vãng lai và khách hàng chọn size, mức đường/đá cho món hỗ trợ, và topping đang bán được gắn với món. Mặc định là size đang bán rẻ nhất, đường/đá tiêu chuẩn nếu có và chưa chọn topping.
+- Máy chủ tính giá một ly bằng giá size cộng giá các topping. Các mức đường/đá của món pha theo công thức được chuẩn hóa thành `null` và ID topping được sắp xếp. Mỗi cập nhật đọc lại tùy chọn hiện hành, từ chối lựa chọn sai hoặc đã ngừng bán và cho phép làm mới. UC10 chưa ghi giỏ và không cần migration.
+- `composer ci:check` đạt Pint, PHPStan và 92 test SQLite với 758 assertion. Bộ MySQL cô lập đạt 13 test với 183 assertion. `npm run build` thành công. Brave ở 360 px và 1280 px xác nhận giá cập nhật khi đổi size, thêm/bỏ hai topping, đổi đường/đá và làm mới sau khi topping ngừng bán. Trang chi tiết không cuộn ngang toàn trang.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -131,5 +137,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC10 đã đủ phụ thuộc để triển khai từ `develop`.
-- Các module tùy chỉnh đồ uống, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
+- UC10 chờ nghiệm thu và tích hợp vào `develop` trước khi triển khai UC11.
+- Các module giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.

@@ -18,17 +18,7 @@
                     <p class="whitespace-pre-line leading-relaxed wrap-anywhere">{{ $product->description }}</p>
                 @endif
 
-                <section aria-labelledby="size-heading" class="space-y-2">
-                    <h2 id="size-heading" class="text-lg font-semibold">Size và giá</h2>
-                    <dl class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white px-4">
-                        @foreach ($sizes as $size)
-                            <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3 text-sm">
-                                <dt class="min-w-0 wrap-anywhere">{{ $size->label }}</dt>
-                                <dd class="font-medium tabular-nums">{{ number_format($size->price_vnd, 0, ',', '.') }} ₫</dd>
-                            </div>
-                        @endforeach
-                    </dl>
-                </section>
+                <livewire:drink-customizer :product="$product" />
             </div>
         </div>
     </article>
