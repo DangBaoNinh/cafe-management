@@ -177,6 +177,35 @@ class CheckoutTest extends TestCase
         $this->get(route('checkout.create'))->assertRedirectToRoute('cart.index');
     }
 
+    public function test_outside_area_error_appears_once_below_saved_address_and_keeps_the_cart(): void
+    {
+        [$user] = $this->basket();
+        $address = $this->address($user, '761', '26764');
+        $this->delivery();
+        $cart = $user->cart()->sole();
+        $message = 'Địa chỉ chưa được hỗ trợ giao hàng. Vui lòng chọn địa chỉ khác hoặc nhận tại quán.';
+
+        $response = $this->actingAs($user)->followingRedirects()->post(route('checkout.review'), $this->details([
+            'fulfillment_type' => 'delivery', 'address_id' => $address->id,
+        ]))->assertOk()->assertSee('Địa chỉ đã lưu')->assertSee($message);
+
+        $this->assertSame(1, substr_count($response->getContent(), $message), 'The address error should be rendered once.');
+        $response->assertDontSeeHtml('<li>'.$message.'</li>');
+        $this->assertDatabaseCount('orders', 0);
+        $this->assertSame(1, $cart->refresh()->version);
+        $this->assertSame(2, $cart->items()->sole()->quantity);
+    }
+
+    public function test_missing_address_keeps_its_error_in_the_summary_when_there_is_no_select(): void
+    {
+        [$user] = $this->basket(withAddress: false);
+        $this->actingAs($user)->followingRedirects()->post(route('checkout.review'), $this->details([
+            'fulfillment_type' => 'delivery',
+        ]))->assertOk()
+            ->assertSee('thêm địa chỉ giao hàng')
+            ->assertSeeHtml('<li>'.__('validation.required', ['attribute' => 'địa chỉ giao hàng']).'</li>');
+    }
+
     public function test_failed_write_rolls_back_order_payment_histories_and_cart_deletion(): void
     {
         [$user] = $this->basket();
@@ -252,7 +281,7 @@ class CheckoutTest extends TestCase
         ];
     }
 
-    private function basket(): array
+    private function basket(bool $withAddress = true): array
     {
         $user = User::factory()->create();
         $category = Category::create(['name' => 'Cà phê', 'slug' => 'ca-phe-'.$user->id]);
@@ -264,7 +293,7 @@ class CheckoutTest extends TestCase
             'size_id' => $size->id, 'ice_level' => 'less', 'topping_ids' => [$topping->id],
         ], 2);
 
-        return [$user, $product, $topping, $this->address($user)];
+        return [$user, $product, $topping, $withAddress ? $this->address($user) : null];
     }
 
     private function address(User $user, string $district = '760', string $ward = '26734'): UserAddress

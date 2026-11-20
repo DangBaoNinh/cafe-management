@@ -7,6 +7,11 @@
     $fulfillment = old('fulfillment_type', 'pickup');
     $method = old('method', 'cod');
     $addressId = old('address_id');
+    $inlineErrorFields = ['recipient_name', 'phone', 'fulfillment_type', 'method', 'coupon_code'];
+    if ($addresses->isNotEmpty()) {
+        $inlineErrorFields[] = 'address_id';
+    }
+    $summaryErrors = collect($errors->getMessages())->except($inlineErrorFields)->flatten();
 @endphp
 
 <x-layouts::customer title="Đặt hàng">
@@ -14,9 +19,9 @@
         <flux:link :href="route('cart.index')">Về giỏ hàng</flux:link>
         <h1 class="text-3xl font-semibold tracking-tight">Đặt hàng</h1>
 
-        @if ($errors->any())
+        @if ($summaryErrors->isNotEmpty())
             <ul role="alert" class="space-y-1 rounded-lg border border-red-200 bg-white p-4 text-sm text-red-800">
-                @foreach ($errors->all() as $message)
+                @foreach ($summaryErrors as $message)
                     <li>{{ $message }}</li>
                 @endforeach
             </ul>
