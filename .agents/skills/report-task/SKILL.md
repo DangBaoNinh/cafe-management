@@ -11,6 +11,8 @@ Kết thúc nhiệm vụ bằng báo cáo tiếng Việt trong hội thoại, k�
 
 Ghi mã nhiệm vụ hoặc UC nếu có, tên, mục tiêu và một trạng thái **Hoàn thành**, **Hoàn thành một phần**, **Bị chặn** hoặc **Chưa thực hiện**. Chỉ ghi UC hoàn thành khi đáp ứng tiêu chí chấp nhận.
 
+Với nhiệm vụ trong Git, ghi nhánh hiện tại, nhánh cơ sở, hash của các commit thuộc nhiệm vụ, trạng thái working tree và trạng thái merge vào `main` (**Chưa merge**, **Đã merge** hoặc **Không áp dụng**). Dựa vào trạng thái Git thực tế. Ghi rõ thay đổi chưa commit và chỉ báo **Đã merge** khi kết quả nhiệm vụ đã có trong `main`. Nếu không xác định được nhánh cơ sở, ghi rõ.
+
 ## 2. CÔNG VIỆC ĐÃ THỰC HIỆN
 
 Liệt kê công việc thực tế. Nêu rõ chức năng đã hoàn chỉnh và chức năng mới triển khai một phần. Để công việc dự kiến ở mục 7.
