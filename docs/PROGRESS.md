@@ -7,7 +7,8 @@
 - Tạo schema `coffee_shop` trên MySQL 8.4.3 với `utf8mb4`. Đã chạy ba migration nền cho người dùng, cache và hàng đợi, gồm bảng session và token đặt lại mật khẩu.
 - Có trang chủ, layout khách hàng, khu vực tài khoản với hồ sơ Livewire và layout riêng tại `/admin`. Route quản trị hiện yêu cầu đăng nhập và từ chối quyền truy cập của tài khoản khách hàng.
 - Dùng Fortify cho xác thực bằng email và mật khẩu. Email đặt lại mật khẩu được ghi vào log ở môi trường local.
-- Khởi tạo Git trên nhánh `main`. Git bỏ qua `.env`, biến thể cục bộ của `.env`, `vendor`, `node_modules`, file build và log.
+- Đã commit nền tảng Laravel trên `main` tại `571f166`. Git bỏ qua `.env`, biến thể cục bộ của `.env`, `vendor`, `node_modules`, file build và log.
+- Đã tạo `develop` từ commit nền. Quy trình Git Flow được chuẩn bị trên `chore/gitflow-setup` để review và tích hợp vào `develop`.
 
 ## Kết quả kiểm tra
 
@@ -21,6 +22,7 @@
 
 ## Việc còn lại
 
-- Git chưa có `user.name` và `user.email`, nên initial commit chưa được tạo. Có thể đặt hai giá trị ở phạm vi repository rồi commit. Repository chưa có remote.
+- Tích hợp `chore/gitflow-setup` vào `develop` khi có yêu cầu. Sau đó chuẩn bị lại nhánh `docs/system-design` từ `develop` để bắt đầu phân tích, thiết kế cơ sở dữ liệu và đặc tả Use Case.
+- Khi cần tự commit, cấu hình `user.name` và `user.email` ở phạm vi repository. Repository chưa có remote.
 - Việc gửi email thật cần thông tin SMTP. Kiểm tra hiện tại dùng mailer `log`.
 - Phân quyền Admin, Staff, Customer và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.

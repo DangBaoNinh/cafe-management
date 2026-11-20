@@ -5,10 +5,12 @@ description: Kiểm thử hoặc rà soát một Use Case Coffee Shop đã tri�
 
 # Kiểm thử và rà soát Use Case
 
+Xác nhận nhánh công việc, checkout và working tree. So sánh thay đổi với nhánh cơ sở theo `docs/GIT_WORKFLOW.md`, thường là `develop` cho UC. Dùng `git diff develop...HEAD` nếu cơ sở là `develop` và kiểm tra cả thay đổi chưa commit khi chúng thuộc phạm vi rà soát.
+
 1. Đọc đặc tả UC và tiêu chí chấp nhận. Đối chiếu các quy tắc liên quan trong `docs/BUSINESS_RULES.md` nếu có. Xác định route hoặc action thực tế, tác nhân và dữ liệu thử cần thiết.
 2. Đối chiếu từng tiêu chí với mã nguồn và bằng chứng kiểm thử. Kiểm tra luồng chính, luồng thay thế và ngoại lệ. Thử dữ liệu sai, tác nhân thiếu quyền và truy cập tài nguyên của người dùng khác nếu có liên quan. Rà soát các biện pháp bảo mật áp dụng cho luồng.
 3. Kiểm tra dữ liệu được ghi, điều kiện chuyển trạng thái và tính nhất quán sau thành công hoặc thất bại. Khi UC có transaction, kiểm tra việc hoàn tác khi ghi dở dang. Dùng dữ liệu kiểm thử cô lập.
-4. Chạy các bài PHPUnit, Livewire hoặc kiểm tra HTTP phù hợp với điểm vào và rủi ro của UC. Ghi lệnh hoặc kịch bản đã chạy cùng kết quả.
+4. Chạy các bài PHPUnit, Livewire hoặc kiểm tra HTTP phù hợp với điểm vào và rủi ro của UC. Ghi lệnh hoặc kịch bản đã chạy cùng kết quả. Chỉ đề xuất merge khi có bằng chứng đáp ứng tiêu chí chấp nhận và các bài kiểm thử bắt buộc đều đạt.
 5. Ghi lỗi theo mức độ ảnh hưởng, vị trí `file:dòng` hoặc route/action, điều kiện và các bước tái hiện, kết quả mong đợi và kết quả thực tế. Với mỗi tiêu chí, ghi **Đạt**, **Không đạt** hoặc **Chưa kiểm chứng** và nêu bằng chứng hoặc lý do.
 6. After completing the workflow, apply the `report-task` skill to generate the standardized completion report.
 

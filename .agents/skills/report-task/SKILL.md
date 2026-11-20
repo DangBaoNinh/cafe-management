@@ -11,6 +11,8 @@ Kết thúc nhiệm vụ bằng báo cáo tiếng Việt trong hội thoại, k�
 
 Ghi mã nhiệm vụ hoặc UC nếu có, tên, mục tiêu và một trạng thái **Hoàn thành**, **Hoàn thành một phần**, **Bị chặn** hoặc **Chưa thực hiện**. Chỉ ghi UC hoàn thành khi đáp ứng tiêu chí chấp nhận.
 
+Với nhiệm vụ dùng Git, ghi nhánh hiện tại, nhánh cơ sở, hash commit của nhiệm vụ, trạng thái working tree và thay đổi chưa commit nếu có. Ghi nhánh đích dự kiến theo Git Flow và trạng thái **Chưa merge**, **Đã merge** hoặc **Không áp dụng** đối với nhánh đích. Chỉ ghi **Đã merge** khi đã xác minh. Nếu có nhiều nhánh đích, ghi trạng thái cho từng nhánh.
+
 ## 2. CÔNG VIỆC ĐÃ THỰC HIỆN
 
 Liệt kê công việc thực tế. Nêu rõ chức năng đã hoàn chỉnh và chức năng mới triển khai một phần. Để công việc dự kiến ở mục 7.
@@ -45,3 +47,5 @@ Khi có nội dung cần người dùng kiểm tra, ghi cách khởi chạy, URL
 ## 7. CÔNG VIỆC TIẾP THEO
 
 Ghi bước hợp lý tiếp theo theo kế hoạch hiện tại và các phụ thuộc hoặc điều kiện cần có. Thực hiện bước đó khi người dùng yêu cầu.
+
+Nếu đang chờ merge, ghi điều kiện còn thiếu như review, kiểm thử bắt buộc hoặc yêu cầu merge của người dùng. Dựa vào kết quả thực tế ở mục 4.
