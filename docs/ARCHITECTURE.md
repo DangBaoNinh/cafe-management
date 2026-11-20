@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | Cửa hàng và tài khoản | Menu công khai, trang tài khoản, giỏ, checkout, đơn của tôi | Hiển thị tiếng Việt và điều phối yêu cầu của khách. |
 | Nhân viên | Khu vận hành đơn có middleware phù hợp | Tiếp nhận, cập nhật pha chế, bàn giao và ghi nhận thanh toán. |
-| Quản trị | Khu `/admin` được mở qua policy/gate khi TECH02 đạt | Cấu hình, quản lý danh mục và vai trò, quản trị đơn, tra cứu và báo cáo. |
+| Quản trị | Khu `/admin` yêu cầu gate `access-admin` | Cấu hình, quản lý danh mục và vai trò, quản trị đơn, tra cứu và báo cáo. |
 | Laravel application | Controller hoặc action Livewire, Form Request/validation, Policy | Kiểm tra dữ liệu và quyền phía máy chủ, kể cả gọi action trực tiếp. |
 | Nghiệp vụ và dữ liệu | Service/Action cần dùng chung, Eloquent, MySQL | Tính tổng, checkout, chuyển trạng thái và truy vấn; quản lý transaction và snapshot. |
 
@@ -18,6 +18,12 @@
 - Checkout và mọi điểm hiển thị tổng tiền dùng cùng cách tính phía máy chủ. Thanh toán thủ công được biểu diễn bằng method và trạng thái dữ liệu. Tích hợp thật chỉ bổ sung adapter khi UC24 hoặc UC25 được chọn.
 - Session, CSRF và rate limiting dùng cơ chế Laravel. Tài khoản tự đăng ký nhận quyền khách hàng. Vai trò và trạng thái hoạt động được kiểm tra trên mỗi thao tác bảo vệ. Lịch sử đơn và payment hạn chế hiển thị theo vai trò.
 - Vite bundle assets. File ảnh công khai đi qua Laravel filesystem, giới hạn loại, dung lượng và tên file do server tạo. Bí mật chuyển khoản tích hợp tương lai, mail và cấu hình truy cập đặt trong môi trường.
+
+### Nền tảng phân quyền TECH02
+
+- `users.role` nhận `customer`, `staff` hoặc `admin`. Mặc định của bản ghi cũ và đăng ký mới là `customer` đang hoạt động. Laravel chỉ nạp tài khoản đang hoạt động khi đăng nhập, đọc phiên, đọc cookie ghi nhớ hoặc tra tài khoản để đặt lại mật khẩu. Khi tài khoản đang khóa, phiên đã có cũng bị từ chối ở yêu cầu bảo vệ kế tiếp, kể cả cập nhật Livewire.
+- Dùng `access-admin` cho khu quản trị và `operate-orders` cho luồng vận hành dành cho staff hoặc admin đang hoạt động. Các UC tiếp theo kiểm tra thêm chủ sở hữu, bản ghi và trạng thái nghiệp vụ bằng policy phù hợp.
+- Sau khi chạy `php artisan migrate`, người vận hành có quyền terminal có thể chạy `php artisan admin:bootstrap "Tên quản trị viên" "admin@example.test"` với email chưa đăng ký. Lệnh hỏi và xác nhận mật khẩu ẩn tối thiểu 12 ký tự. Lệnh dùng kho cache cơ sở dữ liệu để khóa lần khởi tạo và từ chối khi hệ thống đã có admin, kể cả admin đang khóa. Luồng phân quyền tài khoản sau khởi tạo thuộc UC04.
 
 ## 3. Quyết định thiết kế
 
