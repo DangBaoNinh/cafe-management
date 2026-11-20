@@ -1,6 +1,6 @@
 # Quy tắc nghiệp vụ Coffee Shop
 
-Mỗi quy tắc có mã ổn định để đặc tả UC tham chiếu. Những giá trị phụ thuộc quyết định của cửa hàng được liệt kê tại [Q01–Q05](BUSINESS_ANALYSIS.md#6-quyết-định-cần-xác-nhận).
+Mỗi quy tắc có mã ổn định để đặc tả UC tham chiếu. Các quyết định nghiệp vụ đã nghiệm thu và thông số cấu hình còn cần điền được ghi tại [Q01–Q05](BUSINESS_ANALYSIS.md#6-quyết-định-nghiệp-vụ-đã-xác-nhận).
 
 | Mã | Quy tắc |
 | --- | --- |
@@ -8,7 +8,7 @@ Mỗi quy tắc có mã ổn định để đặc tả UC tham chiếu. Những 
 | BR02 | Mỗi tài khoản có đúng một vai trò `customer`, `staff` hoặc `admin` và trạng thái hoạt động. Tự đăng ký mặc định là customer. Admin đang hoạt động phân quyền, không tự hạ vai trò hoặc khóa mình. Bảo vệ admin hoạt động cuối cùng. |
 | BR03 | Địa chỉ thuộc một khách. Khách có thể đặt một địa chỉ mặc định. Địa chỉ được sao chép vào đơn giao tại checkout để thay đổi hồ sơ sau này không sửa đơn. |
 | BR04 | Menu chỉ hiện danh mục và sản phẩm hoạt động với ít nhất một size hoạt động. Sản phẩm hoặc tùy chọn đã có lịch sử được ngừng bán thay cho xóa dữ liệu liên quan. |
-| BR05 | Mỗi dòng món chọn một size hợp lệ. Mức đường và đá dự kiến là `none`, `less`, `standard`, `extra` khi món cho phép. Nếu không cho chọn, lưu null và dùng cách pha của món. Topping phải hoạt động và được gắn cho món. Mỗi loại topping tối đa một phần trên một ly theo Q02. |
+| BR05 | Mỗi dòng món chọn một size hợp lệ. Mức đường và đá là `none`, `less`, `standard`, `extra` khi món cho phép. Nếu không cho chọn, lưu null và dùng cách pha của món. Topping phải hoạt động và được gắn cho món. Mỗi loại topping tối đa một phần trên một ly theo Q02. |
 | BR06 | Tiền dùng số nguyên VND. Giá dòng là `số lượng × (giá size + tổng giá topping)`. Size có giá bán đầy đủ. Đường và đá không cộng giá. Tổng đơn là `tạm tính - giảm giá + phí giao` và không âm. |
 | BR07 | Mỗi khách có một giỏ. Dòng cùng món, size, đường, đá và tập topping chuẩn hóa được cộng số lượng. Giỏ có phiên bản, giá xem trước và được kiểm tra lại trước khi chốt. |
 | BR08 | Đơn giao yêu cầu tên, điện thoại, địa chỉ hợp lệ và vùng hỗ trợ. Phí dùng mức cấu hình tại lúc đặt. Đơn nhận tại quán dùng tên và điện thoại, không gửi địa chỉ giao và có phí 0. |

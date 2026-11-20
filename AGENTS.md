@@ -17,7 +17,7 @@ Chỉ đọc phần tài liệu liên quan đến yêu cầu hiện tại.
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md) ghi phạm vi và thứ tự các giai đoạn.
 - [Tiến độ](docs/PROGRESS.md) ghi phần đã triển khai, kết quả kiểm tra thực tế và việc còn lại.
 - [Sổ công việc](docs/USE_CASE_TASKS.md) chứa mã, trạng thái, phụ thuộc, đặc tả và nhánh của từng UC hoặc nhiệm vụ kỹ thuật.
-- [Quy tắc nghiệp vụ](docs/BUSINESS_RULES.md) là nguồn quy tắc dùng chung. [Phân tích nghiệp vụ](docs/BUSINESS_ANALYSIS.md) ghi phạm vi và quyết định cần xác nhận.
+- [Quy tắc nghiệp vụ](docs/BUSINESS_RULES.md) là nguồn quy tắc dùng chung. [Phân tích nghiệp vụ](docs/BUSINESS_ANALYSIS.md) ghi phạm vi và các quyết định đã nghiệm thu.
 - [Đặc tả Use Case](docs/use-cases/) mô tả luồng và tiêu chí chấp nhận của từng UC. Dùng [mẫu đặc tả](docs/use-cases/UC_TEMPLATE.md) khi soạn UC mới.
 
 Ưu tiên `$implement-use-case` khi được giao triển khai UC và `$verify-use-case` khi được giao kiểm thử hoặc rà soát UC đã triển khai.

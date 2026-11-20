@@ -47,9 +47,11 @@ MVP phục vụ **một cửa hàng**, dùng VND và thời gian nghiệp vụ t
 | Hiệu năng và truy vết | Phân trang danh sách, eager load quan hệ và dùng chỉ mục theo truy vấn. Kiểm tra EXPLAIN trên dữ liệu đại diện và lịch sử có tác nhân, thời điểm, lý do. |
 | Vận hành | Kiểm tra migrate trên database thử nghiệm có dữ liệu mẫu, khôi phục bản sao lưu thử và cấu hình mail/HTTPS theo môi trường trước demo. |
 
-## 6. Quyết định cần xác nhận
+## 6. Quyết định nghiệp vụ đã xác nhận
 
-| Mã | Cần xác nhận | Giả định thiết kế để review |
+Người dùng đã nghiệm thu bộ thiết kế Task 02 và xác nhận các phương án MVP dưới đây ngày 20/11/2026.
+
+| Mã | Nội dung | Phương án MVP đã xác nhận |
 | --- | --- | --- |
 | Q01 | Khu vực giao, biểu phí và lịch nhận đơn | Danh sách quận/huyện cấu hình, một phí giao cố định, nhận tại quán phí 0 và chưa đặt theo khung giờ. |
 | Q02 | Mức đường, đá và giới hạn topping | Mức enum cố định, topping tối đa một phần mỗi loại. Sản phẩm đánh dấu có cho chọn đường/đá. |
@@ -57,7 +59,9 @@ MVP phục vụ **một cửa hàng**, dùng VND và thời gian nghiệp vụ t
 | Q04 | Chính sách khuyến mãi và hủy | Một mã trên một đơn, giới hạn tổng/lượt mỗi khách tùy mã. Khách hủy ở trạng thái chờ xác nhận. |
 | Q05 | Công thức doanh thu dùng khi nghiệm thu | Doanh thu thanh toán của đơn đã hoàn tất, theo ngày hoàn tất, tách doanh số món, giảm giá và phí giao. |
 
-Các giả định là đầu vào review. Cần xác nhận riêng thời hạn lưu dữ liệu và cách xử lý yêu cầu xóa tài khoản theo BR20. Khi có quyết định mới, cập nhật quy tắc, UC liên quan và thiết kế dữ liệu cùng nhau.
+Phương án của BR20 cũng được xác nhận cho MVP. Tạm chặn tự xóa tài khoản để bảo toàn lịch sử giao dịch. Thời hạn lưu dữ liệu và quy trình xử lý yêu cầu xóa sẽ được chốt khi mở rộng chức năng này.
+
+Điền danh sách vùng giao thực tế, mức phí và thông tin tài khoản nhận chuyển khoản khi cấu hình cửa hàng. Các thông số này không thay đổi quy tắc MVP đã nghiệm thu. Khi thay đổi quy tắc, cập nhật các UC liên quan và thiết kế dữ liệu cùng nhau.
 
 ## 7. Nguồn đặc tả
 

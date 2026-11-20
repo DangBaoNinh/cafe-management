@@ -13,7 +13,7 @@ Danh sách dưới đây quản lý nhánh, phụ thuộc và trạng thái. Có
 | ACCEPTED | Người dùng đã nghiệm thu và commit đã được tích hợp vào develop. |
 | BLOCKED | Đang bị chặn. Ghi lý do, dependency và cách tháo gỡ trong PROGRESS. |
 
-P0 là luồng lõi hoặc điều kiện bắt buộc. P1 là nghiệp vụ MVP hoàn thiện sau nền tảng. P2 là mở rộng triển khai khi được giao. Phụ thuộc phải có đầu ra đủ và đã được xác minh trên cơ sở dùng để triển khai. Nếu chưa dùng được từ develop, báo mã việc chặn và chờ người dùng. Chi tiết các quyết định Q01–Q05 nằm trong [phân tích nghiệp vụ](BUSINESS_ANALYSIS.md#6-quyết-định-cần-xác-nhận).
+P0 là luồng lõi hoặc điều kiện bắt buộc. P1 là nghiệp vụ MVP hoàn thiện sau nền tảng. P2 là mở rộng triển khai khi được giao. Phụ thuộc phải có đầu ra đủ và đã được xác minh trên cơ sở dùng để triển khai. Nếu chưa dùng được từ develop, báo mã việc chặn và chờ người dùng. Xem [các quyết định Q01–Q05 đã nghiệm thu](BUSINESS_ANALYSIS.md#6-quyết-định-nghiệp-vụ-đã-xác-nhận). Trạng thái từng UC chỉ thay đổi theo kết quả triển khai, kiểm thử và tích hợp UC đó.
 
 ## Nhiệm vụ kỹ thuật
 
