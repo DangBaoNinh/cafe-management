@@ -28,10 +28,15 @@
                                 @endunless
                             </td>
                             <td class="p-4">{{ $product->is_active ? 'Đang hoạt động' : 'Ngừng bán' }}</td>
-                            <td class="p-4 text-right">
-                                <flux:button size="sm" :href="route('admin.products.edit', $product)">
-                                    Chỉnh sửa<span class="sr-only"> {{ $product->name }}</span>
-                                </flux:button>
+                            <td class="p-4">
+                                <div class="flex flex-wrap justify-end gap-2">
+                                    <flux:button size="sm" :href="route('admin.products.options', $product)">
+                                        Size và topping<span class="sr-only"> của {{ $product->name }}</span>
+                                    </flux:button>
+                                    <flux:button size="sm" :href="route('admin.products.edit', $product)">
+                                        Chỉnh sửa<span class="sr-only"> {{ $product->name }}</span>
+                                    </flux:button>
+                                </div>
                             </td>
                         </tr>
                     @empty

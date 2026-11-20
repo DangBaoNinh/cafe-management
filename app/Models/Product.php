@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['category_id', 'name', 'slug', 'description', 'image_path', 'is_active', 'allows_sugar', 'allows_ice'])]
 class Product extends Model
@@ -21,6 +23,30 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /** @return HasMany<ProductSize, $this> */
+    public function sizes(): HasMany
+    {
+        return $this->hasMany(ProductSize::class);
+    }
+
+    /** @return HasMany<ProductSize, $this> */
+    public function activeSizes(): HasMany
+    {
+        return $this->sizes()->active();
+    }
+
+    /** @return BelongsToMany<Topping, $this> */
+    public function toppings(): BelongsToMany
+    {
+        return $this->belongsToMany(Topping::class, 'product_toppings');
+    }
+
+    /** @return BelongsToMany<Topping, $this> */
+    public function activeToppings(): BelongsToMany
+    {
+        return $this->toppings()->active();
     }
 
     /** @param Builder<Product> $query */

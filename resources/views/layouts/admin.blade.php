@@ -11,6 +11,7 @@
                     <a href="{{ route('admin.accounts.index') }}" class="hover:underline">Quản lý tài khoản</a>
                     <a href="{{ route('admin.categories.index') }}" class="hover:underline">Quản lý danh mục</a>
                     <a href="{{ route('admin.products.index') }}" class="hover:underline">Quản lý sản phẩm</a>
+                    <a href="{{ route('admin.toppings.index') }}" class="hover:underline">Quản lý topping</a>
                     <a href="{{ route('home') }}" class="hover:underline">Về trang chủ</a>
                 </div>
             </nav>
