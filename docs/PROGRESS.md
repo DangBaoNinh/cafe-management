@@ -11,7 +11,7 @@
 
 ## Giai đoạn 02 — Thiết kế đã nghiệm thu
 
-- Ngày 20/11/2026, người dùng nghiệm thu toàn bộ thiết kế Task 02 và xác nhận các phương án nghiệp vụ MVP Q01–Q05 cùng cách xử lý tài khoản theo BR20. Bản Word là bản trình bày của bộ thiết kế tại thời điểm bàn giao. Trạng thái nghiệm thu được ghi trong Markdown.
+- Ngày 20/11/2026, người dùng nghiệm thu toàn bộ thiết kế Task 02, xác nhận các phương án nghiệp vụ MVP Q01–Q05 cùng cách xử lý tài khoản theo BR20 và cho phép tích hợp `docs/system-design` vào `develop`. Bản Word là bản trình bày của bộ thiết kế tại thời điểm bàn giao. Trạng thái nghiệm thu được ghi trong Markdown.
 
 - Đã soạn [phân tích nghiệp vụ](BUSINESS_ANALYSIS.md), [quy tắc](BUSINESS_RULES.md), [thiết kế dữ liệu](DATABASE_DESIGN.md), [kiến trúc](ARCHITECTURE.md) và [luồng đơn hàng](ORDER_WORKFLOW.md).
 - [Sổ công việc](USE_CASE_TASKS.md) có 25 UC, trong đó 23 UC MVP và 2 UC mở rộng. Có 3 nhiệm vụ kỹ thuật. UC01 và UC02 dùng lại Starter Kit và cần rà soát theo tiêu chí mới.
@@ -31,7 +31,7 @@
 
 ## Việc còn lại
 
-- Nhánh `chore/gitflow-setup` chờ review. Nhánh `docs/system-design` đã được nghiệm thu thiết kế và chờ yêu cầu tích hợp vào `develop`. Repository chưa có remote.
+- Nhánh `chore/gitflow-setup` chờ review. Repository chưa có remote.
 - Bắt đầu từ TECH01 sau khi thiết kế được tích hợp. Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Kiểm tra hiện tại dùng mailer `log`.
 - Phân quyền Admin, Staff, Customer và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
