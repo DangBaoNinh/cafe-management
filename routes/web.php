@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DeliverySettingsController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductOptionController;
 use App\Http\Controllers\Admin\ProductSizeController;
 use App\Http\Controllers\Admin\ToppingController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\DeliveryFeeController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'customer.home')->name('home');
@@ -18,12 +20,15 @@ Route::view('dashboard', 'customer.account')->middleware('auth')->name('dashboar
 
 Route::prefix('cart')->name('cart.')->middleware(['auth', 'can:manage-cart'])->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::get('delivery', DeliveryFeeController::class)->name('delivery');
     Route::patch('{item}', [CartController::class, 'update'])->whereNumber('item')->name('update');
     Route::delete('{item}', [CartController::class, 'destroy'])->whereNumber('item')->name('destroy');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::get('delivery-settings', [DeliverySettingsController::class, 'edit'])->name('delivery-settings.edit');
+    Route::patch('delivery-settings', [DeliverySettingsController::class, 'update'])->name('delivery-settings.update');
     Route::resource('categories', CategoryController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     Route::resource('products', ProductController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     Route::resource('toppings', ToppingController::class)->only(['index', 'create', 'store', 'edit', 'update']);

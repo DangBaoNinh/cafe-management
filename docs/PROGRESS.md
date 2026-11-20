@@ -133,6 +133,13 @@
 - Migration ba bảng giỏ đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 97 bài SQLite với 889 assertion. Bộ MySQL cô lập đạt 14 bài với 200 assertion, gồm ràng buộc một giỏ mỗi khách, số lượng dương và hoàn tác cả dòng lẫn topping khi lỗi. `npm run build` thành công.
 - Trình duyệt với dữ liệu SQLite cô lập xác nhận khách được dẫn tới đăng nhập và quay lại món. Thêm hai ly có topping cho tạm tính 86.000 ₫, cập nhật thành ba ly lên 129.000 ₫, xóa dòng cuối về 0 ₫.
 
+### UC12 đã triển khai cấu hình và xem trước phí
+
+- Admin cập nhật cấu hình duy nhất tại `/admin/delivery-settings`, chọn quận/huyện theo danh mục địa chỉ UC03 và nhập phí cố định từ 0 đến 4.294.967.295 VND. Mặc định tắt giao hàng. Backend từ chối mã sai, mã trùng, danh sách trống khi bật giao và biểu mẫu cũ.
+- Khách xem phí tại `/cart/delivery` theo địa chỉ đã lưu của mình. Khi giao bị tắt hoặc địa chỉ ngoài vùng, khách được hướng dẫn nhận tại quán với phí 0 ₫.
+- Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 101 bài SQLite với 986 assertion. Bộ MySQL cô lập đạt 15 bài với 218 assertion, gồm kiểm tra giữ số 0 đầu mã quận, phí biên và từ chối phiên bản cũ. `npm run build` thành công.
+- Dịch vụ tính phí đã sẵn sàng cho UC14. Checkout cần lấy phí hiện hành khi chốt, lưu vào đơn và kiểm thử rằng đổi cấu hình không đổi phí của đơn đã tạo.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
