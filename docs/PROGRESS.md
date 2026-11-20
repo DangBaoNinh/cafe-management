@@ -140,7 +140,7 @@
 - Admin cập nhật cấu hình duy nhất tại `/admin/delivery-settings`, chọn quận/huyện theo danh mục địa chỉ UC03 và nhập phí cố định từ 0 đến 4.294.967.295 VND. Mặc định tắt giao hàng. Backend từ chối mã sai, mã trùng, danh sách trống khi bật giao và biểu mẫu cũ.
 - Khách xem phí tại `/cart/delivery` theo địa chỉ đã lưu của mình. Khi giao bị tắt hoặc địa chỉ ngoài vùng, khách được hướng dẫn nhận tại quán với phí 0 ₫.
 - Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 101 bài SQLite với 986 assertion. Bộ MySQL cô lập đạt 15 bài với 218 assertion, gồm kiểm tra giữ số 0 đầu mã quận, phí biên và từ chối phiên bản cũ. `npm run build` thành công.
-- Dịch vụ tính phí đã sẵn sàng cho UC14. Checkout cần lấy phí hiện hành khi chốt, lưu vào đơn và kiểm thử rằng đổi cấu hình không đổi phí của đơn đã tạo.
+- Kiểm thử UC14 xác nhận phí được lưu vào đơn khi chốt. Thay đổi cấu hình giao hàng sau đó giữ nguyên phí trên đơn đã tạo.
 
 ### UC13 đã nghiệm thu
 
@@ -149,7 +149,14 @@
 - Admin tạo, sửa và tắt mã tại `/admin/coupons`. Code chuẩn hóa chữ hoa và duy nhất. Mốc hiệu lực nhập theo giờ Việt Nam, lưu UTC. Mã có hiệu lực từ thời điểm bắt đầu đến trước thời điểm kết thúc.
 - Hỗ trợ giảm số tiền cố định hoặc phần trăm nguyên từ 1 đến 100, ngưỡng tạm tính, trần giảm cho phần trăm và giới hạn tổng lượt hoặc lượt mỗi khách. Mức giảm phần trăm làm tròn xuống và tiền giảm không vượt tạm tính.
 - Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 106 bài SQLite với 1.098 assertion. Bộ MySQL cô lập đạt 16 bài với 233 assertion, gồm lưu UTC và khóa duy nhất cho code khác hoa/thường. `npm run build` thành công.
-- UC14 sẽ đếm lượt từ đơn còn hiệu lực theo BR10, khóa bản ghi mã trong giao dịch checkout và lưu snapshot vào đơn. Kịch bản hai checkout tranh lượt cuối cần kiểm tra qua luồng đó.
+- UC14 đếm lượt từ đơn còn hiệu lực theo BR10, khóa bản ghi mã trong giao dịch checkout và lưu mã trên đơn. Kiểm tra qua hai phiên MySQL thật xác nhận chỉ một checkout dùng được lượt cuối.
+
+### UC14 đã kiểm chứng, chờ nghiệm thu
+
+- Khách từ `/cart` vào `/checkout`, chọn cách nhận và thanh toán rồi xem tổng VND trước khi xác nhận. Đơn giao chỉ dùng địa chỉ đã lưu thuộc khách và còn trong vùng. Đơn nhận tại quán có phí 0 ₫.
+- Khi xác nhận, máy chủ khóa khách, giỏ và mã giảm nếu có, kiểm tra phiên bản giỏ và tính lại giá, phí, giảm giá. Lưu đơn, dòng món, topping, payment và hai lịch sử ban đầu rồi làm trống giỏ trong cùng giao dịch. Retry cùng khóa và nội dung trả đơn cũ. Cùng khóa với nội dung khác báo xung đột.
+- Trang xác nhận hiển thị mã đơn, phương thức nhận và tổng. Chuyển khoản chỉ hiện khi cấu hình đủ `CHECKOUT_BANK_NAME`, `CHECKOUT_BANK_ACCOUNT_NUMBER` và `CHECKOUT_BANK_ACCOUNT_HOLDER`. Đã kiểm thử bằng dữ liệu mẫu. Laragon local chưa cấu hình tài khoản nhận tiền thực tế.
+- Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 115 bài SQLite với 1.404 assertion. `php artisan test --testsuite=MySQL` đạt 17 bài với 253 assertion. `npm run build` thành công. Kiểm tra riêng trên hai phiên MySQL có tranh khóa xác nhận một đơn được tạo và giỏ của khách còn lại được giữ.
 
 ## Kết quả kiểm tra nền tảng ban đầu
 
@@ -166,4 +173,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- Checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
+- UC14 chờ nghiệm thu. Theo dõi và xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.

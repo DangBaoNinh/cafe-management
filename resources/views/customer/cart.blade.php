@@ -86,6 +86,11 @@
             @endif
         </div>
 
-        <flux:link :href="route('cart.delivery')">Xem phí giao hàng và nhận tại quán</flux:link>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <flux:link :href="route('cart.delivery')">Xem phí giao hàng và nhận tại quán</flux:link>
+            @if ($lines !== [] && ! in_array(null, array_column($lines, 'total'), true))
+                <flux:button variant="primary" :href="route('checkout.create')">Tiến hành đặt hàng</flux:button>
+            @endif
+        </div>
     </div>
 </x-layouts::customer>

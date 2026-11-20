@@ -65,6 +65,12 @@ class User extends Authenticatable
         return $this->hasOne(Cart::class);
     }
 
+    /** @return HasMany<Order, $this> */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
     /**
      * Get the user's initials
      */
