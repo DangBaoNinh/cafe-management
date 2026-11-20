@@ -35,4 +35,33 @@ class PublicCatalogTest extends MySqlTestCase
             $this->primary->rollBack();
         }
     }
+
+    public function test_mysql_search_binds_keywords_and_filters_by_starting_price(): void
+    {
+        DB::setDefaultConnection($this->primary->getName());
+        $this->primary->beginTransaction();
+
+        try {
+            $slug = 'search-'.Str::uuid();
+            $category = Category::create(['slug' => $slug, 'name' => 'Cà phê thử']);
+            $eligible = $category->products()->create(['slug' => $slug, 'name' => 'Cà phê sữa 100%']);
+            $cheaper = $category->products()->create(['slug' => 'cheap-'.$slug, 'name' => 'Cà phê sữa 50%']);
+            $eligible->sizes()->createMany([
+                ['code' => 's', 'label' => 'Nhỏ', 'price_vnd' => 19000, 'is_active' => false],
+                ['code' => 'm', 'label' => 'Vừa', 'price_vnd' => 40000],
+            ]);
+            $cheaper->sizes()->createMany([
+                ['code' => 's', 'label' => 'Nhỏ', 'price_vnd' => 30000],
+                ['code' => 'm', 'label' => 'Vừa', 'price_vnd' => 40000],
+            ]);
+
+            $this->get(route('menu.index', [
+                'category' => $slug, 'q' => 'PHÊ SỮA', 'min_price' => 40000, 'max_price' => 40000, 'sort' => 'price_desc',
+            ]))->assertOk()->assertSee('Cà phê sữa 100%')->assertDontSee('Cà phê sữa 50%');
+            $this->get(route('menu.index', ['category' => $slug, 'q' => '100%']))
+                ->assertOk()->assertSee('Cà phê sữa 100%')->assertDontSee('Cà phê sữa 50%');
+        } finally {
+            $this->primary->rollBack();
+        }
+    }
 }
