@@ -47,9 +47,9 @@
 - Đã cấu hình `origin` trên GitHub. Workflow `tests` trên `develop` tại `f805aef` chạy thành công. [Kết quả GitHub Actions](https://github.com/DangBaoNinh/cafe-management/actions/runs/44754477616)
 - Đã tích hợp `chore/git-workflow` và cập nhật tài liệu theo quy ước phát triển từ `develop`. [Quy trình Git](GIT_WORKFLOW.md)
 
-### UC01 đã kiểm thử, chờ nghiệm thu
+### UC01 đã nghiệm thu
 
-- Trên `feature/authentication`, dùng các route Fortify hiện có để đăng ký, đăng nhập, đăng xuất và đặt lại mật khẩu. Đăng ký tạo đúng một tài khoản customer đang hoạt động với email chuẩn hóa. Form hiển thị lỗi tiếng Việt khi vượt giới hạn đăng nhập hoặc gửi dữ liệu không hợp lệ.
+- Ngày 20/11/2026, người dùng nghiệm thu UC01 tại commit `c5d8d0d`. Nhánh `feature/authentication` đã được tích hợp vào `develop` tại merge commit `2038772`. Dùng các route Fortify hiện có để đăng ký, đăng nhập, đăng xuất và đặt lại mật khẩu. Đăng ký tạo đúng một tài khoản customer đang hoạt động với email chuẩn hóa. Form hiển thị lỗi tiếng Việt khi vượt giới hạn đăng nhập hoặc gửi dữ liệu không hợp lệ.
 - Khi gửi hoặc dùng token đặt lại mật khẩu, giao dịch khóa hàng tài khoản trên MySQL. Đặt lại thành công cập nhật mật khẩu, xoay token ghi nhớ và vô hiệu hóa liên kết đã dùng. Kiểm thử giả lập lỗi giữa chừng xác nhận mật khẩu cũ và token đặt lại vẫn còn hiệu lực.
 - `composer ci:check` đạt Pint, PHPStan và 44 bài SQLite với 196 assertion. `php artisan test --testsuite=MySQL` đạt 3 bài với 49 assertion, gồm đặt lại mật khẩu, từ chối dùng lại token và đăng xuất với phiên MySQL. `npm run build` thành công. Mailpit nhận thư tiếng Việt có liên kết đặt lại hạn 60 phút từ route quên mật khẩu trên dữ liệu thử cô lập.
 
@@ -66,7 +66,7 @@
 ## Việc còn lại
 
 - Nhánh `chore/gitflow-setup` chờ review.
-- UC01 ở trạng thái `VERIFIED` và chờ nghiệm thu để tích hợp vào `develop`.
+- UC02 đã đủ phụ thuộc để triển khai từ `develop`.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
 - Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
