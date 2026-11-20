@@ -6,6 +6,7 @@ return [
     'current_password' => 'Mật khẩu hiện tại không chính xác.',
     'email' => 'Vui lòng nhập địa chỉ email hợp lệ.',
     'enum' => 'Lựa chọn :attribute không hợp lệ.',
+    'exists' => 'Lựa chọn :attribute không tồn tại.',
     'in' => 'Lựa chọn :attribute không hợp lệ.',
     'integer' => 'Trường :attribute phải là số nguyên.',
     'max' => [
