@@ -2,8 +2,11 @@
 
 use App\Concerns\ProfileValidationRules;
 use Flux\Flux;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -27,21 +30,36 @@ new #[Title('Cài đặt hồ sơ')] class extends Component {
      */
     public function updateProfileInformation(): void
     {
-        $user = Auth::user();
+        $this->name = trim($this->name);
+        $this->email = trim($this->email);
 
         if (config('fortify.lowercase_usernames')) {
             $this->email = Str::lower($this->email);
         }
 
-        $validated = $this->validate($this->profileRules($user->id));
+        $sessionUser = Auth::user();
+        abort_unless($sessionUser?->is_active, 403);
+        $validated = $this->validate($this->profileRules($sessionUser->id));
 
-        $user->fill($validated);
+        try {
+            $sessionUser->getConnection()->transaction(function () use ($sessionUser, $validated): void {
+                $user = $sessionUser->newQuery()->lockForUpdate()->findOrFail($sessionUser->id);
+                abort_unless($user->is_active, 403);
 
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+                if ($user->email !== $validated['email']) {
+                    Password::broker()->deleteToken($user);
+                    $user->email_verified_at = null;
+                }
+
+                $user->fill($validated)->save();
+            });
+        } catch (UniqueConstraintViolationException) {
+            throw ValidationException::withMessages([
+                'email' => __('validation.unique', ['attribute' => __('validation.attributes.email')]),
+            ]);
         }
 
-        $user->save();
+        $sessionUser->refresh();
 
         Flux::toast(variant: 'success', text: __('Profile updated.'));
     }
@@ -71,7 +89,5 @@ new #[Title('Cài đặt hồ sơ')] class extends Component {
 
             </div>
         </form>
-
-        <livewire:pages::settings.delete-user-form />
     </x-pages::settings.layout>
 </section>
