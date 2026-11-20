@@ -39,11 +39,13 @@
 
 - Ngày 20/11/2026, người dùng nghiệm thu TECH03 tại commit `412c7a9`. Nhánh `chore/integration-test-foundation` đã được tích hợp vào `develop` tại merge commit `2664f00`. Bộ mặc định chạy SQLite trong bộ nhớ. Bộ tích hợp MySQL dùng hai kết nối riêng đến `coffee_shop_test`, chạy migration tiến và kiểm tra rollback nhiều bảng cùng tranh chấp khóa hàng. Tài khoản MySQL thử bị từ chối khi đọc `coffee_shop`. Cấu hình thử trỏ đến `coffee_shop` bị từ chối trước khi kết nối.
 - `composer ci:check` đạt Pint, PHPStan và 29 bài SQLite với 69 assertion. MySQL 8.4.3 đạt 2 bài với 26 assertion. Mailpit trên loopback nhận thư mẫu từ Laravel. Thông tin đăng nhập MySQL thử nằm trong file local được Git bỏ qua.
-- Workflow GitHub Actions đã thêm service MySQL 8.4 và bước chạy bộ tích hợp. `actionlint` đã xác nhận cú pháp workflow. Repository chưa có remote để chạy GitHub Actions.
+- Workflow GitHub Actions đã thêm service MySQL 8.4 và bước chạy bộ tích hợp. `actionlint` đã xác nhận cú pháp workflow.
 
 ### Kiểm tra sau tích hợp TECH02 và TECH03
 
 - Trên `develop`, `composer ci:check` đạt Pint, PHPStan và 39 bài SQLite với 114 assertion. `php artisan test --testsuite=MySQL` đạt 2 bài với 26 assertion. `actionlint` xác nhận workflow và `php artisan migrate:status` xác nhận đủ 4 migration trên Laragon.
+- Đã cấu hình `origin` trên GitHub. Workflow `tests` trên `develop` tại `f805aef` chạy thành công. [Kết quả GitHub Actions](https://github.com/DangBaoNinh/cafe-management/actions/runs/44754477616)
+- Đã tích hợp `chore/git-workflow` và cập nhật tài liệu theo quy ước phát triển từ `develop`. [Quy trình Git](GIT_WORKFLOW.md)
 
 ## Kết quả kiểm tra nền tảng ban đầu
 
@@ -57,7 +59,7 @@
 
 ## Việc còn lại
 
-- Nhánh `chore/gitflow-setup` chờ review. Repository chưa có remote.
+- Nhánh `chore/gitflow-setup` chờ review.
 - UC01 đã đủ phụ thuộc để triển khai từ `develop`.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Kiểm tra hiện tại dùng mailer `log`.
