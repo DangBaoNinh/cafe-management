@@ -7,7 +7,10 @@
         <header class="bg-coffee text-white">
             <nav aria-label="Điều hướng quản trị" class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
                 <a href="{{ route('admin.dashboard') }}" class="font-semibold">{{ config('app.name') }} · Quản trị</a>
-                <a href="{{ route('home') }}" class="text-sm hover:underline">Về trang chủ</a>
+                <div class="flex flex-wrap gap-4 text-sm">
+                    <a href="{{ route('admin.accounts.index') }}" class="hover:underline">Quản lý tài khoản</a>
+                    <a href="{{ route('home') }}" class="hover:underline">Về trang chủ</a>
+                </div>
             </nav>
         </header>
 

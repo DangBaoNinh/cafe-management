@@ -5,6 +5,7 @@ return [
     'confirmed' => 'Giá trị xác nhận cho :attribute không khớp.',
     'current_password' => 'Mật khẩu hiện tại không chính xác.',
     'email' => 'Vui lòng nhập địa chỉ email hợp lệ.',
+    'enum' => 'Lựa chọn :attribute không hợp lệ.',
     'in' => 'Lựa chọn :attribute không hợp lệ.',
     'max' => [
         'string' => 'Trường :attribute không được dài quá :max ký tự.',

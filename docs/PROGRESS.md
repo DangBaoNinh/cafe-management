@@ -67,6 +67,13 @@
 - `composer ci:check` đạt Pint, PHPStan và 55 bài SQLite với 307 assertion. `php artisan test --testsuite=MySQL` đạt 6 bài với 88 assertion, gồm kiểm tra cạnh tranh khóa trên hai kết nối và ràng buộc unique. `npm run build` thành công. Edge chạy đạt luồng tạo, sửa, đặt mặc định và xác nhận xóa trên dữ liệu cô lập.
 - Tiêu chí giữ nguyên snapshot đơn được kiểm chứng sau khi tích hợp UC14.
 
+### UC04 đã kiểm thử, chờ nghiệm thu
+
+- Admin đang hoạt động có thể tìm và lọc tại `/admin/accounts`, xác nhận mật khẩu qua Fortify rồi đổi vai trò hoặc khóa, mở khóa tài khoản. Yêu cầu dùng dữ liệu quyền đã cũ được hướng dẫn tải lại trang.
+- Giao dịch khóa bản ghi người thao tác và tài khoản đích theo thứ tự ID rồi kiểm tra lại quyền. Admin không thể tự hạ quyền hay tự khóa. Tài khoản bị khóa mất quyền trên yêu cầu bảo vệ tiếp theo, kể cả khi đang có phiên.
+- `composer ci:check` đạt Pint, PHPStan và 63 bài SQLite với 367 assertion. `php artisan test --testsuite=MySQL` đạt 7 bài với 100 assertion, gồm tranh chấp khóa giữa hai kết nối và kiểm tra lại quyền của admin đã bị hạ vai trò. `npm run build` thành công.
+- Schema Laragon local chưa có admin hoạt động. Luồng quản trị đã được kiểm thử qua HTTP với tài khoản thử cô lập.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -82,4 +89,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
+- UC04 chờ nghiệm thu để tích hợp vào `develop`.
+- Các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
