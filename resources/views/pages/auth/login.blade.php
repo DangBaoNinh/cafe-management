@@ -13,7 +13,7 @@
             <flux:input
                 name="email"
                 :label="__('Email address')"
-                :value="old('email')"
+                :value="is_string(old('email')) ? old('email') : ''"
                 type="email"
                 required
                 autofocus
