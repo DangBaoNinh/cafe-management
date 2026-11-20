@@ -1,4 +1,5 @@
 {
+    "Account deletion is currently disabled.": "Tính năng tự xóa tài khoản hiện chưa được mở.",
     "Already have an account?": "Bạn đã có tài khoản?",
     "Appearance": "Giao diện",
     "Appearance settings": "Cài đặt giao diện",
@@ -37,6 +38,7 @@
     "New password": "Mật khẩu mới",
     "Or, return to": "Hoặc quay lại",
     "Password": "Mật khẩu",
+    "Password confirmation required.": "Vui lòng xác nhận lại mật khẩu để tiếp tục.",
     "Password updated.": "Đã cập nhật mật khẩu.",
     "Please enter your new password below": "Nhập mật khẩu mới.",
     "Profile": "Hồ sơ",
@@ -54,6 +56,7 @@
     "Settings": "Cài đặt",
     "Sign up": "Đăng ký",
     "System": "Theo hệ thống",
+    "The provided password was incorrect.": "Mật khẩu không chính xác.",
     "This is a secure area of the application. Please confirm your password before continuing.": "Vui lòng xác nhận mật khẩu để tiếp tục.",
     "This password reset link will expire in :count minutes.": "Liên kết đặt lại mật khẩu sẽ hết hạn sau :count phút.",
     "Update password": "Đổi mật khẩu",
