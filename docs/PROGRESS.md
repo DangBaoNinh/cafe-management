@@ -75,6 +75,12 @@
 - `composer ci:check` đạt Pint, PHPStan và 63 bài SQLite với 367 assertion. `php artisan test --testsuite=MySQL` đạt 7 bài với 100 assertion, gồm tranh chấp khóa giữa hai kết nối và kiểm tra lại quyền của admin đã bị hạ vai trò. `npm run build` thành công.
 - Schema Laragon local chưa có admin hoạt động. Luồng quản trị đã được kiểm thử qua HTTP với tài khoản thử cô lập. Brave xác nhận chỉ bảng cuộn ngang ở chiều rộng 390 px sau bản sửa bố cục.
 
+### UC05 đã kiểm thử, chờ nghiệm thu
+
+- Admin quản lý danh mục tại `/admin/categories`. Danh sách phân trang theo thứ tự hiển thị. Backend từ chối slug trùng, slug sai định dạng và số thứ tự âm.
+- Migration `categories` và `products` đã chạy trên Laragon local. Khi ẩn danh mục, truy vấn `Product::inActiveCategory()` loại món thuộc danh mục đó và dữ liệu vẫn được giữ. Khóa ngoại ngăn xóa danh mục đã có món. Menu công khai và điều kiện size hoạt động thuộc UC08.
+- `composer ci:check` đạt Pint, PHPStan và 67 bài SQLite với 411 assertion. Bộ MySQL đạt 8 bài với 113 assertion, gồm ràng buộc slug, khóa ngoại và truy vấn theo trạng thái danh mục. `npm run build` thành công. Brave ở 390 px chạy đạt luồng tạo và ẩn danh mục với dữ liệu thử cô lập.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -90,5 +96,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC05 đã đủ phụ thuộc để triển khai từ `develop`.
-- Các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
+- UC05 chờ nghiệm thu để tích hợp vào `develop`.
+- Các module menu, sản phẩm, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
