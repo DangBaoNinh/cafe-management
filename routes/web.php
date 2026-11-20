@@ -35,9 +35,10 @@ Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'can:manage-ca
     Route::get('orders/{number}', [CheckoutController::class, 'confirmation'])->name('confirmation');
 });
 
-Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:view-own-orders'])->group(function () {
+Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-customer-orders'])->group(function () {
     Route::get('/', [CustomerOrderController::class, 'index'])->name('index');
     Route::get('{number}', [CustomerOrderController::class, 'show'])->name('show');
+    Route::post('{number}/cancel', [CustomerOrderController::class, 'cancel'])->name('cancel');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
