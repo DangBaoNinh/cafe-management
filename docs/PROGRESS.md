@@ -100,7 +100,9 @@
 - `composer ci:check` đạt Pint, PHPStan và 77 bài SQLite với 595 assertion. Bộ MySQL cô lập đạt 10 bài với 143 assertion. `npm run build` thành công. Brave ở 390 px xác nhận tạo size, tạo và gắn topping, ngừng bán rồi bỏ gắn. Các trang danh sách và cấu hình đã kiểm tra không cuộn ngang toàn trang.
 - Kiểm tra lựa chọn công khai, giỏ cũ và snapshot đơn chờ các UC tương ứng.
 
-### UC08 đã kiểm thử, chờ nghiệm thu
+### UC08 đã nghiệm thu
+
+- Ngày 20/11/2026, người dùng nghiệm thu UC08 tại commit `43a4809`. Nhánh `feature/product-catalog` được tích hợp vào `develop` tại merge commit `a89ab2c`. Pint, PHPStan, 81 bài SQLite, 11 bài MySQL và bản build đều đạt khi kiểm tra lại trước merge.
 
 - Khách chưa đăng nhập xem được `/menu` và `/menu/{slug}`. Thực đơn lọc theo slug danh mục, phân trang 12 món và giữ danh mục cùng số trang khi quay về từ chi tiết. Danh mục đang hoạt động nhưng trống có thông báo riêng.
 - Danh sách và chi tiết chỉ công khai món đang hoạt động, thuộc danh mục đang hoạt động và có ít nhất một size đang bán. Chi tiết ngoài điều kiện trả 404. Giá từ và bảng giá chỉ xét size đang bán. Ảnh dùng đĩa công khai đã cấu hình. UC08 không cần migration.
@@ -121,5 +123,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC08 chờ nghiệm thu và tích hợp vào `develop` trước khi triển khai UC09 hoặc UC10.
+- UC09 và UC10 đã đủ phụ thuộc để triển khai từ `develop`.
 - Các module tìm kiếm, tùy chỉnh đồ uống, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
