@@ -28,20 +28,24 @@
 - Trên schema thử có dữ liệu mô phỏng theo cấu hình cũ UTC+7, chuyển sang UTC giữ nguyên bản ghi của cả 8 bảng và thời điểm lưu qua mốc 00:00 giờ Việt Nam. Token đặt lại mật khẩu cũ vẫn hợp lệ. Schema `coffee_shop` hiện có chỉ được đọc để đối chiếu metadata.
 - Kiểm thử hồi quy đạt 29 bài với 69 assertion trên SQLite. Pint cho hai file cấu hình và PHPStan đều đạt.
 
-### TECH02 đã kiểm chứng
+### TECH02 đã nghiệm thu
 
-- Ngày 20/11/2026, người dùng nghiệm thu TECH02 tại commit `fdf23fc`. TECH02 giữ trạng thái `VERIFIED` trên nhánh `feature/authorization-foundation` trong thời gian chờ tích hợp vào `develop`. Đã thêm vai trò và trạng thái tài khoản, gate quản trị và vận hành đơn, kiểm tra khóa tài khoản ở tầng xác thực và lệnh khởi tạo admin đầu tiên. [Kiến trúc ứng dụng](ARCHITECTURE.md#nền-tảng-phân-quyền-tech02)
+- Ngày 20/11/2026, người dùng nghiệm thu TECH02 tại commit `fdf23fc`. Nhánh `feature/authorization-foundation` đã được tích hợp vào `develop` tại merge commit `a81b91c`. Đã thêm vai trò và trạng thái tài khoản, gate quản trị và vận hành đơn, kiểm tra khóa tài khoản ở tầng xác thực và lệnh khởi tạo admin đầu tiên. [Kiến trúc ứng dụng](ARCHITECTURE.md#nền-tảng-phân-quyền-tech02)
 - SQLite đạt 39 bài kiểm thử và 114 assertion, gồm quyền của guest, customer, staff, admin, từ chối phiên và yêu cầu Livewire của tài khoản khóa, kiểm soát dữ liệu đăng ký và khởi tạo admin. Pint và PHPStan đạt.
 - MySQL 8.4.3 thử nghiệm xác nhận migration giữ nguyên các trường của tài khoản mô phỏng và gán mặc định customer đang hoạt động. Kiểm tra mật khẩu cũ, token ghi nhớ, từ chối vai trò sai và tranh chấp khóa khởi tạo đều đạt.
 - Đã chạy migration bổ sung trên Laragon local. Bảng `users` trống trước migration. Việc khởi tạo admin trên schema `coffee_shop` đang chờ thông tin tài khoản của người vận hành.
 
-### TECH03 đã kiểm chứng
+### TECH03 đã nghiệm thu
 
-- TECH03 đạt `VERIFIED` trên nhánh `chore/integration-test-foundation`. Bộ mặc định chạy SQLite trong bộ nhớ. Bộ tích hợp MySQL dùng hai kết nối riêng đến `coffee_shop_test`, chạy migration tiến và kiểm tra rollback nhiều bảng cùng tranh chấp khóa hàng. Tài khoản MySQL thử bị từ chối khi đọc `coffee_shop`. Cấu hình thử trỏ đến `coffee_shop` bị từ chối trước khi kết nối.
+- Ngày 20/11/2026, người dùng nghiệm thu TECH03 tại commit `412c7a9`. Nhánh `chore/integration-test-foundation` đã được tích hợp vào `develop` tại merge commit `2664f00`. Bộ mặc định chạy SQLite trong bộ nhớ. Bộ tích hợp MySQL dùng hai kết nối riêng đến `coffee_shop_test`, chạy migration tiến và kiểm tra rollback nhiều bảng cùng tranh chấp khóa hàng. Tài khoản MySQL thử bị từ chối khi đọc `coffee_shop`. Cấu hình thử trỏ đến `coffee_shop` bị từ chối trước khi kết nối.
 - `composer ci:check` đạt Pint, PHPStan và 29 bài SQLite với 69 assertion. MySQL 8.4.3 đạt 2 bài với 26 assertion. Mailpit trên loopback nhận thư mẫu từ Laravel. Thông tin đăng nhập MySQL thử nằm trong file local được Git bỏ qua.
 - Workflow GitHub Actions đã thêm service MySQL 8.4 và bước chạy bộ tích hợp. `actionlint` đã xác nhận cú pháp workflow. Repository chưa có remote để chạy GitHub Actions.
 
-## Kết quả kiểm tra
+### Kiểm tra sau tích hợp TECH02 và TECH03
+
+- Trên `develop`, `composer ci:check` đạt Pint, PHPStan và 39 bài SQLite với 114 assertion. `php artisan test --testsuite=MySQL` đạt 2 bài với 26 assertion. `actionlint` xác nhận workflow và `php artisan migrate:status` xác nhận đủ 4 migration trên Laragon.
+
+## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
 - `php artisan migrate:status` xác nhận cả ba migration đã chạy. Đã kiểm tra các route xác thực và route quản trị.
@@ -54,6 +58,7 @@
 ## Việc còn lại
 
 - Nhánh `chore/gitflow-setup` chờ review. Repository chưa có remote.
+- UC01 đã đủ phụ thuộc để triển khai từ `develop`.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Kiểm tra hiện tại dùng mailer `log`.
 - Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
