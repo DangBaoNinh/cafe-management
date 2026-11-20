@@ -35,6 +35,12 @@
 - MySQL 8.4.3 thử nghiệm xác nhận migration giữ nguyên các trường của tài khoản mô phỏng và gán mặc định customer đang hoạt động. Kiểm tra mật khẩu cũ, token ghi nhớ, từ chối vai trò sai và tranh chấp khóa khởi tạo đều đạt.
 - Đã chạy migration bổ sung trên Laragon local. Bảng `users` trống trước migration. Việc khởi tạo admin trên schema `coffee_shop` đang chờ thông tin tài khoản của người vận hành.
 
+### TECH03 đã kiểm chứng
+
+- TECH03 đạt `VERIFIED` trên nhánh `chore/integration-test-foundation`. Bộ mặc định chạy SQLite trong bộ nhớ. Bộ tích hợp MySQL dùng hai kết nối riêng đến `coffee_shop_test`, chạy migration tiến và kiểm tra rollback nhiều bảng cùng tranh chấp khóa hàng. Tài khoản MySQL thử bị từ chối khi đọc `coffee_shop`. Cấu hình thử trỏ đến `coffee_shop` bị từ chối trước khi kết nối.
+- `composer ci:check` đạt Pint, PHPStan và 29 bài SQLite với 69 assertion. MySQL 8.4.3 đạt 2 bài với 26 assertion. Mailpit trên loopback nhận thư mẫu từ Laravel. Thông tin đăng nhập MySQL thử nằm trong file local được Git bỏ qua.
+- Workflow GitHub Actions đã thêm service MySQL 8.4 và bước chạy bộ tích hợp. `actionlint` đã xác nhận cú pháp workflow. Repository chưa có remote để chạy GitHub Actions.
+
 ## Kết quả kiểm tra
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -48,6 +54,6 @@
 ## Việc còn lại
 
 - Nhánh `chore/gitflow-setup` chờ review. Repository chưa có remote.
-- TECH02 chờ tích hợp vào `develop`. TECH03 có thể triển khai từ `develop`. Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
+- Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Kiểm tra hiện tại dùng mailer `log`.
 - Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.

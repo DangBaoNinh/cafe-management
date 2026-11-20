@@ -3,6 +3,7 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         defaultTestSuite="Unit,Feature"
 >
     <testsuites>
         <testsuite name="Unit">
@@ -11,6 +12,9 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <testsuite name="MySQL">
+            <directory>tests/Integration/MySql</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
@@ -18,17 +22,19 @@
         </include>
     </source>
     <php>
-        <env name="APP_ENV" value="testing"/>
+        <!-- Laravel reads server variables before inherited environment variables. -->
+        <server name="APP_ENV" value="testing"/>
+        <server name="APP_CONFIG_CACHE" value="bootstrap/cache/config.testing.php"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
-        <env name="DB_URL" value=""/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
+        <server name="CACHE_STORE" value="array"/>
+        <server name="DB_CONNECTION" value="sqlite"/>
+        <server name="DB_DATABASE" value=":memory:"/>
+        <server name="DB_URL" value=""/>
+        <server name="MAIL_MAILER" value="array"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+        <server name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>

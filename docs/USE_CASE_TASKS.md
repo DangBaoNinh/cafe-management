@@ -21,7 +21,7 @@ P0 là luồng lõi hoặc điều kiện bắt buộc. P1 là nghiệp vụ MVP
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | TECH01 | Nền tảng dữ liệu | Nhóm phát triển | Rà soát 8 bảng hiện có, quy ước migration, đơn vị VND, UTC, InnoDB, constraint và tổ chức migration theo UC. | P0 | — | `chore/database-foundation` | ACCEPTED | MySQL thử nghiệm chạy migration nền, quy ước FK và chỉ mục được đối chiếu với ERD, có kiểm chứng dữ liệu cũ. |
 | TECH02 | Nền tảng phân quyền | Nhóm phát triển | Bổ sung vai trò và cờ hoạt động vào users, policy/gate chung và lệnh/luồng khởi tạo admin có kiểm soát. | P0 | TECH01 | `feature/authorization-foundation` | VERIFIED | Guest, customer, staff, admin và tài khoản khóa được kiểm thử đúng quyền, dữ liệu cũ mặc định customer. |
-| TECH03 | Môi trường và kiểm thử tích hợp | Nhóm phát triển | Chuẩn hóa môi trường Laragon, mail local, MySQL thử riêng và kiểm thử CI cho transaction/khóa hàng. | P0 | TECH01 | `chore/integration-test-foundation` | TODO | Lệnh test và cấu hình chạy được với SQLite và MySQL thử, dữ liệu thật được bảo toàn và bí mật giữ ngoài Git. |
+| TECH03 | Môi trường và kiểm thử tích hợp | Nhóm phát triển | Chuẩn hóa môi trường Laragon, mail local, MySQL thử riêng và kiểm thử CI cho transaction/khóa hàng. | P0 | TECH01 | `chore/integration-test-foundation` | VERIFIED | Lệnh test và cấu hình chạy được với SQLite và MySQL thử, dữ liệu thật được bảo toàn và bí mật giữ ngoài Git. |
 
 ## Use Case theo thứ tự phụ thuộc
 
