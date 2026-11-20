@@ -30,7 +30,7 @@
 
 ### TECH02 đã kiểm chứng
 
-- TECH02 đạt `VERIFIED` trên nhánh `feature/authorization-foundation`. Đã thêm vai trò và trạng thái tài khoản, gate quản trị và vận hành đơn, kiểm tra khóa tài khoản ở tầng xác thực và lệnh khởi tạo admin đầu tiên. [Kiến trúc ứng dụng](ARCHITECTURE.md#nền-tảng-phân-quyền-tech02)
+- Ngày 20/11/2026, người dùng nghiệm thu TECH02 tại commit `fdf23fc`. TECH02 giữ trạng thái `VERIFIED` trên nhánh `feature/authorization-foundation` trong thời gian chờ tích hợp vào `develop`. Đã thêm vai trò và trạng thái tài khoản, gate quản trị và vận hành đơn, kiểm tra khóa tài khoản ở tầng xác thực và lệnh khởi tạo admin đầu tiên. [Kiến trúc ứng dụng](ARCHITECTURE.md#nền-tảng-phân-quyền-tech02)
 - SQLite đạt 39 bài kiểm thử và 114 assertion, gồm quyền của guest, customer, staff, admin, từ chối phiên và yêu cầu Livewire của tài khoản khóa, kiểm soát dữ liệu đăng ký và khởi tạo admin. Pint và PHPStan đạt.
 - MySQL 8.4.3 thử nghiệm xác nhận migration giữ nguyên các trường của tài khoản mô phỏng và gán mặc định customer đang hoạt động. Kiểm tra mật khẩu cũ, token ghi nhớ, từ chối vai trò sai và tranh chấp khóa khởi tạo đều đạt.
 - Đã chạy migration bổ sung trên Laragon local. Bảng `users` trống trước migration. Việc khởi tạo admin trên schema `coffee_shop` đang chờ thông tin tài khoản của người vận hành.
@@ -48,6 +48,6 @@
 ## Việc còn lại
 
 - Nhánh `chore/gitflow-setup` chờ review. Repository chưa có remote.
-- TECH02 chờ nghiệm thu và tích hợp vào `develop`. TECH03 có thể triển khai từ `develop`. Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
+- TECH02 chờ tích hợp vào `develop`. TECH03 có thể triển khai từ `develop`. Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Kiểm tra hiện tại dùng mailer `log`.
 - Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
