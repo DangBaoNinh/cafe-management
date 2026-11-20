@@ -168,7 +168,9 @@
 - Chi tiết theo mã tại `/orders/{number}` hiển thị món, size, topping, địa chỉ và tiền đã lưu trên đơn, trạng thái thanh toán và mốc trạng thái theo giờ Việt Nam. Cùng trả 404 khi mã không tồn tại hoặc thuộc khách khác. Ghi chú nội bộ và tham chiếu thanh toán riêng không xuất hiện.
 - Không có migration. `composer ci:check` đạt Pint, PHPStan và 120 bài SQLite với 1.493 assertion. Bộ MySQL đạt 17 bài với 260 assertion. `npm run build` thành công. Các bài HTTP kiểm tra phân quyền, bộ lọc, phân trang, snapshot sau khi đổi dữ liệu gốc và truy vấn chỉ đọc.
 
-### UC16 đã kiểm chứng, chờ nghiệm thu
+### UC16 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC16 tại commit `afd5e5d`. Tích hợp vào `develop` tại merge commit `d5cf372` sau khi chạy lại Pint, PHPStan, 125 bài SQLite, 17 bài MySQL, bản build và hai kịch bản tranh khóa MySQL.
 
 - Chủ đơn có thể mở **Hủy đơn hàng** và xác nhận trên trang chi tiết khi đơn còn **Chờ xác nhận**. Lý do tùy chọn, tối đa 500 ký tự, được lưu trong lịch sử nghiệp vụ. Yêu cầu cũ hoặc gửi lặp báo trạng thái đã đổi.
 - Máy chủ khóa đơn rồi khóa payment, kiểm tra trạng thái hiện tại và lưu trạng thái cùng hai dòng lịch sử trong một giao dịch. Đơn hủy có payment `voided` nếu chưa thu hoặc `refund_pending` nếu đã thu. Trang chi tiết hướng dẫn liên hệ cửa hàng để hoàn tiền thủ công. Đơn đã hủy được loại khỏi số lượt sử dụng mã giảm giá theo BR10.
@@ -190,4 +192,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC16 chờ nghiệm thu. Xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.
+- Xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.
