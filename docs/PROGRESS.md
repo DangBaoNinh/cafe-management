@@ -91,7 +91,9 @@
 - `composer ci:check` đạt Pint, PHPStan và 72 bài SQLite với 483 assertion. Bộ MySQL cô lập đạt 9 bài với 127 assertion, gồm thay ảnh, dọn ảnh khi trùng slug và ngừng bán. `npm run build` thành công. Brave ở 390 px xác minh tải và hiển thị ảnh, sửa trạng thái, và trang danh sách lẫn trang sửa không cuộn ngang toàn trang.
 - Điều kiện size hoạt động, hiển thị menu, mua hàng và lịch sử đơn sẽ được kiểm tra qua các UC tương ứng khi có luồng hoàn chỉnh.
 
-### UC07 đã kiểm thử, chờ nghiệm thu
+### UC07 đã nghiệm thu
+
+- Ngày 20/11/2026, người dùng nghiệm thu UC07 tại commit `de5f22e`. Nhánh `feature/product-options` được tích hợp vào `develop` tại merge commit `81b294a`. Pint, PHPStan, 77 bài SQLite, 10 bài MySQL và bản build đều đạt khi kiểm tra lại trước merge.
 
 - Admin quản lý giá và trạng thái size theo món tại `/admin/products/{product}/options` và quản lý topping tại `/admin/toppings`. Mã được lưu chữ thường. Giá VND là số nguyên từ 0 đến 4.294.967.295 theo kiểu cột MySQL.
 - Ba migration mới đã chạy trên Laragon local. Cơ sở dữ liệu ràng buộc mã size duy nhất trong từng món, mã topping duy nhất và cặp gắn duy nhất. Ngừng bán giữ size hoặc topping và loại khỏi `activeSizes()` hoặc `activeToppings()`. Bỏ gắn chỉ xóa liên kết với món tương ứng.
@@ -113,5 +115,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC07 chờ nghiệm thu và tích hợp vào `develop` trước khi triển khai UC08.
+- UC08 đã đủ phụ thuộc để triển khai từ `develop`.
 - Các module menu, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
