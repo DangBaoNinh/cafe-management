@@ -59,6 +59,13 @@
 - Mục Bảo mật dùng xác nhận Fortify và kiểm tra lại thời hạn ở action Livewire. Đổi mật khẩu yêu cầu mật khẩu hiện tại còn đúng tại thời điểm ghi. Tự xóa tài khoản đã được gỡ khỏi giao diện và action cũ trả HTTP 403.
 - `composer ci:check` đạt Pint, PHPStan và 46 bài SQLite với 251 assertion, gồm kiểm tra thông báo tiếng Việt khi xác nhận sai mật khẩu. `php artisan test --testsuite=MySQL` đạt 4 bài với 67 assertion. `npm run build` thành công.
 
+### UC03 đã kiểm thử, chờ nghiệm thu
+
+- Khách hàng quản lý địa chỉ tại `/settings/addresses`. Backend kiểm tra quyền sở hữu và đối chiếu mã tỉnh, huyện, xã theo danh mục ba cấp trước 01/07/2025. Khả năng giao hàng được kiểm tra tại checkout theo BR08. [Nguồn và giấy phép danh mục](../resources/data/vietnam-legacy-addresses.NOTICE.txt)
+- Migration tạo `user_addresses` đã chạy trên Laragon local. Giao dịch khóa hàng khách khi ghi và khóa unique sinh từ `is_default` giới hạn tối đa một địa chỉ mặc định. Xóa địa chỉ mặc định để trống mặc định.
+- `composer ci:check` đạt Pint, PHPStan và 55 bài SQLite với 307 assertion. `php artisan test --testsuite=MySQL` đạt 6 bài với 88 assertion, gồm kiểm tra cạnh tranh khóa trên hai kết nối và ràng buộc unique. `npm run build` thành công. Edge chạy đạt luồng tạo, sửa, đặt mặc định và xác nhận xóa trên dữ liệu cô lập.
+- Tiêu chí giữ nguyên snapshot đơn được kiểm chứng sau khi tích hợp UC14.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -72,7 +79,7 @@
 ## Việc còn lại
 
 - Nhánh `chore/gitflow-setup` chờ review.
-- UC03 đã đủ phụ thuộc để triển khai từ `develop`.
+- UC03 ở trạng thái `VERIFIED` và chờ nghiệm thu để tích hợp vào `develop`.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
 - Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
