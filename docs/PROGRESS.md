@@ -53,11 +53,11 @@
 - Khi gửi hoặc dùng token đặt lại mật khẩu, giao dịch khóa hàng tài khoản trên MySQL. Đặt lại thành công cập nhật mật khẩu, xoay token ghi nhớ và vô hiệu hóa liên kết đã dùng. Kiểm thử giả lập lỗi giữa chừng xác nhận mật khẩu cũ và token đặt lại vẫn còn hiệu lực.
 - `composer ci:check` đạt Pint, PHPStan và 44 bài SQLite với 196 assertion. `php artisan test --testsuite=MySQL` đạt 3 bài với 49 assertion, gồm đặt lại mật khẩu, từ chối dùng lại token và đăng xuất với phiên MySQL. `npm run build` thành công. Mailpit nhận thư tiếng Việt có liên kết đặt lại hạn 60 phút từ route quên mật khẩu trên dữ liệu thử cô lập.
 
-### UC02 đã kiểm thử, chờ nghiệm thu
+### UC02 đã nghiệm thu
 
-- Trên `feature/customer-profile`, Livewire chỉ lưu họ tên và email của chủ phiên. Email được chuẩn hóa, email trùng bị từ chối và dữ liệu cũ được giữ nguyên. Khi đổi email, giao dịch xóa token đặt lại mật khẩu gắn với email cũ.
+- Ngày 20/11/2026, người dùng nghiệm thu UC02 tại commit `a594a0f`. Nhánh `feature/customer-profile` đã được tích hợp vào `develop` tại merge commit `8dbc557`. Livewire chỉ lưu họ tên và email của chủ phiên. Email được chuẩn hóa, email trùng bị từ chối và dữ liệu cũ được giữ nguyên. Khi đổi email, giao dịch xóa token đặt lại mật khẩu gắn với email cũ.
 - Mục Bảo mật dùng xác nhận Fortify và kiểm tra lại thời hạn ở action Livewire. Đổi mật khẩu yêu cầu mật khẩu hiện tại còn đúng tại thời điểm ghi. Tự xóa tài khoản đã được gỡ khỏi giao diện và action cũ trả HTTP 403.
-- `composer ci:check` đạt Pint, PHPStan và 45 bài SQLite với 241 assertion. `php artisan test --testsuite=MySQL` đạt 4 bài với 67 assertion. `npm run build` thành công.
+- `composer ci:check` đạt Pint, PHPStan và 46 bài SQLite với 251 assertion, gồm kiểm tra thông báo tiếng Việt khi xác nhận sai mật khẩu. `php artisan test --testsuite=MySQL` đạt 4 bài với 67 assertion. `npm run build` thành công.
 
 ## Kết quả kiểm tra nền tảng ban đầu
 
@@ -72,7 +72,7 @@
 ## Việc còn lại
 
 - Nhánh `chore/gitflow-setup` chờ review.
-- UC02 ở trạng thái `VERIFIED` và chờ nghiệm thu để tích hợp vào `develop`.
+- UC03 đã đủ phụ thuộc để triển khai từ `develop`.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
 - Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
