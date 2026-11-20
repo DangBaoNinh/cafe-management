@@ -82,7 +82,9 @@
 - Migration `categories` và `products` đã chạy trên Laragon local. Khi ẩn danh mục, truy vấn `Product::inActiveCategory()` loại món thuộc danh mục đó và dữ liệu vẫn được giữ. Khóa ngoại ngăn xóa danh mục đã có món. Menu công khai và điều kiện size hoạt động thuộc UC08.
 - `composer ci:check` đạt Pint, PHPStan và 67 bài SQLite với 411 assertion. Bộ MySQL đạt 8 bài với 113 assertion, gồm ràng buộc slug, khóa ngoại và truy vấn theo trạng thái danh mục. `npm run build` thành công. Brave ở 390 px chạy đạt luồng tạo và ẩn danh mục với dữ liệu thử cô lập.
 
-### UC06 đã kiểm thử, chờ nghiệm thu
+### UC06 đã nghiệm thu
+
+- Ngày 20/11/2026, người dùng nghiệm thu UC06 tại commit `93b753c`. Nhánh `feature/product-management` được tích hợp vào `develop` tại merge commit `29f3f86`. Pint, PHPStan, 72 bài SQLite, 9 bài MySQL và bản build đều đạt khi kiểm tra lại trước merge.
 
 - Admin thêm, sửa và đổi trạng thái sản phẩm tại `/admin/products`. Mô tả hiển thị dưới dạng văn bản. Ảnh là tùy chọn, nhận JPEG, PNG hoặc WebP tối đa 2 MiB. Laragon local đã có liên kết `public/storage` cho đĩa `public`.
 - Lưu ảnh mới và cập nhật đường dẫn trước khi dọn ảnh cũ. Khi lỗi ghi cơ sở dữ liệu, hệ thống dọn ảnh mới và giữ ảnh cũ. Ngừng bán giữ bản ghi và loại món khỏi truy vấn `Product::active()->inActiveCategory()`.
@@ -104,5 +106,5 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC06 chờ nghiệm thu và tích hợp vào `develop` trước khi triển khai UC07.
+- UC07 đã đủ phụ thuộc để triển khai từ `develop`.
 - Các module size và topping, menu, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
