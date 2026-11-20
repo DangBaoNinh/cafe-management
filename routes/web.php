@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ProductSizeController;
 use App\Http\Controllers\Admin\ToppingController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DeliveryFeeController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,13 @@ Route::prefix('cart')->name('cart.')->middleware(['auth', 'can:manage-cart'])->g
     Route::get('delivery', DeliveryFeeController::class)->name('delivery');
     Route::patch('{item}', [CartController::class, 'update'])->whereNumber('item')->name('update');
     Route::delete('{item}', [CartController::class, 'destroy'])->whereNumber('item')->name('destroy');
+});
+
+Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'can:manage-cart'])->group(function () {
+    Route::get('/', [CheckoutController::class, 'create'])->name('create');
+    Route::post('review', [CheckoutController::class, 'review'])->name('review');
+    Route::post('/', [CheckoutController::class, 'store'])->name('store');
+    Route::get('orders/{number}', [CheckoutController::class, 'confirmation'])->name('confirmation');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {

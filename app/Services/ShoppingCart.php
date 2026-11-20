@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
@@ -24,28 +25,37 @@ class ShoppingCart
                 return ['version' => 0, 'lines' => [], 'subtotal' => 0];
             }
 
-            $lines = [];
-            $subtotal = 0;
-            $items = $cart->items()->with([
-                'toppings', 'size.product.category', 'size.product.activeSizes', 'size.product.activeToppings',
-            ])->orderBy('id')->get();
+            return ['version' => $cart->version, ...$this->pricedLines($cart)];
+        }, 3);
+    }
 
-            foreach ($items as $item) {
-                $unitPrice = null;
+    /** @return array{lines: list<array{item: CartItem, unitPrice: ?int, total: ?int}>, subtotal: int} */
+    public function pricedLines(Cart $cart): array
+    {
+        $lines = [];
+        $subtotal = 0;
+        $items = $cart->items()->with([
+            'toppings', 'size.product.category', 'size.product.activeSizes', 'size.product.activeToppings',
+        ])->orderBy('id')->get();
 
-                try {
-                    $unitPrice = $this->quote($item->size->product, $item->selection())['unit_price_vnd'];
-                } catch (ValidationException) {
-                    // Keep unavailable lines visible so the customer can remove them.
-                }
+        foreach ($items as $item) {
+            $unitPrice = null;
 
-                $total = $unitPrice === null ? null : $unitPrice * $item->quantity;
-                $subtotal += $total ?? 0;
-                $lines[] = ['item' => $item, 'unitPrice' => $unitPrice, 'total' => $total];
+            try {
+                $unitPrice = $this->quote($item->size->product, $item->selection())['unit_price_vnd'];
+            } catch (ValidationException) {
+                // Keep unavailable lines visible so the customer can remove them.
             }
 
-            return ['version' => $cart->version, 'lines' => $lines, 'subtotal' => $subtotal];
-        }, 3);
+            if ($unitPrice !== null && $unitPrice > intdiv(PHP_INT_MAX - $subtotal, $item->quantity)) {
+                throw ValidationException::withMessages(['cart' => 'Tạm tính vượt giới hạn VND được hỗ trợ.']);
+            }
+            $total = $unitPrice === null ? null : $unitPrice * $item->quantity;
+            $subtotal += $total ?? 0;
+            $lines[] = ['item' => $item, 'unitPrice' => $unitPrice, 'total' => $total];
+        }
+
+        return ['lines' => $lines, 'subtotal' => $subtotal];
     }
 
     /** @param array<string, mixed> $selection */
