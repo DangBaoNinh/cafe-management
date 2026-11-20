@@ -3,4 +3,5 @@
     <p class="mt-5 max-w-xl text-base leading-relaxed sm:text-lg">
         Chào mừng bạn đến với Coffee Shop, website đặt cà phê trực tuyến.
     </p>
+    <flux:button :href="route('menu.index')" variant="primary" class="mt-6">Xem thực đơn</flux:button>
 </x-layouts::customer>

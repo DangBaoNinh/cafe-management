@@ -9,6 +9,9 @@
                 <a href="{{ route('home') }}" class="text-lg font-semibold">{{ config('app.name') }}</a>
 
                 <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
+                    <a href="{{ route('menu.index') }}"
+                        @if (request()->routeIs('menu.*')) aria-current="true" @endif
+                        class="hover:underline aria-[current=true]:underline">Thực đơn</a>
                     @auth
                         <a href="{{ route('dashboard') }}" class="hover:underline">Tài khoản</a>
                         <form method="POST" action="{{ route('logout') }}">
