@@ -59,13 +59,13 @@ return [
     | Application Timezone
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the default timezone for your application, which
-    | will be used by the PHP date and date-time functions. The timezone
-    | is set to "UTC" by default as it is suitable for most use cases.
+    | Keep PHP and the MySQL session on UTC so persisted timestamps use
+    | the same time zone. Use Asia/Ho_Chi_Minh for local business dates
+    | and for displaying times to customers and staff.
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'Asia/Ho_Chi_Minh'),
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
