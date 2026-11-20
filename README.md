@@ -6,7 +6,7 @@ Coffee Shop là đồ án môn Mã nguồn mở về website đặt cà phê tr�
 
 - Laravel 13, Laravel Fortify, Blade, Livewire 4 và Flux UI từ bộ khởi tạo Livewire chính thức của Laravel.
 - Tailwind CSS 4, Vite qua Vite+, font Be Vietnam Pro, Composer 2, npm và Git.
-- MySQL cho ứng dụng. PHPUnit dùng SQLite trong bộ nhớ để kiểm thử.
+- MySQL cho ứng dụng. PHPUnit dùng SQLite trong bộ nhớ cho bộ mặc định và MySQL 8.4 cho kiểm thử tích hợp.
 - Môi trường đã dùng gồm Windows 11, Laragon 8.9, Apache 2.4, PHP 8.3.37, MySQL 8.4.3 và Node.js 22.23.5.
 - Cần PHP 8.3 trở lên với các extension Laravel, gồm `pdo_mysql` cho MySQL, `pdo_sqlite` cho PHPUnit và `zip` hoặc công cụ giải nén tương thích cho Composer. Khuyến nghị Node.js 22.18 trở lên trong dòng 22.
 
@@ -52,6 +52,40 @@ php artisan migrate:status
 php artisan route:list
 php artisan test
 ```
+
+### Xem email local bằng Mailpit
+
+Khởi động Mailpit của Laragon. Nếu chạy từ terminal, dùng `mailpit --listen 127.0.0.1:8025 --smtp 127.0.0.1:1025`. Đặt các biến sau trong `.env` local và chạy `php artisan config:clear`.
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtp
+MAIL_HOST=127.0.0.1
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+```
+
+Yêu cầu đặt lại mật khẩu cho tài khoản thử rồi mở hộp thư Mailpit để xem email. Dùng `MAIL_MAILER=log` nếu chạy Laragon mà không bật Mailpit. [Hộp thư Mailpit](http://127.0.0.1:8025)
+
+### Kiểm thử tích hợp MySQL
+
+Tạo schema và tài khoản thử riêng trên MySQL 8.4. Với cấu hình MySQL mặc định, dùng dấu thoát cho ký tự gạch dưới để quyền chỉ áp dụng cho schema thử. Nếu `@@partial_revokes` đang bật, dùng tên `coffee_shop_test` trực tiếp trong `GRANT`. Thay giá trị mật khẩu mẫu bằng mật khẩu local của bạn. [Quyền trên schema MySQL](https://dev.mysql.com/doc/refman/8.4/en/grant.html)
+
+```sql
+CREATE DATABASE coffee_shop_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'coffee_test'@'127.0.0.1' IDENTIFIED BY 'thay-bang-mat-khau-local';
+GRANT ALL PRIVILEGES ON `coffee\_shop\_test`.* TO 'coffee_test'@'127.0.0.1';
+```
+
+Sao chép `.env.mysql-testing.example` thành `.env.mysql-testing` và điền mật khẩu thử. Git bỏ qua file local này. Có thể đặt các biến `MYSQL_TEST_*` trực tiếp trong môi trường chạy, như trong CI.
+
+```powershell
+php artisan test                  # Unit và Feature trên SQLite trong bộ nhớ
+php artisan test --testsuite=MySQL # Transaction và khóa hàng trên MySQL
+```
+
+Bộ MySQL tự chạy migration tiến trên `coffee_shop_test`. Các bản ghi kiểm tra rollback nằm trong transaction và bài kiểm tra khóa dùng một dòng migration có sẵn. Bộ mặc định dùng SQLite với mailer `array`. GitHub Actions chạy cả hai bộ với một MySQL service dùng riêng cho lần chạy CI.
 
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md)
 - [Tiến độ và kết quả kiểm tra](docs/PROGRESS.md)

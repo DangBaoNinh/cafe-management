@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
   pull_request:
 
 permissions:
@@ -12,6 +13,22 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MYSQL_DATABASE: coffee_shop_test
+          MYSQL_USER: coffee_test
+          MYSQL_PASSWORD: ci-disposable
+        ports:
+          - 3306/tcp
+        options: >-
+          --health-cmd="mysqladmin ping --protocol=tcp --host=127.0.0.1 --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
 
     steps:
       - name: Checkout code
@@ -23,6 +40,7 @@ jobs:
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: '8.3'
+          extensions: pdo_mysql, pdo_sqlite
           tools: composer:v2
           coverage: none
 
@@ -41,3 +59,12 @@ jobs:
 
       - name: Run CI Checks
         run: composer ci:check
+
+      - name: Run MySQL integration tests
+        env:
+          MYSQL_TEST_HOST: 127.0.0.1
+          MYSQL_TEST_PORT: ${{ job.services.mysql.ports['3306'] }}
+          MYSQL_TEST_DATABASE: coffee_shop_test
+          MYSQL_TEST_USERNAME: coffee_test
+          MYSQL_TEST_PASSWORD: ci-disposable
+        run: php artisan test --testsuite=MySQL
