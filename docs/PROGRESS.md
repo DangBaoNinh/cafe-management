@@ -19,12 +19,21 @@
 - Đã thiết lập lệnh ngắn trong `AGENTS.md` và bản trình bày [Word](reports/PHAN_TICH_THIET_KE_HE_THONG.docx). Các UC và schema nghiệp vụ đang ở giai đoạn thiết kế.
 - Đã kiểm tra tính duy nhất của mã, thứ tự phụ thuộc, liên kết Markdown, tên bảng ERD và nội dung đặc tả trong Word. Microsoft Word mở được báo cáo và cập nhật mục lục. Lượt kiểm thử hồi quy nền tảng chạy 29 bài với 69 assertion.
 
-## Giai đoạn 03 — TECH01 đã nghiệm thu
+## Giai đoạn 03 — Nền tảng
+
+### TECH01 đã nghiệm thu
 
 - Ngày 20/11/2026, người dùng nghiệm thu TECH01. Commit `3745c63` từ `chore/database-foundation` đã được tích hợp vào `develop`. Laravel và phiên MySQL dùng UTC, MySQL tạo bảng mới bằng InnoDB. [Thiết kế dữ liệu](DATABASE_DESIGN.md) ghi đối chiếu 8 bảng hiện có với ERD và quy ước VND, thời gian, FK, chỉ mục, constraint và migration theo UC.
 - MySQL 8.4.3 chạy đủ 3 migration trên schema thử trống. Kiểm tra đạt cho InnoDB, `utf8mb4`, khóa và chỉ mục nền, từ chối email trùng và ghi thời điểm UTC.
 - Trên schema thử có dữ liệu mô phỏng theo cấu hình cũ UTC+7, chuyển sang UTC giữ nguyên bản ghi của cả 8 bảng và thời điểm lưu qua mốc 00:00 giờ Việt Nam. Token đặt lại mật khẩu cũ vẫn hợp lệ. Schema `coffee_shop` hiện có chỉ được đọc để đối chiếu metadata.
 - Kiểm thử hồi quy đạt 29 bài với 69 assertion trên SQLite. Pint cho hai file cấu hình và PHPStan đều đạt.
+
+### TECH02 đã kiểm chứng
+
+- Ngày 20/11/2026, người dùng nghiệm thu TECH02 tại commit `fdf23fc`. TECH02 giữ trạng thái `VERIFIED` trên nhánh `feature/authorization-foundation` trong thời gian chờ tích hợp vào `develop`. Đã thêm vai trò và trạng thái tài khoản, gate quản trị và vận hành đơn, kiểm tra khóa tài khoản ở tầng xác thực và lệnh khởi tạo admin đầu tiên. [Kiến trúc ứng dụng](ARCHITECTURE.md#nền-tảng-phân-quyền-tech02)
+- SQLite đạt 39 bài kiểm thử và 114 assertion, gồm quyền của guest, customer, staff, admin, từ chối phiên và yêu cầu Livewire của tài khoản khóa, kiểm soát dữ liệu đăng ký và khởi tạo admin. Pint và PHPStan đạt.
+- MySQL 8.4.3 thử nghiệm xác nhận migration giữ nguyên các trường của tài khoản mô phỏng và gán mặc định customer đang hoạt động. Kiểm tra mật khẩu cũ, token ghi nhớ, từ chối vai trò sai và tranh chấp khóa khởi tạo đều đạt.
+- Đã chạy migration bổ sung trên Laragon local. Bảng `users` trống trước migration. Việc khởi tạo admin trên schema `coffee_shop` đang chờ thông tin tài khoản của người vận hành.
 
 ## Kết quả kiểm tra
 
@@ -39,6 +48,6 @@
 ## Việc còn lại
 
 - Nhánh `chore/gitflow-setup` chờ review. Repository chưa có remote.
-- TECH02 và TECH03 có thể triển khai sau khi TECH01 đã tích hợp. Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
+- TECH02 chờ tích hợp vào `develop`. TECH03 có thể triển khai từ `develop`. Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Kiểm tra hiện tại dùng mailer `log`.
-- Phân quyền Admin, Staff, Customer và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
+- Quản lý vai trò và các module menu, sản phẩm, danh mục, giỏ hàng, checkout, đơn hàng, thanh toán, khách hàng, khuyến mãi và doanh thu thuộc các giai đoạn tiếp theo.
