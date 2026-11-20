@@ -4,10 +4,13 @@ namespace App\Livewire;
 
 use App\Enums\DrinkLevel;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\DrinkPricing;
+use App\Services\ShoppingCart;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -25,6 +28,8 @@ class DrinkCustomizer extends Component
 
     public mixed $toppingIds = [];
 
+    public mixed $quantity = 1;
+
     public function mount(Product $product): void
     {
         $this->productId = $product->id;
@@ -36,6 +41,25 @@ class DrinkCustomizer extends Component
         $this->selectDefaults($this->availableProduct());
     }
 
+    public function addToCart(ShoppingCart $cart): void
+    {
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        if ($user === null) {
+            $slug = $this->availableProduct()?->slug;
+            session()->put('url.intended', $slug === null ? route('menu.index') : route('menu.show', $slug));
+            $this->redirectRoute('login');
+
+            return;
+        }
+
+        Gate::authorize('manage-cart');
+        $cart->add($user, $this->productId, $this->selection(), $this->quantity);
+        session()->flash('status', 'Đã thêm món vào giỏ hàng.');
+        $this->redirectRoute('cart.index');
+    }
+
     public function render(DrinkPricing $pricing): View
     {
         $product = $this->availableProduct();
@@ -44,12 +68,7 @@ class DrinkCustomizer extends Component
 
         if ($product !== null) {
             try {
-                $quote = $pricing->quote($product, [
-                    'size_id' => $this->sizeId,
-                    'sugar_level' => $this->sugarLevel,
-                    'ice_level' => $this->iceLevel,
-                    'topping_ids' => $this->toppingIds,
-                ]);
+                $quote = $pricing->quote($product, $this->selection());
             } catch (ValidationException $exception) {
                 $messages = $exception->validator->errors()->all();
             }
@@ -61,6 +80,17 @@ class DrinkCustomizer extends Component
             'messages' => $messages,
             'levels' => DrinkLevel::cases(),
         ]);
+    }
+
+    /** @return array<string, mixed> */
+    private function selection(): array
+    {
+        return [
+            'size_id' => $this->sizeId,
+            'sugar_level' => $this->sugarLevel,
+            'ice_level' => $this->iceLevel,
+            'topping_ids' => $this->toppingIds,
+        ];
     }
 
     private function availableProduct(): ?Product

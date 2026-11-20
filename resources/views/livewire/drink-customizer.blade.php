@@ -73,5 +73,27 @@
                 {{ $quote === null ? '—' : number_format($quote['unit_price_vnd'], 0, ',', '.').' ₫' }}
             </strong>
         </div>
+
+        @can('manage-cart')
+            <form wire:submit="addToCart" class="flex flex-wrap items-end gap-3">
+                <div class="w-32 space-y-2">
+                    <label for="drink-quantity" class="block text-sm font-medium">Số lượng</label>
+                    <flux:input id="drink-quantity" type="number" wire:model="quantity"
+                        required min="1" :max="\App\Models\CartItem::MAX_QUANTITY" />
+                </div>
+                <flux:button type="submit" variant="primary" :disabled="$quote === null">Thêm vào giỏ</flux:button>
+            </form>
+        @endcan
+        @guest
+            <flux:button type="button" wire:click="addToCart">Đăng nhập để thêm vào giỏ</flux:button>
+        @endguest
+
+        @if ($errors->any())
+            <ul role="alert" class="space-y-1 rounded-lg border border-red-200 bg-white p-4 text-sm text-red-800">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        @endif
     @endif
 </section>

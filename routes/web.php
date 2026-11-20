@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductOptionController;
 use App\Http\Controllers\Admin\ProductSizeController;
 use App\Http\Controllers\Admin\ToppingController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,12 @@ Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
 Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
 
 Route::view('dashboard', 'customer.account')->middleware('auth')->name('dashboard');
+
+Route::prefix('cart')->name('cart.')->middleware(['auth', 'can:manage-cart'])->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::patch('{item}', [CartController::class, 'update'])->whereNumber('item')->name('update');
+    Route::delete('{item}', [CartController::class, 'destroy'])->whereNumber('item')->name('destroy');
+});
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
