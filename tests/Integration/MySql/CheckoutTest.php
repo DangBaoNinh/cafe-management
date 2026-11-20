@@ -23,6 +23,7 @@ class CheckoutTest extends MySqlTestCase
             $coupon = Coupon::create([
                 'code' => strtoupper(Str::random(16)), 'discount_type' => 'fixed', 'discount_value' => 10000,
                 'starts_at' => now()->subHour(), 'ends_at' => now()->addHour(), 'total_limit' => 1,
+                'per_user_limit' => 1,
             ]);
 
             $first = User::factory()->create();
@@ -58,6 +59,25 @@ class CheckoutTest extends MySqlTestCase
             $this->actingAs($first)->get(route('orders.index', ['status' => 'processing']))
                 ->assertOk()->assertSee($order->order_number);
             $this->get($link)->assertOk()->assertSee('Món thử')->assertSee('30.000 ₫')->assertSee('Chờ thanh toán');
+
+            $this->primary->flushQueryLog();
+            $this->primary->enableQueryLog();
+            $this->post(route('orders.cancel', $order->order_number), ['expected_status' => 'pending', 'confirm' => '1'])
+                ->assertStatus(303);
+            $queries = array_map('strtolower', array_column($this->primary->getQueryLog(), 'query'));
+            $this->primary->disableQueryLog();
+            $locks = array_values(array_filter($queries, static fn (string $sql): bool => str_contains($sql, 'for update')));
+            $this->assertCount(2, $locks);
+            $this->assertStringContainsString('from `orders`', $locks[0]);
+            $this->assertStringContainsString('from `payments`', $locks[1]);
+            $this->assertSame('cancelled', $order->refresh()->status->value);
+            $this->assertSame('voided', $order->payment()->sole()->status->value);
+            $this->assertSame($coupon->id, $order->coupon_id);
+
+            app(ShoppingCart::class)->add($first, $product->id, ['size_id' => $size->id], 1);
+            $this->submission($first, $coupon);
+            $this->actingAs($second)->post(route('checkout.store'), $secondSubmission)->assertStatus(303);
+            $this->assertSame(30000, $second->orders()->sole()->total_vnd);
         } finally {
             $this->primary->disableQueryLog();
             $this->primary->rollBack();
@@ -67,7 +87,7 @@ class CheckoutTest extends MySqlTestCase
     private function submission(User $user, Coupon $coupon): array
     {
         $details = [
-            'cart_version' => 1, 'fulfillment_type' => 'pickup', 'method' => 'cod',
+            'cart_version' => $user->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'cod',
             'recipient_name' => 'Khách thử', 'phone' => '0901234567', 'coupon_code' => $coupon->code,
         ];
         $response = $this->actingAs($user)->post(route('checkout.review'), $details)->assertOk();

@@ -18,7 +18,7 @@
                                 @if (request()->routeIs('cart.*')) aria-current="page" @endif
                                 class="hover:underline aria-[current=page]:underline">Giỏ hàng</a>
                         @endcan
-                        @can('view-own-orders')
+                        @can('access-customer-orders')
                             <a href="{{ route('orders.index') }}"
                                 @if (request()->routeIs('orders.*')) aria-current="page" @endif
                                 class="hover:underline aria-[current=page]:underline">Đơn của tôi</a>

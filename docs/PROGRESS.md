@@ -168,6 +168,13 @@
 - Chi tiết theo mã tại `/orders/{number}` hiển thị món, size, topping, địa chỉ và tiền đã lưu trên đơn, trạng thái thanh toán và mốc trạng thái theo giờ Việt Nam. Cùng trả 404 khi mã không tồn tại hoặc thuộc khách khác. Ghi chú nội bộ và tham chiếu thanh toán riêng không xuất hiện.
 - Không có migration. `composer ci:check` đạt Pint, PHPStan và 120 bài SQLite với 1.493 assertion. Bộ MySQL đạt 17 bài với 260 assertion. `npm run build` thành công. Các bài HTTP kiểm tra phân quyền, bộ lọc, phân trang, snapshot sau khi đổi dữ liệu gốc và truy vấn chỉ đọc.
 
+### UC16 đã kiểm chứng, chờ nghiệm thu
+
+- Chủ đơn có thể mở **Hủy đơn hàng** và xác nhận trên trang chi tiết khi đơn còn **Chờ xác nhận**. Lý do tùy chọn, tối đa 500 ký tự, được lưu trong lịch sử nghiệp vụ. Yêu cầu cũ hoặc gửi lặp báo trạng thái đã đổi.
+- Máy chủ khóa đơn rồi khóa payment, kiểm tra trạng thái hiện tại và lưu trạng thái cùng hai dòng lịch sử trong một giao dịch. Đơn hủy có payment `voided` nếu chưa thu hoặc `refund_pending` nếu đã thu. Trang chi tiết hướng dẫn liên hệ cửa hàng để hoàn tiền thủ công. Đơn đã hủy được loại khỏi số lượt sử dụng mã giảm giá theo BR10.
+- `composer ci:check` đạt Pint, PHPStan và 125 bài SQLite với 1.584 assertion, gồm kiểm tra rollback khi ghi lịch sử thanh toán thất bại. Bộ MySQL đạt 17 bài với 270 assertion, gồm kiểm tra dùng lại mã đã hết lượt sau hủy. `npm run build` thành công.
+- Hai phiên MySQL cô lập kiểm tra cả hai thứ tự giữa khách hủy và giao dịch mô phỏng nhân viên xác nhận. Trong mỗi lượt, phiên đến sau chờ khóa rồi bị từ chối. Brave ở 360 px kiểm tra xác nhận hủy, phản hồi 419 khi thiếu CSRF, hai kết quả thanh toán và bộ lọc **Đã kết thúc**.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -183,4 +190,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- Hủy đơn của khách, xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.
+- UC16 chờ nghiệm thu. Xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.

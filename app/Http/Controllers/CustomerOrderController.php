@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrderStatus;
+use App\Http\Requests\CancelCustomerOrderRequest;
 use App\Models\User;
+use App\Services\CancelCustomerOrder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class CustomerOrderController extends Controller
@@ -58,6 +61,13 @@ class CustomerOrderController extends Controller
             ->firstOrFail();
 
         return view('customer.orders.show', ['order' => $order]);
+    }
+
+    public function cancel(CancelCustomerOrderRequest $request, string $number, CancelCustomerOrder $cancelOrder): RedirectResponse
+    {
+        $cancelOrder->cancel($this->customer($request), $number, $request->validated('reason'));
+
+        return to_route('orders.show', $number, 303)->with('status', 'Đã hủy đơn hàng.');
     }
 
     private function customer(Request $request): User
