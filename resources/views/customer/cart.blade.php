@@ -85,5 +85,7 @@
                 <p class="text-sm">Tạm tính chỉ gồm các món và tùy chọn còn bán.</p>
             @endif
         </div>
+
+        <flux:link :href="route('cart.delivery')">Xem phí giao hàng và nhận tại quán</flux:link>
     </div>
 </x-layouts::customer>

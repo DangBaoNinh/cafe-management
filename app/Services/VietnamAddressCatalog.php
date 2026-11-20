@@ -35,6 +35,19 @@ class VietnamAddressCatalog
         );
     }
 
+    /** @return list<string> */
+    public function districtCodes(): array
+    {
+        $codes = [];
+        foreach ($this->provinces as $province) {
+            foreach (array_keys($province['districts']) as $code) {
+                $codes[] = (string) $code;
+            }
+        }
+
+        return $codes;
+    }
+
     /** @return array<int|string, string> */
     public function wards(string $province, string $district): array
     {
