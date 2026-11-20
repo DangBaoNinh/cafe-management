@@ -151,7 +151,9 @@
 - Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 106 bài SQLite với 1.098 assertion. Bộ MySQL cô lập đạt 16 bài với 233 assertion, gồm lưu UTC và khóa duy nhất cho code khác hoa/thường. `npm run build` thành công.
 - UC14 đếm lượt từ đơn còn hiệu lực theo BR10, khóa bản ghi mã trong giao dịch checkout và lưu mã trên đơn. Kiểm tra qua hai phiên MySQL thật xác nhận chỉ một checkout dùng được lượt cuối.
 
-### UC14 đã kiểm chứng, chờ nghiệm thu
+### UC14 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC14 tại commit `f59109c`, gồm bản sửa thông báo địa chỉ ngoài vùng chỉ hiện một lần. Tích hợp vào `develop` tại merge commit `b511337`. Pint, PHPStan, 117 bài SQLite, 17 bài MySQL và bản build đạt trước merge.
 
 - Khách từ `/cart` vào `/checkout`, chọn cách nhận và thanh toán rồi xem tổng VND trước khi xác nhận. Đơn giao chỉ dùng địa chỉ đã lưu thuộc khách và còn trong vùng. Đơn nhận tại quán có phí 0 ₫.
 - Khi xác nhận, máy chủ khóa khách, giỏ và mã giảm nếu có, kiểm tra phiên bản giỏ và tính lại giá, phí, giảm giá. Lưu đơn, dòng món, topping, payment và hai lịch sử ban đầu rồi làm trống giỏ trong cùng giao dịch. Retry cùng khóa và nội dung trả đơn cũ. Cùng khóa với nội dung khác báo xung đột.
@@ -173,4 +175,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC14 chờ nghiệm thu. Theo dõi và xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.
+- Theo dõi và xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.
