@@ -142,7 +142,9 @@
 - Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 101 bài SQLite với 986 assertion. Bộ MySQL cô lập đạt 15 bài với 218 assertion, gồm kiểm tra giữ số 0 đầu mã quận, phí biên và từ chối phiên bản cũ. `npm run build` thành công.
 - Dịch vụ tính phí đã sẵn sàng cho UC14. Checkout cần lấy phí hiện hành khi chốt, lưu vào đơn và kiểm thử rằng đổi cấu hình không đổi phí của đơn đã tạo.
 
-### UC13 đã triển khai quản lý mã và tính giảm
+### UC13 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC13 tại commit `b1cffdb` gồm bản sửa khung cuộn danh sách mã. Tích hợp vào `develop` tại merge commit `628883e`. Pint, PHPStan, 106 bài SQLite, 16 bài MySQL và bản build đạt trước merge.
 
 - Admin tạo, sửa và tắt mã tại `/admin/coupons`. Code chuẩn hóa chữ hoa và duy nhất. Mốc hiệu lực nhập theo giờ Việt Nam, lưu UTC. Mã có hiệu lực từ thời điểm bắt đầu đến trước thời điểm kết thúc.
 - Hỗ trợ giảm số tiền cố định hoặc phần trăm nguyên từ 1 đến 100, ngưỡng tạm tính, trần giảm cho phần trăm và giới hạn tổng lượt hoặc lượt mỗi khách. Mức giảm phần trăm làm tròn xuống và tiền giảm không vượt tạm tính.
