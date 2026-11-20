@@ -160,6 +160,12 @@
 - Trang xác nhận hiển thị mã đơn, phương thức nhận và tổng. Chuyển khoản chỉ hiện khi cấu hình đủ `CHECKOUT_BANK_NAME`, `CHECKOUT_BANK_ACCOUNT_NUMBER` và `CHECKOUT_BANK_ACCOUNT_HOLDER`. Đã kiểm thử bằng dữ liệu mẫu. Laragon local chưa cấu hình tài khoản nhận tiền thực tế.
 - Migration đã chạy trên Laragon local. `composer ci:check` đạt Pint, PHPStan và 115 bài SQLite với 1.404 assertion. `php artisan test --testsuite=MySQL` đạt 17 bài với 253 assertion. `npm run build` thành công. Kiểm tra riêng trên hai phiên MySQL có tranh khóa xác nhận một đơn được tạo và giỏ của khách còn lại được giữ.
 
+### UC15 đã kiểm chứng, chờ nghiệm thu
+
+- Khách mở **Đơn của tôi** tại `/orders`, từ trang tài khoản hoặc theo liên kết **Theo dõi đơn** sau checkout. Danh sách mới nhất trước, phân trang 10 đơn và giữ bộ lọc **Đang xử lý** hoặc **Đã kết thúc** qua các trang.
+- Chi tiết theo mã tại `/orders/{number}` hiển thị món, size, topping, địa chỉ và tiền đã lưu trên đơn, trạng thái thanh toán và mốc trạng thái theo giờ Việt Nam. Cùng trả 404 khi mã không tồn tại hoặc thuộc khách khác. Ghi chú nội bộ và tham chiếu thanh toán riêng không xuất hiện.
+- Không có migration. `composer ci:check` đạt Pint, PHPStan và 120 bài SQLite với 1.493 assertion. Bộ MySQL đạt 17 bài với 260 assertion. `npm run build` thành công. Các bài HTTP kiểm tra phân quyền, bộ lọc, phân trang, snapshot sau khi đổi dữ liệu gốc và truy vấn chỉ đọc.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -175,4 +181,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- Theo dõi và xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.
+- UC15 chờ nghiệm thu. Xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.

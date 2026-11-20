@@ -48,10 +48,16 @@ class CheckoutTest extends MySqlTestCase
 
             $this->actingAs($second)->postJson(route('checkout.store'), $secondSubmission)
                 ->assertUnprocessable()->assertJsonValidationErrors('coupon_code');
-            $this->assertSame(30000, $first->orders()->sole()->total_vnd);
+            $order = $first->orders()->sole();
+            $this->assertSame(30000, $order->total_vnd);
             $this->assertSame(0, $first->cart()->sole()->items()->count());
             $this->assertSame(1, $second->cart()->sole()->items()->count());
             $this->assertFalse($second->orders()->exists());
+            $link = route('orders.show', $order->order_number);
+            $this->get($link)->assertNotFound();
+            $this->actingAs($first)->get(route('orders.index', ['status' => 'processing']))
+                ->assertOk()->assertSee($order->order_number);
+            $this->get($link)->assertOk()->assertSee('Món thử')->assertSee('30.000 ₫')->assertSee('Chờ thanh toán');
         } finally {
             $this->primary->disableQueryLog();
             $this->primary->rollBack();

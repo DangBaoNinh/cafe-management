@@ -4,7 +4,7 @@
     @foreach (['Tạm tính' => $subtotal, 'Giảm giá' => $discount, 'Phí giao' => $deliveryFee, 'Tổng tiền' => $total] as $label => $amount)
         <div @class(['flex flex-wrap justify-between gap-x-4', 'border-t border-coffee/15 pt-2 text-lg font-semibold' => $loop->last])>
             <dt>{{ $label }}</dt>
-            <dd>{{ preg_replace('/\B(?=(\d{3})+(?!\d))/', '.', (string) $amount) }} ₫</dd>
+            <dd><x-customer.vnd :amount="$amount" /></dd>
         </div>
     @endforeach
 </dl>

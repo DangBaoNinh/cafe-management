@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ToppingController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DeliveryFeeController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,11 @@ Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'can:manage-ca
     Route::post('review', [CheckoutController::class, 'review'])->name('review');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');
     Route::get('orders/{number}', [CheckoutController::class, 'confirmation'])->name('confirmation');
+});
+
+Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:view-own-orders'])->group(function () {
+    Route::get('/', [CustomerOrderController::class, 'index'])->name('index');
+    Route::get('{number}', [CustomerOrderController::class, 'show'])->name('show');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {

@@ -31,6 +31,9 @@
             </div>
         @endif
 
-        <flux:link :href="route('menu.index')">Về thực đơn</flux:link>
+        <div class="flex flex-wrap items-center gap-4">
+            <flux:button variant="primary" :href="route('orders.show', $order->order_number)">Theo dõi đơn</flux:button>
+            <flux:link :href="route('menu.index')">Về thực đơn</flux:link>
+        </div>
     </section>
 </x-layouts::customer>
