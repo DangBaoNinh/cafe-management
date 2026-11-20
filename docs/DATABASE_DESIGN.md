@@ -31,6 +31,20 @@ Dùng MySQL InnoDB, `utf8mb4`, PK `BIGINT UNSIGNED` cho bảng nghiệp vụ và
 
 Bảy bảng hạ tầng đã có gồm `password_reset_tokens`, `sessions`, `cache`, `cache_locks`, `jobs`, `job_batches` và `failed_jobs`. Bảng `users` đã được tính ở nhóm nghiệp vụ.
 
+### Đối chiếu schema nền TECH01
+
+| Bảng | Khóa và chỉ mục hiện có | Đối chiếu với thiết kế |
+| --- | --- | --- |
+| `users` | PK `id` kiểu `BIGINT UNSIGNED`, unique `email` | Kiểu khóa khớp các quan hệ từ địa chỉ, giỏ, đơn và tác nhân trong ERD. TECH02 bổ sung vai trò và cờ hoạt động. |
+| `password_reset_tokens` | PK `email` | Fortify tra token theo email. |
+| `sessions` | PK `id`, index riêng cho `user_id` nullable và `last_activity` | Schema hạ tầng Laravel dùng `user_id` để tra phiên, không khai báo FK. |
+| `cache`, `cache_locks` | PK `key` và index `expiration` trên mỗi bảng | Phục vụ tra cứu và dọn mục hết hạn của Laravel. |
+| `jobs` | PK `id`, index `queue` | Phục vụ lấy công việc theo hàng đợi. |
+| `job_batches` | PK `id` | Phục vụ tra lô công việc theo mã. |
+| `failed_jobs` | PK `id`, unique `uuid` và index `connection,queue,failed_at` | Phục vụ nhận diện công việc lỗi và truy vấn theo hàng đợi/thời điểm. |
+
+ERD mô tả quan hệ nghiệp vụ. Migration tạo bảng con sẽ khai báo FK và chỉ mục theo từ điển dữ liệu. PK, unique và index của bảng hạ tầng theo schema Laravel.
+
 ## 3. ERD nghiệp vụ
 
 ```mermaid
@@ -65,3 +79,11 @@ erDiagram
 - Checkout dùng transaction với thứ tự khóa giỏ rồi mã giảm khi có. Kiểm tra lại phiên bản giỏ, quyền, tùy chọn, giá và tổng đã xác nhận. Đếm đơn còn hiệu lực bằng dữ liệu hiện hành ở MySQL sau khi khóa mã, tránh snapshot cũ khi chờ đồng thời. Unique idempotency chống xử lý lặp và request hash phân biệt nội dung. Kiểm tra khóa đã dùng trước khi yêu cầu giỏ còn dòng để retry sau chốt hoạt động.
 - Cập nhật đơn và payment khóa đơn trước payment, kiểm tra trạng thái kỳ vọng, ghi lịch sử cùng giao dịch. Khi giải phóng lượt mã, checkout vẫn bảo toàn giới hạn nhờ hàng mã được dùng làm điểm tuần tự hóa khi cấp lượt. Các quy tắc chuyển trạng thái nằm trong [quy trình đơn hàng](ORDER_WORKFLOW.md).
 - Migrate theo thứ tự người dùng, catalog, giỏ/cấu hình, đơn/payment/lịch sử. Thử forward migration trên MySQL riêng có dữ liệu mô phỏng và thử rollback với bản sao thử nghiệm. Dùng SQLite trong PHPUnit cho luồng độc lập engine, dùng MySQL cho khóa hàng, ràng buộc sinh và đồng thời.
+
+## 5. Quy ước triển khai migration
+
+- Giữ migration đã chạy trong lịch sử. Tạo migration mới có timestamp trong `database/migrations` cho từng UC hoặc nhiệm vụ kỹ thuật, theo thứ tự bảng cha trước bảng con. Đặt tên theo thay đổi, ví dụ `add_role_and_is_active_to_users_table`. Trong `down()`, tháo FK/bảng con trước bảng cha. Với cột bắt buộc trên bảng có dữ liệu, xác định giá trị mặc định hoặc backfill trước khi siết ràng buộc.
+- Dùng `id()` và `foreignId()` với FK khai báo rõ hành vi khi xóa. Chỉ dùng cascade cho dữ liệu phụ thuộc có thể xóa cùng chủ thể, như topping của dòng giỏ. Dùng restrict cho dữ liệu đã được đơn hoặc lịch sử tham chiếu. Cột tác nhân nullable dành cho sự kiện hệ thống. Dùng unique cho các khóa nghiệp vụ, CHECK cho điều kiện nội tại một hàng khi phù hợp, và transaction cho bất biến liên quan nhiều hàng. Đối chiếu thứ tự cột của chỉ mục ghép với truy vấn và tận dụng tiền tố của chỉ mục đã có.
+- Dùng `unsignedBigInteger` cho số tiền VND, đặt hậu tố `_vnd` cho cột chỉ chứa tiền và tính bằng số nguyên. Dữ liệu có thể biểu diễn cả tiền và tỷ lệ, như `coupons.discount_value`, phải được đọc theo kiểu giảm giá.
+- Laravel chạy ở UTC và kết nối MySQL đặt phiên ở `+00:00`. Đổi giờ sang `Asia/Ho_Chi_Minh` ở biên hiển thị và đổi hai mốc ngày địa phương sang UTC trước khi truy vấn. MySQL tự đổi múi giờ của cột `TIMESTAMP` khi đọc/ghi. Với `DATETIME`, ứng dụng phải chuyển đầu vào sang UTC trước khi ghi. [MySQL 8.4 Reference Manual](https://dev.mysql.com/doc/refman/8.4/en/time-zone-support.html)
+- Khi tích hợp TECH01, Laravel lấy giờ UTC từ cấu hình ứng dụng. Có thể bỏ `APP_TIMEZONE` cũ khỏi `.env`. Làm mới cache cấu hình và khởi động lại tiến trình Laravel chạy lâu nếu đang sử dụng. Schema Laragon đã đối chiếu dùng InnoDB, `utf8mb4` và từng có múi giờ phiên trùng giờ ứng dụng (+07:00), nên chuyển phiên sang UTC giữ nguyên thời điểm đã lưu. Với môi trường có lịch sử múi giờ khác, đối chiếu thời điểm đã biết trên bản sao trước khi áp dụng.
