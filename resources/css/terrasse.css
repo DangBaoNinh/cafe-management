@@ -55,6 +55,30 @@
 .terrasse-product-card:hover { border-color: var(--color-accent); }
 .terrasse-product-card h2, .terrasse-product-card h3 { font-family: var(--terrasse-display); font-weight: 650; font-size: 1.65rem; line-height: 1.08; }
 
+.terrasse-account-header {
+    padding: clamp(1.4rem, 5vw, 3.5rem);
+    border: 1px solid #432329;
+    background: linear-gradient(90deg, #432329 0%, #432329f5 42%, #4323295c 100%),
+        #432329 url("../assets/terrasse/paris-terrasse.jpg") right 58% / cover no-repeat;
+    color: #fff4df;
+}
+.terrasse-account-header > h1 { max-width: 16ch; }
+.terrasse-account-avatar {
+    display: grid;
+    flex: 0 0 3rem;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid #e5bd91;
+    border-radius: 50%;
+    color: var(--terrasse-gold);
+    font: 600 1.1rem/1 var(--terrasse-display);
+}
+.terrasse-account-role { padding: .15rem .5rem; border-radius: 1rem; background: #f2d5b3; color: var(--color-coffee); font-size: .72rem; font-weight: 600; }
+.terrasse-account-link { border-top: 2px solid var(--color-accent); }
+.terrasse-account-link:hover { background: #f2e5d9; border-color: var(--color-accent); }
+.terrasse-account-link:focus-visible { outline: 2px solid var(--color-accent); }
+.terrasse-account-icon { display: grid; flex: 0 0 2.5rem; aspect-ratio: 1; place-items: center; border-radius: 50%; background: #f0e2d7; color: var(--color-accent); }
+
 .terrasse-workspace { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: 100vh; }
 .terrasse-sidebar { background: var(--color-coffee); color: #fcebd9; }
 .terrasse-sidebar .terrasse-brand-mark { color: var(--terrasse-gold); }
@@ -90,6 +114,9 @@
 
 @media (max-width: 39.999rem) {
     .terrasse-store-header nav { min-height: 0; }
+    .terrasse-account-header {
+        background-image: linear-gradient(90deg, #432329 12%, #432329df 100%), url("../assets/terrasse/paris-terrasse.jpg");
+    }
     .terrasse-hero {
         align-items: start;
         min-height: 36rem;

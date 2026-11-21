@@ -27,10 +27,11 @@
                                 @if (request()->routeIs('orders.*')) aria-current="page" @endif
                                 class="terrasse-store-link">Đơn của tôi</a>
                         @endcan
-                        <a href="{{ route('dashboard') }}" class="terrasse-store-link">Tài khoản</a>
+                        <a href="{{ route('dashboard') }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif
+                            class="terrasse-store-link">Tài khoản</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="terrasse-store-link cursor-pointer">Đăng xuất</button>
+                            <button type="submit" class="terrasse-store-link cursor-pointer" data-test="logout-button">Đăng xuất</button>
                         </form>
                     @else
                         <a href="{{ route('login') }}" class="terrasse-store-link">Đăng nhập</a>
