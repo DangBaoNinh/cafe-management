@@ -33,9 +33,9 @@ MVP phục vụ **một cửa hàng**, dùng VND và thời gian nghiệp vụ t
 | [UC26 — Đặt đồ uống hẹn giờ nhận tại quán](use-cases/UC26.md) | Khách chọn giờ đến lấy đồ uống và đưa phiếu điện tử để nhân viên kiểm tra trước bàn giao. Hẹn giờ là tùy chọn của nhận tại quán. |
 | [UC27 — Đặt bàn hoặc phòng họp tại quán](use-cases/UC27.md) | Chọn bàn hoặc phòng còn trống trên sơ đồ từng tầng theo giờ đến và số người. Khi khách rời đi, nhân viên xác nhận trả chỗ. Mỗi tầng trong hai tầng có 5 bàn tối đa 4 người, 5 bàn tối đa 2 người và 1 phòng họp tối đa 10 người. |
 
-Quán mở 07:00–23:00, khách đặt trước ít nhất một giờ. UC26 không giới hạn số đơn theo giờ nhận. Hai UC dùng chung chính sách đổi lịch, đến trễ, không đến và hạn chế đặt lịch theo [BR25–BR28](BUSINESS_RULES.md#quy-tắc-mở-rộng-uc26-và-uc27). Q01 mô tả phạm vi MVP gốc, còn hẹn nhận theo giờ được đặc tả ở UC26.
+Quán mở 07:00–23:00, nhận hẹn từ 07:00 đến 22:30 theo bước 5 phút. Khách đặt trước ít nhất một giờ. UC26 không giới hạn số đơn theo giờ nhận. Hai UC dùng chung chính sách đổi lịch, đến trễ, không đến, hạn chế đặt lịch và đối chiếu phụ phí theo [BR25–BR29](BUSINESS_RULES.md#quy-tắc-mở-rộng-uc26-và-uc27). Q01 mô tả phạm vi MVP gốc, còn hẹn nhận theo giờ được đặc tả ở UC26.
 
-Giờ hẹn dùng bước 5 phút. Khách gửi đổi lịch trước giờ hẹn. Phụ phí thanh toán trực tiếp được cộng vào hóa đơn tại quầy. Còn cần xác định cách xử lý khi quán đóng cửa trước mốc 30 phút và cách nhân viên đối chiếu khoản phụ phí trả trên ứng dụng.
+Giờ hẹn cuối 22:30 cho khách đủ 30 phút đến trước khi quán đóng cửa. Nhân viên xem trạng thái từng khoản phụ phí ngay khi tra mã. Hóa đơn tại quầy chỉ cộng các khoản phải thu qua kênh tại quầy.
 
 ## 4. Luồng chính và ngoại lệ
 
