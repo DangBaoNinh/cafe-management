@@ -205,7 +205,9 @@
 - Không cần migration. `composer ci:check` đạt Pint, PHPStan và 141 bài SQLite với 1.946 assertion. Bộ MySQL đạt 18 bài với 308 assertion. `npm run build` thành công. Brave ở 360 px kiểm tra hai mốc pha chế, chặn yêu cầu thiếu mã CSRF, chuyển khoản trước và sau đối chiếu, và tiến trình phía khách.
 - Hai phiên MySQL kiểm chứng yêu cầu lặp ở cả hai mốc bị từ chối sau khi chờ khóa. Nếu giao dịch mô phỏng hủy bởi quản trị viên ghi trước, yêu cầu pha chế bị từ chối. Nếu đối chiếu chuyển khoản ghi trước, yêu cầu pha chế dùng trạng thái thanh toán đã cập nhật.
 
-### UC19 đã kiểm chứng, chờ nghiệm thu
+### UC19 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC19 tại commit `75842a3`. Tích hợp vào `develop` tại merge commit `acbce46` sau khi chạy lại Pint, PHPStan, 147 bài SQLite, 19 bài MySQL, bản build và ba kịch bản tranh khóa MySQL.
 
 - Nhân viên và quản trị viên vào **Bàn giao** tại `/operations/handoff`. Danh sách gồm đơn sẵn sàng và đang giao, sắp theo thời gian đặt, 15 đơn mỗi trang. Đơn nhận tại quán hoàn tất trực tiếp sau khi khách nhận. Đơn giao tận nơi phải qua **Đang giao** và giữ trạng thái đó nếu chưa giao thành công.
 - Bàn giao yêu cầu chuyển khoản đã `paid`. Với COD, khi hoàn tất đơn, số tiền thực thu phải khớp tổng đơn, kể cả phí giao. Cùng một giao dịch ghi `completed_at`, COD `paid` và hai lịch sử. Chủ đơn xem được các mốc bàn giao trong tiến trình.
@@ -227,4 +229,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC19 chờ nghiệm thu và tích hợp vào `develop` để gỡ phụ thuộc của UC21 và UC23.
+- UC21 và UC23 đủ phụ thuộc để triển khai sau khi UC19 được tích hợp vào `develop`.
