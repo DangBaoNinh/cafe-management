@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliverySettingsController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
@@ -69,7 +70,7 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
-    Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{number}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{number}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');

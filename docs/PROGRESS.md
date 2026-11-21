@@ -231,6 +231,12 @@
 - Hồ sơ hiển thị tên, email, trạng thái và tóm tắt đơn thuộc khách, gồm mã, giờ đặt, trạng thái và tổng tiền. Mã đơn mở chi tiết UC21. Liên kết chỉnh sửa tài khoản đi qua UC04 và yêu cầu xác nhận mật khẩu khi cần. UC22 chỉ đọc và không cần migration.
 - `composer ci:check` đạt Pint, PHPStan và 157 bài SQLite với 2.287 assertion. Bộ MySQL đạt 21 bài với 365 assertion. `npm run build` thành công. Brave ở 360 px kiểm tra lọc, dữ liệu dài không tràn ngang, liên kết đến đúng đơn, lỗi bộ lọc, xác nhận mật khẩu và từ chối nhân viên.
 
+### UC23 đã kiểm chứng, chờ nghiệm thu
+
+- Trang tổng quan `/admin` dành cho quản trị viên hoạt động. Bộ lọc mặc định gồm 7 ngày gần nhất kể cả hôm nay, giới hạn 366 ngày tính cả hai đầu và dùng ngày Việt Nam. Backend lấy từ 00:00 ngày đầu đến trước 00:00 ngày sau ngày cuối, quy đổi sang UTC.
+- Doanh thu tổng và theo ngày hoàn tất chỉ tính đơn `completed` có thanh toán `paid`. Tách tạm tính, giảm giá, phí giao, tổng thu và số đơn đủ điều kiện. Phần trạng thái đếm theo ngày đặt. Ngày trống hiển thị 0 và báo cáo chỉ trả số liệu tổng hợp. Không cần migration.
+- `composer ci:check` đạt Pint, PHPStan và 161 bài SQLite với 2.339 assertion. Bộ MySQL đạt 22 bài với 378 assertion. `npm run build` thành công. Brave ở 360 và 1.280 px kiểm tra bộ lọc, số liệu, lỗi ngày, quyền và cuộn ngang trong bảng.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -246,4 +252,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC23 đã đủ phụ thuộc trên `develop`.
+- UC23 chờ nghiệm thu và tích hợp vào `develop`.
