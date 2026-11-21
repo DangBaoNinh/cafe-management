@@ -6,7 +6,7 @@
         $peakRevenue = max(1, max(array_column($daily, 'total')));
     @endphp
     <div class="space-y-8">
-        <header class="space-y-2 border-b border-coffee/15 pb-5">
+        <header class="space-y-2 border-b border-terrasse-ink/15 pb-5">
             <h1 class="text-2xl font-semibold sm:text-3xl">Tổng quan quản trị</h1>
             <p class="terrasse-muted text-sm">Doanh thu và tình trạng đơn hàng của quán.</p>
         </header>
@@ -69,7 +69,7 @@
                             @foreach ($daily as $date => $day)
                                 <li title="{{ $date }} · {{ number_format($day['total'], 0, ',', '.') }} ₫">
                                     <span class="terrasse-report-bar" style="--bar-height: {{ round($day['total'] * 100 / $peakRevenue, 2) }}%" aria-hidden="true"></span>
-                                    <time datetime="{{ $date }}" class="terrasse-muted border-t border-coffee/15 pt-1 text-xs">{{ Illuminate\Support\Facades\Date::parse($date)->format('d/m') }}</time>
+                                    <time datetime="{{ $date }}" class="terrasse-muted border-t border-terrasse-ink/15 pt-1 text-xs">{{ Illuminate\Support\Facades\Date::parse($date)->format('d/m') }}</time>
                                     <span class="sr-only"><x-customer.vnd :amount="$day['total']" /></span>
                                 </li>
                             @endforeach
@@ -85,7 +85,7 @@
                 </header>
                 <dl class="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2">
                     @foreach (OrderStatus::cases() as $status)
-                        <div class="flex items-center justify-between gap-2 border-b border-coffee/10 pb-2">
+                        <div class="flex items-center justify-between gap-2 border-b border-terrasse-ink/10 pb-2">
                             <dt><x-terrasse.status :$status /></dt>
                             <dd class="text-sm font-semibold tabular-nums">{{ number_format($statuses[$status->value], 0, ',', '.') }}</dd>
                         </div>
@@ -96,9 +96,9 @@
 
         <section class="space-y-4">
             <h2 id="daily-revenue-heading" class="terrasse-display text-3xl font-semibold">Doanh thu theo ngày</h2>
-            <div role="region" aria-labelledby="daily-revenue-heading" tabindex="0" class="terrasse-panel max-w-full overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-coffee">
+            <div role="region" aria-labelledby="daily-revenue-heading" tabindex="0" class="terrasse-panel max-w-full overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-accent">
                 <table class="w-full text-sm whitespace-nowrap">
-                    <thead class="border-b border-coffee/15 bg-coffee/5">
+                    <thead class="border-b border-terrasse-ink/15 bg-terrasse-ink/5">
                         <tr class="text-right">
                             <th scope="col" class="px-4 py-3 text-left">Ngày hoàn tất</th>
                             <th scope="col" class="px-4 py-3">Số đơn</th>
@@ -108,7 +108,7 @@
                             <th scope="col" class="px-4 py-3">Tổng thu</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-coffee/15 tabular-nums">
+                    <tbody class="divide-y divide-terrasse-ink/15 tabular-nums">
                         @foreach ($daily as $date => $day)
                             <tr class="text-right">
                                 <th scope="row" class="px-4 py-3 text-left font-medium"><time datetime="{{ $date }}">{{ \Illuminate\Support\Facades\Date::parse($date)->format('d/m/Y') }}</time></th>

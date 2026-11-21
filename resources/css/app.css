@@ -13,6 +13,14 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme inline {
+    --color-terrasse-paper: var(--terrasse-paper);
+    --color-terrasse-ink: var(--terrasse-ink);
+    --color-terrasse-muted: var(--terrasse-muted);
+    --color-terrasse-danger: var(--terrasse-danger);
+    --color-terrasse-danger-surface: var(--terrasse-danger-surface);
+}
+
 @theme {
     --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 

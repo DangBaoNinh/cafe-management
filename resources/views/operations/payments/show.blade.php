@@ -7,15 +7,15 @@
         </header>
 
         @if (session('status'))
-            <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
+            <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
         @foreach (['expected_status', 'method'] as $field)
             @error($field)
-                <p role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ $message }}</p>
+                <p role="alert" class="rounded-lg border border-terrasse-danger/30 bg-terrasse-danger-surface p-4 text-sm text-terrasse-danger">{{ $message }}</p>
             @enderror
         @endforeach
 
-        <dl class="grid gap-4 rounded-xl border border-coffee/15 bg-white p-4 sm:grid-cols-2">
+        <dl class="grid gap-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:grid-cols-2">
             <div>
                 <dt class="text-sm">Trạng thái đơn</dt>
                 <dd class="font-semibold">{{ $payment->order->status->label() }}</dd>
@@ -55,14 +55,14 @@
         </dl>
 
         @if ($canReconcileDemo)
-            <form method="POST" action="{{ route('operations.payments.demo-reconcile', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+            <form method="POST" action="{{ route('operations.payments.demo-reconcile', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 @csrf
                 <h2 class="text-lg font-semibold">Đối chiếu cổng mô phỏng</h2>
                 <p class="text-sm">Tra cứu giao dịch đã ghi tại cổng khi cửa hàng chưa nhận được callback.</p>
                 <flux:button type="submit" variant="primary">Đối chiếu giao dịch mô phỏng</flux:button>
             </form>
         @elseif ($canReconcile)
-            <form method="POST" action="{{ route('operations.payments.reconcile', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+            <form method="POST" action="{{ route('operations.payments.reconcile', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 @csrf
                 <input type="hidden" name="method" value="{{ $payment->method->value }}">
                 <input type="hidden" name="expected_status" value="{{ $payment->status->value }}">
@@ -94,7 +94,7 @@
             </form>
         @elseif ($payment->status === \App\Enums\PaymentStatus::RefundPending)
             @can('access-admin')
-                <form method="POST" action="{{ route('operations.payments.refund', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+                <form method="POST" action="{{ route('operations.payments.refund', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                     @csrf
                     <input type="hidden" name="method" value="{{ $payment->method->value }}">
                     <input type="hidden" name="expected_status" value="{{ $payment->status->value }}">
@@ -117,10 +117,10 @@
                     <flux:button type="submit" variant="primary">Ghi nhận đã hoàn tiền</flux:button>
                 </form>
             @else
-                <p class="rounded-xl border border-coffee/15 bg-white p-4 text-sm">Quản trị viên ghi nhận hoàn tiền cho khoản này sau khi hoàn ngoài hệ thống.</p>
+                <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">Quản trị viên ghi nhận hoàn tiền cho khoản này sau khi hoàn ngoài hệ thống.</p>
             @endcan
         @elseif ($payment->method === \App\Enums\PaymentMethod::Cod && $payment->status === \App\Enums\PaymentStatus::Pending)
-            <p class="rounded-xl border border-coffee/15 bg-white p-4 text-sm">Ghi nhận tiền thu khi bàn giao và hoàn tất đơn.</p>
+            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">Ghi nhận tiền thu khi bàn giao và hoàn tất đơn.</p>
         @endif
     </section>
 </x-layouts::admin>

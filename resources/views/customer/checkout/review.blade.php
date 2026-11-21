@@ -5,7 +5,7 @@
         <flux:link :href="route('checkout.create')">Sửa thông tin đặt hàng</flux:link>
         <h1 class="text-3xl font-semibold tracking-tight">Xác nhận đặt hàng</h1>
 
-        <div class="space-y-2 rounded-xl border border-coffee/15 bg-white p-4">
+        <div class="space-y-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <p class="font-semibold">{{ $details->fulfillment->label() }} · {{ $details->method->label() }}</p>
             <p class="wrap-anywhere">{{ $order['recipient_name'] }} · {{ $order['phone'] }}</p>
             @if ($address = $order['address_snapshot'])
@@ -18,7 +18,7 @@
             @endif
         </div>
 
-        <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+        <ul class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
             @foreach ($quote['items'] as ['line' => $line, 'toppings' => $toppings])
                 <li class="space-y-1 p-4 wrap-anywhere">
                     <p class="font-semibold">{{ $line['quantity'] }} × {{ $line['product_name'] }}</p>

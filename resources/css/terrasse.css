@@ -8,11 +8,38 @@
     --terrasse-muted: #705450;
     --terrasse-line: #dcc9b6;
     --terrasse-paper: #fffaf2;
+    --terrasse-highlight: #f2e3d8;
+    --terrasse-field: #fffdf8;
+    --terrasse-danger: #991b1b;
+    --terrasse-danger-surface: #fef2f2;
+    --terrasse-footer-base: #432329;
+    --terrasse-sidebar-hover: #60353d;
     --terrasse-gold: #ffd6a0;
     --terrasse-display: "EB Garamond", Georgia, serif;
 
     background-color: var(--color-cream);
     color: var(--terrasse-ink);
+    color-scheme: light;
+}
+
+.dark .terrasse {
+    --color-coffee: #321e24;
+    --color-cream: #26191b;
+    --color-accent: #f0bb92;
+    --color-accent-foreground: #351b21;
+    --color-accent-content: #f0bb92;
+    --terrasse-ink: #fff0de;
+    --terrasse-muted: #dfc4b5;
+    --terrasse-line: #735055;
+    --terrasse-paper: #322226;
+    --terrasse-highlight: #503036;
+    --terrasse-field: #281a1e;
+    --terrasse-danger: #ffb4ad;
+    --terrasse-danger-surface: #48232a;
+    --terrasse-footer-base: #321e24;
+    --terrasse-sidebar-hover: #503036;
+
+    color-scheme: dark;
 }
 
 .terrasse h1, .terrasse-display {
@@ -22,7 +49,7 @@
 }
 
 .terrasse h1 { font-size: clamp(2.5rem, 5vw, 4.25rem); }
-.terrasse :where(input, textarea, select, [data-flux-control]) { color-scheme: light; }
+.terrasse .terrasse-auth h1 { font-size: clamp(2rem, 5vw, 2.65rem); }
 .terrasse :focus-visible { outline-offset: 4px; }
 .terrasse-frame { width: min(100% - 2rem, 76rem); margin-inline: auto; }
 .terrasse-panel { background: var(--terrasse-paper); border: 1px solid var(--terrasse-line); }
@@ -33,7 +60,17 @@
 .terrasse-store-header { border-bottom: 1px solid var(--terrasse-line); background: var(--color-cream); }
 .terrasse-store-header nav { min-height: 5rem; }
 .terrasse-store-link:hover, .terrasse-store-link[aria-current] { text-decoration: underline; text-underline-offset: .35rem; }
-.terrasse-store-footer { border-top: 1px solid var(--terrasse-line); }
+.terrasse-store-footer {
+    border-top: 2px solid #b58b64;
+    color: #fff2de;
+    background: linear-gradient(90deg, var(--terrasse-footer-base) 45%, color-mix(in srgb, var(--terrasse-footer-base) 72%, transparent)),
+        var(--terrasse-footer-base) url("../assets/terrasse/paris-terrasse.jpg") right 68% / cover no-repeat;
+}
+.terrasse-store-footer .terrasse-brand-mark { color: var(--terrasse-gold); }
+.terrasse-store-footer :focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-footer-muted { color: #ead1bc; }
+.terrasse-footer-link:hover { color: var(--terrasse-gold); text-decoration: underline; text-underline-offset: .3em; }
+.terrasse-footer-bottom { border-top: 1px solid #9d7269; }
 
 .terrasse-hero {
     display: grid;
@@ -55,11 +92,96 @@
 .terrasse-product-card:hover { border-color: var(--color-accent); }
 .terrasse-product-card h2, .terrasse-product-card h3 { font-family: var(--terrasse-display); font-weight: 650; font-size: 1.65rem; line-height: 1.08; }
 
+.terrasse-account-header {
+    padding: clamp(1.4rem, 5vw, 3.5rem);
+    border: 1px solid #432329;
+    background: linear-gradient(90deg, #432329 0%, #432329f5 42%, #4323295c 100%),
+        #432329 url("../assets/terrasse/paris-terrasse.jpg") right 58% / cover no-repeat;
+    color: #fff4df;
+}
+.terrasse-account-header > h1 { max-width: 16ch; }
+.terrasse-account-avatar {
+    display: grid;
+    flex: 0 0 3rem;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid #e5bd91;
+    border-radius: 50%;
+    color: var(--terrasse-gold);
+    font: 600 1.1rem/1 var(--terrasse-display);
+}
+.terrasse-account-role { padding: .15rem .5rem; border-radius: 1rem; background: #f2d5b3; color: var(--color-coffee); font-size: .72rem; font-weight: 600; }
+.terrasse-account-link { border-top: 2px solid var(--color-accent); }
+.terrasse-account-link:hover { background: var(--terrasse-highlight); border-color: var(--color-accent); }
+.terrasse-account-link:focus-visible { outline: 2px solid var(--color-accent); }
+.terrasse-account-icon { display: grid; flex: 0 0 2.5rem; aspect-ratio: 1; place-items: center; border-radius: 50%; background: var(--terrasse-highlight); color: var(--color-accent); }
+
+.terrasse-settings-header {
+    padding-block: clamp(1.4rem, 4vw, 2.65rem);
+    background-position: right 52%;
+}
+.terrasse-settings-header a { color: var(--terrasse-gold); }
+.terrasse-settings-header a:hover { text-decoration: underline; text-underline-offset: .25em; }
+.terrasse-settings-header a:focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-settings-nav a { border-inline-start: 2px solid transparent; }
+.terrasse-settings-nav a:hover, .terrasse-settings-nav a[aria-current] {
+    background: var(--terrasse-highlight);
+    color: var(--color-accent-content);
+}
+.terrasse-settings-nav a[aria-current] { border-inline-start-color: currentColor; font-weight: 600; }
+.terrasse-settings-panel { padding: clamp(1rem, 3vw, 2rem); }
+.terrasse-settings-panel-header { border-bottom: 1px solid var(--terrasse-line); padding-bottom: 1.15rem; }
+.terrasse :is(input:not([type="radio"], [type="checkbox"]), select, textarea):where([data-flux-control]) {
+    border-color: var(--terrasse-line);
+    background-color: var(--terrasse-field);
+}
+.terrasse :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--terrasse-danger); }
+.terrasse-settings-jump { color: var(--color-accent-content); }
+.terrasse-address-card { border: 1px solid var(--terrasse-line); background: var(--terrasse-field); }
+.terrasse-address-empty { border: 1px dashed var(--terrasse-line); }
+.terrasse-address-form { scroll-margin-top: 1rem; }
+
+.terrasse-theme-option {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--terrasse-line);
+    border-radius: .5rem;
+}
+.terrasse-theme-option:hover, .terrasse-theme-option:has(:checked) { border-color: var(--color-accent); }
+.terrasse-theme-option:has(:checked) { background: var(--terrasse-highlight); }
+.terrasse-theme-option:has(:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.terrasse-theme-option input { accent-color: var(--color-accent); }
+.terrasse-theme-preview {
+    display: grid;
+    align-items: end;
+    min-height: 5.25rem;
+    padding: .75rem;
+    background: linear-gradient(#762d39 0 24%, transparent 24%), #f6efe3;
+}
+.terrasse-theme-preview[data-theme="dark"] { background-color: #26191b; }
+.terrasse-theme-preview[data-theme="system"] {
+    background: linear-gradient(#762d39 0 24%, transparent 24%), linear-gradient(120deg, #f6efe3 50%, #26191b 50%);
+}
+.terrasse-theme-preview span {
+    display: block;
+    width: 72%;
+    height: 2.25rem;
+    border: 1px solid #b88b7f;
+    border-radius: .25rem;
+    background:
+        linear-gradient(#ac786b, #ac786b) .5rem .55rem / 42% 2px no-repeat,
+        linear-gradient(#ac786b, #ac786b) .5rem .95rem / 28% 2px no-repeat,
+        #fffaf2;
+}
+.terrasse-theme-preview[data-theme="dark"] span { background-color: #39272c; }
+.terrasse-theme-preview[data-theme="system"] span { background-color: #ead0ba; }
+
 .terrasse-workspace { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: 100vh; }
 .terrasse-sidebar { background: var(--color-coffee); color: #fcebd9; }
 .terrasse-sidebar .terrasse-brand-mark { color: var(--terrasse-gold); }
 .terrasse-sidebar :focus-visible { outline: 2px solid var(--terrasse-gold); }
-.terrasse-sidebar a[aria-current], .terrasse-sidebar a:hover, .terrasse-sidebar button:hover { background: #60353d; }
+.terrasse-sidebar a[aria-current], .terrasse-sidebar a:hover, .terrasse-sidebar button:hover { background: var(--terrasse-sidebar-hover); }
 .terrasse-sidebar a[aria-current] { border-inline-start-color: var(--terrasse-gold); color: #fff1de; font-weight: 600; }
 .terrasse-sidebar-caption { color: #e8c4ae; font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
 .terrasse-revenue-total { color: #fff1d9; background: linear-gradient(95deg, #432329fc 25%, #432329b5), url("../assets/terrasse/paris-terrasse.jpg") right 61% / cover; }
@@ -90,6 +212,9 @@
 
 @media (max-width: 39.999rem) {
     .terrasse-store-header nav { min-height: 0; }
+    .terrasse-account-header {
+        background-image: linear-gradient(90deg, #432329 12%, #432329df 100%), url("../assets/terrasse/paris-terrasse.jpg");
+    }
     .terrasse-hero {
         align-items: start;
         min-height: 36rem;

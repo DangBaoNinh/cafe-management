@@ -2,15 +2,15 @@
     <h2 id="drink-options-heading" class="text-lg font-semibold">Tùy chỉnh đồ uống</h2>
 
     @if ($product === null)
-        <p role="alert" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">Món này hiện không còn bán.</p>
+        <p role="alert" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">Món này hiện không còn bán.</p>
     @else
         <fieldset class="space-y-2">
             <legend class="font-medium">Size và giá</legend>
-            <div class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+            <div class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                 @foreach ($product->activeSizes as $size)
                     <label wire:key="drink-size-{{ $size->id }}" class="flex cursor-pointer items-start gap-3 px-4 py-3 text-sm">
                         <input type="radio" name="drink-size" value="{{ $size->id }}" wire:model.live="sizeId"
-                            @checked((string) $size->id === $sizeId) class="mt-0.5 size-4 shrink-0 accent-coffee">
+                            @checked((string) $size->id === $sizeId) class="mt-0.5 size-4 shrink-0 accent-accent">
                         <span class="min-w-0 flex-1 wrap-anywhere">{{ $size->label }}</span>
                         <span class="shrink-0 font-medium tabular-nums">{{ number_format($size->price_vnd, 0, ',', '.') }} ₫</span>
                     </label>
@@ -41,12 +41,12 @@
         @if ($product->activeToppings->isNotEmpty())
             <fieldset class="space-y-2">
                 <legend class="font-medium">Topping</legend>
-                <div class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+                <div class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                     @foreach ($product->activeToppings as $topping)
                         <label wire:key="drink-topping-{{ $topping->id }}" class="flex cursor-pointer items-start gap-3 px-4 py-3 text-sm">
                             <input type="checkbox" value="{{ $topping->id }}" wire:model.live="toppingIds"
                                 @checked(is_array($toppingIds) && in_array((string) $topping->id, $toppingIds, true))
-                                class="mt-0.5 size-4 shrink-0 accent-coffee">
+                                class="mt-0.5 size-4 shrink-0 accent-accent">
                             <span class="min-w-0 flex-1 wrap-anywhere">{{ $topping->name }}</span>
                             <span class="shrink-0 font-medium tabular-nums">+{{ number_format($topping->price_vnd, 0, ',', '.') }} ₫</span>
                         </label>
@@ -56,7 +56,7 @@
         @endif
 
         @if ($messages !== [])
-            <div role="alert" class="space-y-3 rounded-lg border border-red-200 bg-white p-4 text-sm text-red-800">
+            <div role="alert" class="space-y-3 rounded-lg border border-terrasse-danger/30 bg-terrasse-paper p-4 text-sm text-terrasse-danger">
                 <ul class="space-y-1">
                     @foreach ($messages as $message)
                         <li>{{ $message }}</li>
@@ -89,7 +89,7 @@
         @endguest
 
         @if ($errors->any())
-            <ul role="alert" class="space-y-1 rounded-lg border border-red-200 bg-white p-4 text-sm text-red-800">
+            <ul role="alert" class="space-y-1 rounded-lg border border-terrasse-danger/30 bg-terrasse-paper p-4 text-sm text-terrasse-danger">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach

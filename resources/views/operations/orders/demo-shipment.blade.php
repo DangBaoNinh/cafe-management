@@ -2,7 +2,7 @@
 @use('App\Enums\PaymentMethod')
 
 @if ($shipment !== null || ($order->status === OrderStatus::Ready && $order->payment?->allowsHandoff() && filled($order->address_snapshot['address_line'] ?? null)))
-    <section class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+    <section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
         <h2 class="text-lg font-semibold">Vận đơn mô phỏng</h2>
         @if ($shipment === null)
             <p class="text-sm">Tạo vận đơn để trình diễn quy trình giao hàng.</p>

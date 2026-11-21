@@ -12,11 +12,11 @@
         <h1 class="text-2xl font-semibold">Cấu hình giao hàng</h1>
 
         @if (session('status'))
-            <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
+            <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
 
         @if ($errors->any())
-            <ul role="alert" class="space-y-1 rounded-lg border border-red-200 bg-white p-4 text-sm text-red-800">
+            <ul role="alert" class="space-y-1 rounded-lg border border-terrasse-danger/30 bg-terrasse-paper p-4 text-sm text-terrasse-danger">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -40,7 +40,7 @@
             <fieldset class="space-y-2">
                 <legend class="font-semibold">Quận/huyện hỗ trợ giao</legend>
                 <p class="text-sm">Mở tỉnh/thành phố để chọn quận/huyện. Khi bật giao hàng, cần chọn ít nhất một vùng.</p>
-                <div class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+                <div class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                     @foreach ($catalog->provinces() as $provinceCode => $province)
                         @php
                             $districts = $catalog->districts((string) $provinceCode);
@@ -55,7 +55,7 @@
                                     @foreach ($districts as $code => $district)
                                         <label class="flex items-start gap-2 text-sm">
                                             <input type="checkbox" name="eligible_districts[]" value="{{ $code }}"
-                                                @checked(in_array((string) $code, $selected, true)) class="mt-0.5 size-4 shrink-0 accent-coffee">
+                                                @checked(in_array((string) $code, $selected, true)) class="mt-0.5 size-4 shrink-0 accent-accent">
                                             <span>{{ $district }}</span>
                                         </label>
                                     @endforeach

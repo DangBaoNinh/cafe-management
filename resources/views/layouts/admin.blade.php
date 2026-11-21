@@ -32,7 +32,7 @@
         @include('partials.head')
     </head>
     <body class="terrasse font-sans antialiased">
-        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-white focus:p-3">Đến nội dung chính</a>
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-terrasse-paper focus:p-3">Đến nội dung chính</a>
         <div class="terrasse-workspace">
             <aside class="terrasse-sidebar min-w-0 px-4 py-4 lg:px-4 lg:py-7">
                 <x-terrasse.brand :href="route($workspaceHome)" :caption="$canAdminister ? 'Quản trị' : 'Vận hành'" class="mb-4 ms-1 lg:mb-7" />

@@ -1,12 +1,12 @@
 <x-layouts::admin :title="$title">
     <section class="space-y-6">
-        <header class="space-y-2 border-b border-coffee/15 pb-5">
+        <header class="space-y-2 border-b border-terrasse-ink/15 pb-5">
             <h1 class="font-semibold">{{ $title }}</h1>
             <p class="terrasse-muted text-sm">{{ number_format($orders->total(), 0, ',', '.') }} đơn hàng</p>
         </header>
 
         @if ($orders->isEmpty())
-            <p class="rounded-xl border border-coffee/15 bg-white p-5">
+            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
                 {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : $emptyMessage }}
             </p>
         @else

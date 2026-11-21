@@ -6,14 +6,14 @@
             <nav aria-label="Danh mục thực đơn" class="flex flex-wrap gap-2">
                 <a href="{{ route('menu.index', Arr::except($filters, ['category'])) }}"
                     @if ($selectedCategory === null) aria-current="page" @endif
-                    @class(['rounded-full border px-4 py-2 text-sm font-medium', 'border-coffee bg-coffee text-white' => $selectedCategory === null, 'border-coffee/15 bg-white hover:border-coffee/50' => $selectedCategory !== null])>
+                    @class(['rounded-full border px-4 py-2 text-sm font-medium', 'border-accent bg-accent text-accent-foreground' => $selectedCategory === null, 'border-terrasse-ink/15 bg-terrasse-paper hover:border-terrasse-ink/50' => $selectedCategory !== null])>
                     Tất cả
                 </a>
                 @foreach ($categories as $category)
                     @php($isSelected = $selectedCategory?->is($category) ?? false)
                     <a href="{{ route('menu.index', [...$filters, 'category' => $category->slug]) }}"
                         @if ($isSelected) aria-current="page" @endif
-                        @class(['max-w-full wrap-anywhere rounded-full border px-4 py-2 text-sm font-medium', 'border-coffee bg-coffee text-white' => $isSelected, 'border-coffee/15 bg-white hover:border-coffee/50' => ! $isSelected])>
+                        @class(['max-w-full wrap-anywhere rounded-full border px-4 py-2 text-sm font-medium', 'border-accent bg-accent text-accent-foreground' => $isSelected, 'border-terrasse-ink/15 bg-terrasse-paper hover:border-terrasse-ink/50' => ! $isSelected])>
                         {{ $category->name }}
                     </a>
                 @endforeach
@@ -31,7 +31,7 @@
                 @endforeach
             </ul>
         @elseif ($products !== null)
-            <div class="space-y-3 rounded-xl border border-coffee/15 bg-white p-6">
+            <div class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-6">
                 @if ($products->total() > 0)
                     <p>Trang này không có món.</p>
                     <flux:link :href="$products->url(1)">Về trang đầu</flux:link>

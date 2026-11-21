@@ -18,13 +18,13 @@
         </header>
 
         @if (session('status'))
-            <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
+            <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
         @error('expected_status')
-            <p role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ $message }}</p>
+            <p role="alert" class="rounded-lg border border-terrasse-danger/30 bg-terrasse-danger-surface p-4 text-sm text-terrasse-danger">{{ $message }}</p>
         @enderror
 
-        <dl class="grid gap-4 rounded-xl border border-coffee/15 bg-white p-4 sm:grid-cols-3">
+        <dl class="grid gap-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:grid-cols-3">
             <div>
                 <dt class="text-sm">Trạng thái đơn</dt>
                 <dd class="font-semibold">{{ $order->status->label() }}</dd>
@@ -47,7 +47,7 @@
         </dl>
 
         @if ($order->status->allowsAdminCancellation())
-            <details class="rounded-xl border border-coffee/15 bg-white p-4" @error('reason') open @enderror>
+            <details class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4" @error('reason') open @enderror>
                 <summary class="cursor-pointer font-semibold">Hủy đơn ngoại lệ</summary>
                 <form method="POST" action="{{ route('admin.orders.cancel', $order->order_number) }}" class="mt-4 space-y-3">
                     @csrf

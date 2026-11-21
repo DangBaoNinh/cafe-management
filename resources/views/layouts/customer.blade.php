@@ -1,4 +1,4 @@
-@props(['title' => null, 'fullBleed' => false])
+@props(['title' => null, 'fullBleed' => false, 'settings' => false])
 
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -6,8 +6,8 @@
         @include('partials.head')
     </head>
     <body class="terrasse flex min-h-screen flex-col font-sans antialiased">
-        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-white focus:p-3">Đến nội dung chính</a>
-        <header class="terrasse-store-header">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-terrasse-paper focus:p-3">Đến nội dung chính</a>
+        <header id="store-header" class="terrasse-store-header" tabindex="-1">
             <nav aria-label="Điều hướng chính" class="terrasse-frame flex flex-wrap items-center justify-between gap-4 py-4">
                 <x-terrasse.brand :href="route('home')" />
 
@@ -27,10 +27,11 @@
                                 @if (request()->routeIs('orders.*')) aria-current="page" @endif
                                 class="terrasse-store-link">Đơn của tôi</a>
                         @endcan
-                        <a href="{{ route('dashboard') }}" class="terrasse-store-link">Tài khoản</a>
+                        <a href="{{ route('dashboard') }}" @if (request()->routeIs('dashboard')) aria-current="page" @elseif ($settings) aria-current="location" @endif
+                            class="terrasse-store-link">Tài khoản</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="terrasse-store-link cursor-pointer">Đăng xuất</button>
+                            <button type="submit" class="terrasse-store-link cursor-pointer" data-test="logout-button">Đăng xuất</button>
                         </form>
                     @else
                         <a href="{{ route('login') }}" class="terrasse-store-link">Đăng nhập</a>
@@ -43,11 +44,16 @@
         <main id="main-content" class="{{ $fullBleed ? 'flex-1' : 'terrasse-frame flex-1 py-8 sm:py-12' }}">
             {{ $slot }}
         </main>
-        <footer class="terrasse-store-footer">
-            <div class="terrasse-frame flex flex-wrap items-center justify-between gap-2 py-5 text-sm">
-                <a href="{{ route('home') }}" class="terrasse-store-link font-semibold">{{ config('app.name') }}</a>
-                <a href="{{ route('menu.index') }}" class="terrasse-store-link terrasse-muted">Thực đơn</a>
-            </div>
-        </footer>
+        <x-terrasse.store-footer />
+
+        @if ($settings)
+            @persist('toast')
+                <flux:toast.group>
+                    <flux:toast />
+                </flux:toast.group>
+            @endpersist
+
+            @fluxScripts
+        @endif
     </body>
 </html>

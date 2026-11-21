@@ -4,7 +4,7 @@
 
 @php($preparing = $order->status === OrderStatus::Preparing)
 
-<section class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+<section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
     <h2 class="text-lg font-semibold">Pha chế</h2>
     @if ($preparing || $order->payment?->allowsPreparation())
         <form method="POST" action="{{ route('operations.orders.prepare', $order->order_number) }}">

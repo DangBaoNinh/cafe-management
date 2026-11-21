@@ -1,9 +1,9 @@
 @props(['entries', 'labelForStatus'])
 
 @if ($entries->isEmpty())
-    <p class="rounded-xl border border-coffee/15 bg-white p-4">Chưa có lịch sử.</p>
+    <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">Chưa có lịch sử.</p>
 @else
-    <ol class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+    <ol class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
         @foreach ($entries as $entry)
             <li class="space-y-1 p-4 wrap-anywhere">
                 <div class="flex flex-wrap items-baseline justify-between gap-2">

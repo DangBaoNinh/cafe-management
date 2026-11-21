@@ -5,9 +5,9 @@
     $sort = $filterInput['sort'] ?? 'name';
 @endphp
 
-<div class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4 sm:p-5">
+<div class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-5">
     @if ($filterErrors)
-        <ul role="alert" class="list-inside list-disc space-y-1 text-sm text-red-700">
+        <ul role="alert" class="list-inside list-disc space-y-1 text-sm text-terrasse-danger">
             @foreach ($filterErrors->all() as $message)
                 <li>{{ $message }}</li>
             @endforeach

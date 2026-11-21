@@ -10,7 +10,7 @@
                 <h2 class="text-lg font-semibold">Size</h2>
                 <flux:button variant="primary" :href="route('admin.products.sizes.create', $product)">Thêm size</flux:button>
             </div>
-            <ul class="divide-y divide-coffee/15 rounded-lg border border-coffee/15 bg-white">
+            <ul class="divide-y divide-terrasse-ink/15 rounded-lg border border-terrasse-ink/15 bg-terrasse-paper">
                 @forelse ($sizes as $size)
                     <li class="flex flex-wrap items-center justify-between gap-3 p-4">
                         <div class="min-w-0 wrap-anywhere">
@@ -32,7 +32,7 @@
                 <h2 class="text-lg font-semibold">Topping đã gắn</h2>
                 <flux:link :href="route('admin.toppings.index')">Quản lý topping</flux:link>
             </div>
-            <ul class="divide-y divide-coffee/15 rounded-lg border border-coffee/15 bg-white">
+            <ul class="divide-y divide-terrasse-ink/15 rounded-lg border border-terrasse-ink/15 bg-terrasse-paper">
                 @forelse ($toppings as $topping)
                     <li class="flex flex-wrap items-center justify-between gap-3 p-4">
                         <div class="min-w-0 wrap-anywhere">

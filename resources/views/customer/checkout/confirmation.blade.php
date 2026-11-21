@@ -1,7 +1,7 @@
 <x-layouts::customer title="Đã đặt hàng">
     <section class="mx-auto max-w-2xl space-y-5">
         <h1 class="text-3xl font-semibold tracking-tight">Đã đặt hàng</h1>
-        <div class="space-y-2 rounded-xl border border-coffee/15 bg-white p-4">
+        <div class="space-y-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <p class="font-semibold wrap-anywhere">Mã đơn {{ $order->order_number }}</p>
             <p>{{ $order->fulfillment_type->label() }} · {{ $payment->method->label() }}</p>
         </div>
@@ -10,9 +10,9 @@
             :delivery-fee="$order->delivery_fee_vnd" :total="$order->total_vnd" />
 
         @if ($payment->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details !== null && $order->total_vnd === 0)
-            <p role="status" class="rounded-xl border border-coffee/15 bg-white p-4">Tổng tiền bằng 0 ₫. Bạn không cần chuyển khoản.</p>
+            <p role="status" class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">Tổng tiền bằng 0 ₫. Bạn không cần chuyển khoản.</p>
         @elseif ($payment->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details !== null)
-            <div class="space-y-3 rounded-xl border border-coffee/15 bg-white p-4">
+            <div class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 <h2 class="font-semibold">Thông tin chuyển khoản</h2>
                 <dl class="grid gap-3 text-sm sm:grid-cols-2">
                     @foreach ([

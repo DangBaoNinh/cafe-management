@@ -6,7 +6,7 @@
             <p class="text-sm">Phiên dùng để trình diễn. Không phát sinh giao dịch thật.</p>
         </header>
 
-        <dl class="grid gap-4 rounded-xl border border-coffee/15 bg-white p-5 sm:grid-cols-2">
+        <dl class="grid gap-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5 sm:grid-cols-2">
             <div class="wrap-anywhere">
                 <dt class="text-sm">Mã đơn</dt>
                 <dd class="font-semibold">{{ $order->order_number }}</dd>
@@ -28,9 +28,9 @@
                 </div>
             </form>
         @elseif ($session->result === \App\Models\DemoPaymentSession::SUCCEEDED && $session->applied_at === null)
-            <p role="status" class="rounded-xl border border-coffee/15 bg-white p-4">Cổng đã ghi giao dịch. Đơn đang chờ quản trị viên đối chiếu.</p>
+            <p role="status" class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">Cổng đã ghi giao dịch. Đơn đang chờ quản trị viên đối chiếu.</p>
         @else
-            <p role="status" class="rounded-xl border border-coffee/15 bg-white p-4">Phiên này đã kết thúc. Xem trạng thái mới nhất trên trang đơn hàng.</p>
+            <p role="status" class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">Phiên này đã kết thúc. Xem trạng thái mới nhất trên trang đơn hàng.</p>
         @endif
     </section>
 </x-layouts::customer>

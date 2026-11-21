@@ -11,13 +11,13 @@
         </header>
 
         @if (session('status'))
-            <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
+            <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
         @error('expected_status')
-            <p role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ $message }}</p>
+            <p role="alert" class="rounded-lg border border-terrasse-danger/30 bg-terrasse-danger-surface p-4 text-sm text-terrasse-danger">{{ $message }}</p>
         @enderror
 
-        <dl class="grid gap-4 rounded-xl border border-coffee/15 bg-white p-4 sm:grid-cols-3">
+        <dl class="grid gap-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:grid-cols-3">
             <div>
                 <dt class="text-sm">Trạng thái đơn</dt>
                 <dd class="font-semibold">{{ $order->status->label() }}</dd>
@@ -36,7 +36,7 @@
         </dl>
 
         @if ($payment?->status === \App\Enums\PaymentStatus::RefundPending)
-            <p class="rounded-xl border border-coffee/15 bg-white p-4">
+            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 @if ($payment->method === \App\Enums\PaymentMethod::DemoGateway)
                     Giao dịch mô phỏng đang chờ quản trị viên ghi nhận hoàn tiền.
                 @else
@@ -53,7 +53,7 @@
         <x-customer.start-demo-payment :order="$order" :payment="$payment" />
 
         @if ($order->status === \App\Enums\OrderStatus::Pending)
-            <details class="rounded-xl border border-coffee/15 bg-white p-4" @if ($errors->hasAny(['reason', 'confirm'])) open @endif>
+            <details class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4" @if ($errors->hasAny(['reason', 'confirm'])) open @endif>
                 <summary class="cursor-pointer font-semibold">Hủy đơn hàng</summary>
                 <form method="POST" action="{{ route('orders.cancel', $order->order_number) }}" class="mt-4 space-y-4">
                     @csrf
@@ -75,7 +75,7 @@
         @if ($order->statusHistories->isNotEmpty())
             <div class="space-y-3">
                 <h2 class="text-lg font-semibold">Tiến trình đơn</h2>
-                <ol class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+                <ol class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                     @foreach ($order->statusHistories as $history)
                         <li class="flex flex-wrap items-baseline justify-between gap-2 p-4">
                             <span class="font-medium">{{ \App\Enums\OrderStatus::from($history->to_status)->label() }}</span>
