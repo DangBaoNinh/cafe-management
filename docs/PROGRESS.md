@@ -276,6 +276,11 @@
 - Đã nghiệm thu các thay đổi từ `feature/terrasse-account` tại `2f73b27`. Trang tài khoản, cài đặt và chân trang cửa hàng dùng giao diện Terrasse. Chế độ sáng, tối và theo hệ thống được dùng chung giữa cửa hàng, khu quản trị và khu vận hành.
 - Đã kiểm tra trên Edge tại 360 và 1440 px với dữ liệu thử. Chế độ hiển thị đồng bộ giữa hai tab, quyền truy cập và chuyển hướng đăng nhập đúng theo vai trò, các trang đã kiểm tra không cuộn ngang toàn trang. Build, Pint, PHPStan, 177 bài SQLite với 2.605 assertion và 24 bài MySQL với 417 assertion đều đạt.
 
+## Trợ lý cửa hàng
+
+- Đã nghiệm thu nhánh `feature/storefront-chat` tại `7d46d88` và tích hợp vào `develop` tại `fc56ffc`. Khách có thể hỏi về thực đơn, nhận gợi ý, chọn size và thêm món vào giỏ từ khung chat.
+- Laravel trên Laragon đã trả lời hai lượt liên tiếp với Gemini thật và hiển thị thẻ món. SQLite đạt 180 bài với 2.633 assertion, MySQL đạt 24 bài với 417 assertion. Build, Pint và PHPStan đều đạt.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
