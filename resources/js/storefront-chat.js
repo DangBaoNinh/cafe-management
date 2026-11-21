@@ -107,6 +107,7 @@ function initializeChat() {
         const userTurn = { role: 'user', text: message };
         appendMessage(message, userTurn.role);
         input.value = '';
+        input.focus({ preventScroll: true });
         submit.disabled = true;
         showStatus('Đang trả lời…');
 
