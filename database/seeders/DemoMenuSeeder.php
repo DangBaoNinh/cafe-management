@@ -7,8 +7,11 @@ use App\Models\Product;
 use App\Models\Topping;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LogicException;
+use RuntimeException;
 
 class DemoMenuSeeder extends Seeder
 {
@@ -93,6 +96,8 @@ class DemoMenuSeeder extends Seeder
                         ],
                     );
 
+                    $this->seedPhoto($product);
+
                     if (! $product->wasRecentlyCreated) {
                         continue;
                     }
@@ -108,5 +113,22 @@ class DemoMenuSeeder extends Seeder
                 }
             }
         });
+    }
+
+    private function seedPhoto(Product $product): void
+    {
+        if ($product->image_path !== null) {
+            return;
+        }
+
+        $filename = "{$product->slug}.webp";
+        $path = "products/demo-menu/{$filename}";
+        $disk = Storage::disk('public');
+
+        if (! $disk->exists($path) && ! $disk->put($path, File::get(__DIR__."/assets/demo-menu/{$filename}"))) {
+            throw new RuntimeException("Không thể lưu ảnh món mẫu: {$filename}");
+        }
+
+        Product::query()->whereKey($product->id)->whereNull('image_path')->update(['image_path' => $path]);
     }
 }
