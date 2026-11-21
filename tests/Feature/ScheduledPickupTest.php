@@ -247,6 +247,32 @@ class ScheduledPickupTest extends TestCase
         $this->assertTrue($customer->booking_blocked_until->isFuture());
     }
 
+    public function test_delayed_expiry_does_not_count_a_no_show_before_the_latest_arrival(): void
+    {
+        $this->at('18:00');
+        [$customer, $oldOrder, $oldPickup] = $this->scheduled('20:00');
+        [, , $visited] = $this->scheduled('21:00', customer: $customer);
+        [, , $newPickup] = $this->scheduled('21:15', customer: $customer);
+
+        $this->at('21:00');
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
+            ->post(route('operations.pickups.arrive', $visited->code), ['channel' => 'counter'])->assertStatus(303);
+        $this->artisan('pickups:expire')->expectsOutput('Số đơn hẹn đã hủy do không đến: 1')->assertSuccessful();
+        $streakAfterDelayedExpiry = $customer->refresh()->booking_no_shows;
+        $this->assertSame('cancelled', $oldOrder->refresh()->status->value);
+        $this->assertEquals($oldPickup->arrival_deadline, $oldPickup->refresh()->no_show_at);
+
+        $this->at('21:45');
+        $this->artisan('pickups:expire')->expectsOutput('Số đơn hẹn đã hủy do không đến: 1')->assertSuccessful();
+        $this->assertNotNull($newPickup->refresh()->no_show_at);
+        $this->actingAs($customer->refresh())->postJson(route('checkout.review'), [
+            ...$this->basket($customer), 'pickup_time' => '2026-11-22 07:00',
+        ])->assertOk();
+        $this->assertSame(0, $streakAfterDelayedExpiry);
+        $this->assertSame(1, $customer->refresh()->booking_no_shows);
+        $this->assertNull($customer->booking_blocked_until);
+    }
+
     public function test_cancellation_and_rejection_invalidate_tickets_without_counting_absences(): void
     {
         $this->at('20:00');

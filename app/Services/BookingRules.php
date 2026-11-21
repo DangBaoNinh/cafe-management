@@ -48,7 +48,13 @@ class BookingRules
     /** Record once per booking under the same transaction and customer row lock. */
     public static function recordAttendance(User $customer, bool $arrived, CarbonImmutable $at): void
     {
+        // A delayed expiry still cancels the booking, but cannot change a streak reset by a later arrival.
+        if ($customer->booking_last_arrived_at?->gte($at)) {
+            return;
+        }
+
         if ($arrived) {
+            $customer->booking_last_arrived_at = $at;
             $customer->booking_no_shows = 0;
             $customer->save();
 

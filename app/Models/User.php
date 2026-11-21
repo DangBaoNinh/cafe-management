@@ -24,12 +24,13 @@ use Illuminate\Support\Str;
  * @property UserRole $role
  * @property bool $is_active
  * @property CarbonImmutable|null $booking_blocked_until
+ * @property CarbonImmutable|null $booking_last_arrived_at
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token', 'booking_no_shows', 'booking_blocked_until'])]
+#[Hidden(['password', 'remember_token', 'booking_no_shows', 'booking_blocked_until', 'booking_last_arrived_at'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -55,6 +56,7 @@ class User extends Authenticatable
             'is_active' => 'boolean',
             'booking_no_shows' => 'integer',
             'booking_blocked_until' => 'immutable_datetime',
+            'booking_last_arrived_at' => 'immutable_datetime',
         ];
     }
 
