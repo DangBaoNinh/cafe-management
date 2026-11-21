@@ -254,3 +254,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
+- UC24 bị chặn dù UC19 và UC20 đã nghiệm thu trên `develop`. Cần chốt nhà cung cấp, xác nhận quyền truy cập sandbox và có tài liệu tạo phiên, xác thực callback và tra cứu giao dịch. Dùng hợp đồng của nhà cung cấp để chốt thiết kế lưu sự kiện trước khi triển khai.
