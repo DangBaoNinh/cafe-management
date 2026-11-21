@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DeliverySettingsController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
@@ -72,6 +73,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{number}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{number}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::get('customers/{customer}', [CustomerController::class, 'show'])->whereNumber('customer')->name('customers.show');
     Route::get('delivery-settings', [DeliverySettingsController::class, 'edit'])->name('delivery-settings.edit');
     Route::patch('delivery-settings', [DeliverySettingsController::class, 'update'])->name('delivery-settings.update');
     Route::resource('categories', CategoryController::class)->only(['index', 'create', 'store', 'edit', 'update']);
