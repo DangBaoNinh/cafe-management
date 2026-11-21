@@ -32,6 +32,7 @@
         @endif
 
         <div class="flex flex-wrap items-center gap-4">
+            <x-customer.start-demo-payment :order="$order" :payment="$payment" />
             <flux:button variant="primary" :href="route('orders.show', $order->order_number)">Theo dõi đơn</flux:button>
             <flux:link :href="route('menu.index')">Về thực đơn</flux:link>
         </div>

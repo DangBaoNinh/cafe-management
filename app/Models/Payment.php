@@ -29,6 +29,12 @@ class Payment extends Model
         return $this->hasMany(PaymentStatusHistory::class);
     }
 
+    /** @return HasMany<DemoPaymentSession, $this> */
+    public function demoSessions(): HasMany
+    {
+        return $this->hasMany(DemoPaymentSession::class);
+    }
+
     public function matchesCollectedAmount(int $orderTotal, int $amount): bool
     {
         return $amount === $orderTotal && $amount === $this->amount_vnd;
@@ -44,7 +50,7 @@ class Payment extends Model
     {
         return $this->status === match ($this->method) {
             PaymentMethod::Cod => PaymentStatus::Pending,
-            PaymentMethod::BankTransfer => PaymentStatus::Paid,
+            PaymentMethod::BankTransfer, PaymentMethod::DemoGateway => PaymentStatus::Paid,
         };
     }
 

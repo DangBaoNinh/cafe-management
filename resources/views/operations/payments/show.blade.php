@@ -54,7 +54,14 @@
             @endif
         </dl>
 
-        @if ($canReconcile)
+        @if ($canReconcileDemo)
+            <form method="POST" action="{{ route('operations.payments.demo-reconcile', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+                @csrf
+                <h2 class="text-lg font-semibold">Đối chiếu cổng mô phỏng</h2>
+                <p class="text-sm">Tra cứu giao dịch đã ghi tại cổng khi cửa hàng chưa nhận được callback.</p>
+                <flux:button type="submit" variant="primary">Đối chiếu giao dịch mô phỏng</flux:button>
+            </form>
+        @elseif ($canReconcile)
             <form method="POST" action="{{ route('operations.payments.reconcile', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
                 @csrf
                 <input type="hidden" name="method" value="{{ $payment->method->value }}">
@@ -92,7 +99,11 @@
                     <input type="hidden" name="method" value="{{ $payment->method->value }}">
                     <input type="hidden" name="expected_status" value="{{ $payment->status->value }}">
                     <h2 class="text-lg font-semibold">Ghi nhận hoàn tiền</h2>
-                    <p class="text-sm">Hoàn tiền ngoài hệ thống trước, sau đó nhập tham chiếu giao dịch đã thực hiện.</p>
+                    @if ($payment->method === \App\Enums\PaymentMethod::DemoGateway)
+                        <p class="text-sm">Nhập tham chiếu để ghi nhận hoàn tiền mô phỏng.</p>
+                    @else
+                        <p class="text-sm">Hoàn tiền ngoài hệ thống trước, sau đó nhập tham chiếu giao dịch đã thực hiện.</p>
+                    @endif
                     <div class="space-y-2">
                         <label class="block text-sm font-medium" for="refund-reference">Tham chiếu hoàn tiền</label>
                         <flux:input id="refund-reference" name="refund_reference" maxlength="255" :value="is_string(old('refund_reference')) ? old('refund_reference') : ''" required />

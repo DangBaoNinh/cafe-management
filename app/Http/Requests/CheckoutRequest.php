@@ -6,6 +6,7 @@ use App\Enums\FulfillmentType;
 use App\Enums\PaymentMethod;
 use App\Models\Coupon;
 use App\Services\CheckoutDetails;
+use App\Services\DemoPaymentGateway;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -45,7 +46,9 @@ class CheckoutRequest extends FormRequest
         $rules = [
             'cart_version' => ['required', 'integer:strict', 'min:0'],
             'fulfillment_type' => ['required', Rule::enum(FulfillmentType::class)],
-            'method' => ['required', Rule::enum(PaymentMethod::class)],
+            'method' => ['required', Rule::enum(PaymentMethod::class)->except(
+                DemoPaymentGateway::enabled() ? [] : [PaymentMethod::DemoGateway],
+            )],
             'recipient_name' => ['required', 'string', 'max:120'],
             'phone' => ['required', 'string', 'regex:/\A(?:0|\+84)[1-9][0-9]{8,9}\z/'],
             'address_id' => [

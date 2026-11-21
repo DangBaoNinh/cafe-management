@@ -4,7 +4,7 @@
 
         @if ($payments->isEmpty())
             <p class="rounded-xl border border-coffee/15 bg-white p-5">
-                {{ $payments->total() > 0 ? 'Trang này không có khoản thanh toán.' : 'Chưa có chuyển khoản cần đối chiếu hoặc khoản chờ hoàn tiền.' }}
+                {{ $payments->total() > 0 ? 'Trang này không có khoản thanh toán.' : 'Chưa có khoản thanh toán cần đối chiếu hoặc chờ hoàn tiền.' }}
             </p>
         @else
             <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">

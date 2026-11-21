@@ -16,10 +16,13 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DeliveryFeeController;
+use App\Http\Controllers\DemoPaymentController;
 use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Middleware\EnsureDemoPaymentEnabled;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'customer.home')->name('home');
@@ -46,7 +49,15 @@ Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-custom
     Route::get('/', [CustomerOrderController::class, 'index'])->name('index');
     Route::get('{number}', [CustomerOrderController::class, 'show'])->name('show');
     Route::post('{number}/cancel', [CustomerOrderController::class, 'cancel'])->name('cancel');
+    Route::prefix('{number}/demo-payment')->name('demo-payment.')->middleware(EnsureDemoPaymentEnabled::class)->group(function () {
+        Route::post('/', [DemoPaymentController::class, 'start'])->name('start');
+        Route::get('{reference}', [DemoPaymentController::class, 'show'])->whereUuid('reference')->name('show');
+        Route::post('{reference}', [DemoPaymentController::class, 'simulate'])->whereUuid('reference')->name('simulate');
+    });
 });
+
+Route::post('payments/demo/callback', [DemoPaymentController::class, 'callback'])
+    ->middleware(EnsureDemoPaymentEnabled::class)->withoutMiddleware(PreventRequestForgery::class)->name('payments.demo.callback');
 
 Route::prefix('operations/orders')->name('operations.orders.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('/', [OrderIntakeController::class, 'index'])->name('index');
@@ -67,6 +78,8 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
     Route::get('{number}', [ManualPaymentController::class, 'show'])->name('show');
     Route::post('{number}/reconcile', [ManualPaymentController::class, 'reconcile'])->name('reconcile');
     Route::post('{number}/refund', [ManualPaymentController::class, 'refund'])->middleware('can:access-admin')->name('refund');
+    Route::post('{number}/demo-reconcile', [DemoPaymentController::class, 'reconcile'])
+        ->middleware([EnsureDemoPaymentEnabled::class, 'can:access-admin'])->name('demo-reconcile');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
