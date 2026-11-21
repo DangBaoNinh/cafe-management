@@ -1,12 +1,12 @@
 <x-layouts::admin title="Đối chiếu thanh toán">
     <section class="space-y-6">
-        <header class="space-y-2 border-b border-coffee/15 pb-5">
+        <header class="space-y-2 border-b border-terrasse-ink/15 pb-5">
             <h1 class="font-semibold">Đối chiếu thanh toán</h1>
             <p class="terrasse-muted text-sm">{{ number_format($payments->total(), 0, ',', '.') }} khoản thanh toán</p>
         </header>
 
         @if ($payments->isEmpty())
-            <p class="rounded-xl border border-coffee/15 bg-white p-5">
+            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
                 {{ $payments->total() > 0 ? 'Trang này không có khoản thanh toán.' : 'Chưa có khoản thanh toán cần đối chiếu hoặc chờ hoàn tiền.' }}
             </p>
         @else

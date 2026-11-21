@@ -6,11 +6,11 @@
         </header>
 
         @if (session('status'))
-            <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
+            <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
 
         @if ($errors->any())
-            <ul role="alert" class="space-y-1 rounded-lg border border-red-200 bg-white p-4 text-sm text-red-800">
+            <ul role="alert" class="space-y-1 rounded-lg border border-terrasse-danger/30 bg-terrasse-paper p-4 text-sm text-terrasse-danger">
                 @foreach ($errors->all() as $message)
                     <li>{{ $message }}</li>
                 @endforeach
@@ -18,9 +18,9 @@
         @endif
 
         @if ($lines === [])
-            <p class="rounded-xl border border-coffee/15 bg-white p-5">Giỏ hàng của bạn đang trống.</p>
+            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">Giỏ hàng của bạn đang trống.</p>
         @else
-            <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+            <ul class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                 @foreach ($lines as ['item' => $item, 'unitPrice' => $unitPrice, 'total' => $total])
                     @php($product = $item->size->product)
                     <li class="space-y-3 p-4 sm:p-5">
@@ -49,7 +49,7 @@
                             @if ($total === null)
                                 <div class="space-y-1 text-sm">
                                     <p>Số lượng · {{ $item->quantity }}</p>
-                                    <p class="text-red-800">Món hoặc tùy chọn đã ngừng bán hoặc thay đổi. Vui lòng xóa dòng này và xem lại thực đơn.</p>
+                                    <p class="text-terrasse-danger">Món hoặc tùy chọn đã ngừng bán hoặc thay đổi. Vui lòng xóa dòng này và xem lại thực đơn.</p>
                                 </div>
                             @else
                                 <form method="POST" action="{{ route('cart.update', $item) }}" class="flex flex-wrap items-end gap-3">

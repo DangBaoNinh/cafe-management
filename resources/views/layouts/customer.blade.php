@@ -5,8 +5,8 @@
     <head>
         @include('partials.head')
     </head>
-    <body @class(['terrasse flex min-h-screen flex-col font-sans antialiased', 'terrasse-settings' => $settings])>
-        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-white focus:p-3">Đến nội dung chính</a>
+    <body class="terrasse flex min-h-screen flex-col font-sans antialiased">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-terrasse-paper focus:p-3">Đến nội dung chính</a>
         <header id="store-header" class="terrasse-store-header" tabindex="-1">
             <nav aria-label="Điều hướng chính" class="terrasse-frame flex flex-wrap items-center justify-between gap-4 py-4">
                 <x-terrasse.brand :href="route('home')" />

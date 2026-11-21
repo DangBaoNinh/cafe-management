@@ -6,7 +6,7 @@
     $payment = $order->payment;
 @endphp
 
-<section class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+<section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
     <h2 class="text-lg font-semibold">Bàn giao</h2>
     @if ($order->status === OrderStatus::OutForDelivery)
         <p class="text-sm">Nếu chưa giao được, giữ đơn ở trạng thái Đang giao để cửa hàng xử lý.</p>
@@ -28,7 +28,7 @@
             @endif
 
             <label class="flex items-start gap-2 text-sm font-medium">
-                <input class="mt-0.5 size-4 shrink-0 accent-coffee" type="checkbox" name="confirmed" value="1" required>
+                <input class="mt-0.5 size-4 shrink-0 accent-accent" type="checkbox" name="confirmed" value="1" required>
                 <span>{{ $dispatching ? 'Đã bàn giao đơn cho người giao hàng.' : 'Khách đã nhận đơn.' }}</span>
             </label>
             <flux:error name="confirmed" />

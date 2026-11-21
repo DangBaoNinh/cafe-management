@@ -6,14 +6,14 @@
             @foreach ($filters as $value => $label)
                 <a href="{{ route('orders.index', $value === 'all' ? [] : ['status' => $value]) }}"
                     @if ($filter === $value) aria-current="page" @endif
-                    class="rounded-lg border border-coffee/20 px-3 py-2 text-sm font-medium hover:underline aria-[current=page]:bg-coffee aria-[current=page]:text-white">
+                    class="rounded-lg border border-terrasse-ink/20 px-3 py-2 text-sm font-medium hover:underline aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground">
                     {{ $label }}
                 </a>
             @endforeach
         </nav>
 
         @if ($orders->isEmpty())
-            <div class="space-y-3 rounded-xl border border-coffee/15 bg-white p-5">
+            <div class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
                 <p>{{ match (true) {
                     $orders->total() > 0 => 'Trang này không có đơn hàng.',
                     $filter === 'processing' => 'Bạn không có đơn đang xử lý.',
@@ -25,7 +25,7 @@
                 @endif
             </div>
         @else
-            <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+            <ul class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                 @foreach ($orders as $order)
                     <li class="space-y-3 p-4 sm:p-5">
                         <div class="flex flex-wrap items-baseline justify-between gap-2">

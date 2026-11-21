@@ -20,14 +20,14 @@
         <h1 class="text-3xl font-semibold tracking-tight">Đặt hàng</h1>
 
         @if ($summaryErrors->isNotEmpty())
-            <ul role="alert" class="space-y-1 rounded-lg border border-red-200 bg-white p-4 text-sm text-red-800">
+            <ul role="alert" class="space-y-1 rounded-lg border border-terrasse-danger/30 bg-terrasse-paper p-4 text-sm text-terrasse-danger">
                 @foreach ($summaryErrors as $message)
                     <li>{{ $message }}</li>
                 @endforeach
             </ul>
         @endif
 
-        <form method="POST" action="{{ route('checkout.review') }}" class="space-y-5 rounded-xl border border-coffee/15 bg-white p-4 sm:p-6">
+        <form method="POST" action="{{ route('checkout.review') }}" class="space-y-5 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-6">
             @csrf
             <input type="hidden" name="cart_version" value="{{ $cartVersion }}">
 

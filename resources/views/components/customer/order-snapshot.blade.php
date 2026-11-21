@@ -2,7 +2,7 @@
 
 @php($address = $order->address_snapshot)
 
-<div class="space-y-2 rounded-xl border border-coffee/15 bg-white p-4 wrap-anywhere">
+<div class="space-y-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 wrap-anywhere">
     <h2 class="text-lg font-semibold">Thông tin nhận hàng</h2>
     <p>{{ $order->recipient_name }} · {{ $order->phone }}</p>
     @if ($address !== null)
@@ -17,7 +17,7 @@
 
 <div class="space-y-3">
     <h2 class="text-lg font-semibold">Món đã đặt</h2>
-    <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+    <ul class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
         @foreach ($order->items as $item)
             <li class="space-y-2 p-4 wrap-anywhere">
                 <div class="flex flex-wrap items-baseline justify-between gap-2">

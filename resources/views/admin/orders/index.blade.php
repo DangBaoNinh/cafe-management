@@ -3,7 +3,7 @@
 
 <x-layouts::admin title="Quản lý đơn hàng">
     <section class="space-y-6">
-        <header class="space-y-2 border-b border-coffee/15 pb-5">
+        <header class="space-y-2 border-b border-terrasse-ink/15 pb-5">
             <h1 class="font-semibold">Quản lý đơn hàng</h1>
             <p class="terrasse-muted text-sm">Tra cứu đơn, cách nhận và tình trạng thanh toán.</p>
         </header>
@@ -55,13 +55,13 @@
         </form>
 
         @if ($orders->isEmpty())
-            <p class="rounded-xl border border-coffee/15 bg-white p-5">
+            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
                 {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : 'Không tìm thấy đơn hàng.' }}
             </p>
         @else
             <div class="terrasse-panel max-w-full overflow-x-auto rounded-md" role="region" aria-label="Danh sách đơn hàng" tabindex="0">
                 <table class="w-full text-left text-sm">
-                    <thead class="bg-coffee/5 whitespace-nowrap">
+                    <thead class="bg-terrasse-ink/5 whitespace-nowrap">
                         <tr>
                             <th scope="col" class="px-4 py-3">Mã đơn</th>
                             <th scope="col" class="px-4 py-3">Giờ đặt</th>
@@ -71,7 +71,7 @@
                             <th scope="col" class="px-4 py-3 text-right">Tổng tiền</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-coffee/15">
+                    <tbody class="divide-y divide-terrasse-ink/15">
                         @foreach ($orders as $order)
                             <tr>
                                 <th scope="row" class="px-4 py-3 whitespace-nowrap">

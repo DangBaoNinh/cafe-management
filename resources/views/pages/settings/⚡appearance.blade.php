@@ -9,7 +9,7 @@ new #[Layout('layouts::settings')] #[Title('Cài đặt giao diện')] class ext
 }; ?>
 
 <div class="min-w-0">
-    <x-pages::settings.layout :heading="__('Appearance')" :subheading="__('Update the appearance settings for your account')">
+    <x-pages::settings.layout :heading="__('Appearance')" subheading="Chọn chế độ hiển thị cho toàn bộ Coffee Shop trên trình duyệt này.">
         <fieldset x-data class="grid gap-3 sm:grid-cols-3">
             <legend class="sr-only">Chế độ hiển thị</legend>
             @foreach ([

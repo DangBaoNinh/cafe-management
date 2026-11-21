@@ -18,9 +18,9 @@
             <flux:button type="submit" variant="primary">Lọc tài khoản</flux:button>
         </form>
 
-        <div class="relative overflow-x-auto rounded-lg border border-coffee/15 bg-white">
+        <div class="relative overflow-x-auto rounded-lg border border-terrasse-ink/15 bg-terrasse-paper">
             <table class="w-full text-left text-sm">
-                <thead class="border-b border-coffee/15">
+                <thead class="border-b border-terrasse-ink/15">
                     <tr>
                         <th scope="col" class="p-4">Tài khoản</th>
                         <th scope="col" class="p-4">Vai trò</th>
@@ -28,7 +28,7 @@
                         <th scope="col" class="p-4"><span class="sr-only">Thao tác</span></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-coffee/15">
+                <tbody class="divide-y divide-terrasse-ink/15">
                     @forelse ($accounts as $account)
                         <tr>
                             <td class="p-4"><div class="font-medium">{{ $account->name }}</div>{{ $account->email }}</td>

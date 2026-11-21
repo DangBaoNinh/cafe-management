@@ -3,7 +3,7 @@
         <flux:link :href="route('cart.index')">Về giỏ hàng</flux:link>
         <h1 class="text-3xl font-semibold tracking-tight">Phí giao hàng</h1>
 
-        <div class="space-y-4 rounded-xl border border-coffee/15 bg-white p-5">
+        <div class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
             <h2 class="font-semibold">Giao tận nơi</h2>
             @if ($addresses->isEmpty())
                 <p class="text-sm">Thêm địa chỉ để kiểm tra vùng giao và phí.</p>
@@ -29,7 +29,7 @@
             @endif
         </div>
 
-        <div class="flex flex-wrap justify-between gap-2 rounded-xl border border-coffee/15 bg-white p-5">
+        <div class="flex flex-wrap justify-between gap-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
             <h2 class="font-semibold">Nhận tại quán</h2>
             <strong>{{ number_format($pickupFee, 0, ',', '.') }} ₫</strong>
         </div>

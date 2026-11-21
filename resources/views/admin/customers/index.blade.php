@@ -2,7 +2,7 @@
     <section class="space-y-6">
         <h1 class="text-2xl font-semibold sm:text-3xl">Tra cứu khách hàng</h1>
 
-        <form method="GET" action="{{ route('admin.customers.index') }}" class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+        <form method="GET" action="{{ route('admin.customers.index') }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="min-w-0 space-y-2">
                     <label class="block text-sm font-medium" for="customer-search">Tên hoặc email</label>
@@ -28,11 +28,11 @@
         </form>
 
         @if ($customers->isEmpty())
-            <p class="rounded-xl border border-coffee/15 bg-white p-5">
+            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
                 {{ $customers->total() > 0 ? 'Trang này không có khách hàng.' : 'Không tìm thấy khách hàng.' }}
             </p>
         @else
-            <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+            <ul class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                 @foreach ($customers as $customer)
                     <li class="grid gap-2 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-5">
                         <div class="wrap-anywhere">

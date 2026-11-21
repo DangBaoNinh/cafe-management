@@ -10,15 +10,15 @@
         </header>
 
         @if (session('status'))
-            <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
+            <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
         @foreach (['expected_status', 'decision', 'target_status', 'payment', 'fulfillment_type', 'method', 'shipment', 'event'] as $field)
             @error($field)
-                <p role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ $message }}</p>
+                <p role="alert" class="rounded-lg border border-terrasse-danger/30 bg-terrasse-danger-surface p-4 text-sm text-terrasse-danger">{{ $message }}</p>
             @enderror
         @endforeach
 
-        <dl class="grid gap-4 rounded-xl border border-coffee/15 bg-white p-4 sm:grid-cols-3">
+        <dl class="grid gap-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:grid-cols-3">
             <div>
                 <dt class="text-sm">Trạng thái đơn</dt>
                 <dd class="font-semibold">{{ $order->status->label() }}</dd>
@@ -40,7 +40,7 @@
         <x-customer.order-snapshot :order="$order" />
 
         @if ($order->status === \App\Enums\OrderStatus::Pending)
-            <section class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
+            <section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 <h2 class="text-lg font-semibold">Quyết định tiếp nhận</h2>
                 <form method="POST" action="{{ route('operations.orders.decide', $order->order_number) }}">
                     @csrf
@@ -48,7 +48,7 @@
                     <input type="hidden" name="decision" value="{{ \App\Enums\OrderStatus::Confirmed->value }}">
                     <flux:button type="submit" variant="primary">Xác nhận đơn</flux:button>
                 </form>
-                <details class="border-t border-coffee/15 pt-4" @error('reason') open @enderror>
+                <details class="border-t border-terrasse-ink/15 pt-4" @error('reason') open @enderror>
                     <summary class="cursor-pointer font-semibold">Từ chối đơn</summary>
                     <form method="POST" action="{{ route('operations.orders.decide', $order->order_number) }}" class="mt-4 space-y-3">
                         @csrf

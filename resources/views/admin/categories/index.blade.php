@@ -7,9 +7,9 @@
 
         <x-auth-session-status :status="session('status')" />
 
-        <div class="relative overflow-x-auto rounded-lg border border-coffee/15 bg-white">
+        <div class="relative overflow-x-auto rounded-lg border border-terrasse-ink/15 bg-terrasse-paper">
             <table class="w-full text-left text-sm">
-                <thead class="border-b border-coffee/15">
+                <thead class="border-b border-terrasse-ink/15">
                     <tr>
                         <th scope="col" class="p-4">Danh mục</th>
                         <th scope="col" class="p-4">Thứ tự</th>
@@ -17,7 +17,7 @@
                         <th scope="col" class="p-4"><span class="sr-only">Thao tác</span></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-coffee/15">
+                <tbody class="divide-y divide-terrasse-ink/15">
                     @forelse ($categories as $category)
                         <tr>
                             <td class="p-4"><div class="font-medium">{{ $category->name }}</div>{{ $category->slug }}</td>

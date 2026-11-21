@@ -2,7 +2,7 @@
     <section class="space-y-6">
         <flux:link :href="route('admin.customers.index')">Về danh sách khách hàng</flux:link>
 
-        <div class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4 sm:p-5">
+        <div class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-5">
             <h1 class="text-2xl font-semibold wrap-anywhere sm:text-3xl">{{ $customer->name }}</h1>
             <dl class="grid gap-4 text-sm sm:grid-cols-2">
                 <div class="wrap-anywhere">
@@ -21,11 +21,11 @@
             <h2 id="customer-orders" class="text-xl font-semibold">Đơn hàng ({{ $orders->total() }})</h2>
 
             @if ($orders->isEmpty())
-                <p class="rounded-xl border border-coffee/15 bg-white p-5">
+                <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
                     {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : 'Khách hàng chưa có đơn hàng.' }}
                 </p>
             @else
-                <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+                <ul class="divide-y divide-terrasse-ink/15 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper">
                     @foreach ($orders as $order)
                         <li class="grid gap-2 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-5">
                             <div class="wrap-anywhere">
