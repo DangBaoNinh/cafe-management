@@ -18,6 +18,7 @@
                     <a href="{{ route('operations.payments.index') }}" class="hover:underline">Đối chiếu thanh toán</a>
                     @can('access-admin')
                         <a href="{{ route('admin.orders.index') }}" class="hover:underline">Quản lý đơn hàng</a>
+                        <a href="{{ route('admin.customers.index') }}" class="hover:underline">Tra cứu khách hàng</a>
                         <a href="{{ route('admin.accounts.index') }}" class="hover:underline">Quản lý tài khoản</a>
                         <a href="{{ route('admin.categories.index') }}" class="hover:underline">Quản lý danh mục</a>
                         <a href="{{ route('admin.products.index') }}" class="hover:underline">Quản lý sản phẩm</a>
