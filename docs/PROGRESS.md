@@ -177,7 +177,9 @@
 - `composer ci:check` đạt Pint, PHPStan và 125 bài SQLite với 1.584 assertion, gồm kiểm tra rollback khi ghi lịch sử thanh toán thất bại. Bộ MySQL đạt 17 bài với 270 assertion, gồm kiểm tra dùng lại mã đã hết lượt sau hủy. `npm run build` thành công.
 - Hai phiên MySQL cô lập kiểm tra cả hai thứ tự giữa khách hủy và giao dịch mô phỏng nhân viên xác nhận. Trong mỗi lượt, phiên đến sau chờ khóa rồi bị từ chối. Brave ở 360 px kiểm tra xác nhận hủy, phản hồi 419 khi thiếu CSRF, hai kết quả thanh toán và bộ lọc **Đã kết thúc**.
 
-### UC17 đã kiểm chứng, chờ nghiệm thu
+### UC17 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC17 tại commit `fdbf1a4`. Tích hợp vào `develop` tại merge commit `b199726` sau khi chạy lại Pint, PHPStan, 130 bài SQLite, 17 bài MySQL, bản build và bốn kịch bản tranh khóa MySQL.
 
 - Nhân viên và quản trị viên đang hoạt động vào **Đơn chờ xác nhận** tại `/operations/orders`. Hàng đợi hiển thị đơn cũ nhất trước, 15 đơn mỗi trang. Chi tiết dùng thông tin đã lưu lúc đặt và hiển thị trạng thái thanh toán.
 - Chỉ quyết định được đơn `pending`. Xác nhận ghi lịch sử và giữ nguyên thanh toán, kể cả chuyển khoản chưa đối chiếu. Từ chối bắt buộc lý do tối đa 500 ký tự, giải phóng lượt mã và chuyển thanh toán sang `voided` hoặc `refund_pending`. Trạng thái và lịch sử ghi trong cùng giao dịch.
@@ -199,4 +201,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC17 chờ nghiệm thu. UC20 đối chiếu thanh toán là bước tiếp theo theo thứ tự phụ thuộc.
+- UC18 bị chặn bởi UC20. Luồng đối chiếu để chuyển thanh toán chuyển khoản sang `paid` cần được triển khai, kiểm chứng và tích hợp vào `develop` trước khi bắt đầu UC18.
