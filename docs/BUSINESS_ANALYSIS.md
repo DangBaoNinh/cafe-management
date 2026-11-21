@@ -31,9 +31,11 @@ MVP phục vụ **một cửa hàng**, dùng VND và thời gian nghiệp vụ t
 | Mở rộng tại quán | Phạm vi |
 | --- | --- |
 | [UC26 — Đặt đồ uống hẹn giờ nhận tại quán](use-cases/UC26.md) | Khách chọn giờ đến lấy đồ uống và đưa phiếu điện tử để nhân viên kiểm tra trước bàn giao. Hẹn giờ là tùy chọn của nhận tại quán. |
-| [UC27 — Đặt bàn hoặc phòng họp tại quán](use-cases/UC27.md) | Giữ một bàn hoặc một phòng theo giờ và số người. Quán có hai tầng, mỗi tầng khoảng 10 bàn và một phòng họp lớn. |
+| [UC27 — Đặt bàn hoặc phòng họp tại quán](use-cases/UC27.md) | Giữ một bàn hoặc một phòng theo giờ và số người. Mỗi tầng trong hai tầng có 5 bàn tối đa 4 người, 5 bàn tối đa 2 người và 1 phòng họp tối đa 10 người. |
 
-Hai UC có thể triển khai độc lập. Số bàn chính thức, sức chứa mỗi bàn/phòng, giờ mở cửa, giới hạn khung nhận và các chính sách đến muộn hoặc không đến cần được xác nhận trước triển khai. Q01 mô tả phạm vi MVP gốc, còn hẹn nhận theo khung giờ được đặc tả ở UC26.
+Quán mở 07:00–23:00, khách đặt trước ít nhất một giờ. UC26 không giới hạn số đơn theo giờ nhận. Hai UC dùng chung chính sách đổi lịch, đến trễ, không đến và hạn chế đặt lịch theo [BR25–BR28](BUSINESS_RULES.md#quy-tắc-mở-rộng-uc26-và-uc27). Q01 mô tả phạm vi MVP gốc, còn hẹn nhận theo giờ được đặc tả ở UC26.
+
+Trước khi triển khai, còn cần chốt bước chọn giờ, thời lượng tối đa khách sử dụng bàn/phòng sau check-in, thời hạn gửi yêu cầu đổi lịch và cách xử lý khi giờ đóng cửa hoặc giờ kết thúc đặt chỗ đến trước mốc 30 phút. Quy tắc thu phí chưa xác định luồng đối chiếu trực tuyến khi khách đến quầy.
 
 ## 4. Luồng chính và ngoại lệ
 

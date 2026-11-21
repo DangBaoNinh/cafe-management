@@ -37,11 +37,15 @@ Mỗi quy tắc có mã ổn định để đặc tả UC tham chiếu. Các quy
 
 ## Quy tắc mở rộng UC26 và UC27
 
-Các quy tắc dưới đây là thiết kế đề xuất cho hai UC mới.
+Các quy tắc dưới đây áp dụng cho hai UC mới. Thông số vận hành đã được người dùng xác nhận.
 
 | Mã | Quy tắc |
 | --- | --- |
-| BR21 | Hẹn giờ chỉ áp dụng khi nhận tại quán, phí giao bằng 0 theo BR08. Kiểm tra khung, thời hạn đặt và sức chứa trên backend. Cấp chỗ trong transaction checkout. Hủy hoặc từ chối trả chỗ và làm phiếu mất hiệu lực. |
+| BR21 | Hẹn giờ chỉ áp dụng khi nhận tại quán, phí giao bằng 0 theo BR08. Backend kiểm tra giờ nhận và thời hạn đặt. Số đơn theo giờ nhận không giới hạn. Hủy hoặc từ chối làm phiếu mất hiệu lực. |
 | BR22 | Phiếu điện tử có mã tra cứu duy nhất, khó đoán. Chỉ chủ đơn xem phiếu, chỉ staff/admin đang hoạt động tra cứu và bàn giao. Kiểm tra đơn sẵn sàng, thanh toán và hiệu lực mã. Ghi bàn giao và dùng phiếu trong cùng transaction, áp dụng BR14 và UC19. |
 | BR23 | Một đặt chỗ giữ một bàn hoặc một phòng đủ sức chứa, đang hoạt động, trong giờ mở cửa. Hai lịch giữ chỗ trên cùng tài nguyên không được giao nhau theo khoảng `[bắt đầu, kết thúc)`. Khóa tài nguyên và kiểm tra lại khi ghi. |
 | BR24 | Khách chỉ xem hoặc hủy đặt chỗ của mình. Staff/admin tra lịch, hủy có lý do, check-in, ghi không đến hoặc hoàn tất theo UC27. Chỉ admin cấu hình danh mục chỗ. Hủy giải phóng khoảng đã giữ. Ghi lịch sử trạng thái và tác nhân trong transaction. |
+| BR25 | Quán mở 07:00–23:00 theo giờ Việt Nam. Đặt lịch trước ít nhất 60 phút. Giờ đến phải trong giờ mở cửa, giờ kết thúc đặt bàn/phòng không muộn hơn 23:00. Mỗi tầng có 5 bàn tối đa 4 người, 5 bàn tối đa 2 người và 1 phòng họp tối đa 10 người. |
+| BR26 | Đổi lịch hợp lệ thu cố định 10.000 ₫ mỗi lần. Giờ mới chênh tối đa 60 phút so với giờ hẹn đang có và phải thỏa điều kiện đặt lịch, kể cả lịch trống với UC27. Vượt 60 phút thì đặt lại theo luồng tạo lịch mới. Hiển thị phụ phí trước khi xác nhận. Nếu đổi thất bại, giữ lịch cũ. |
+| BR27 | Đến trễ 5 phút đầu miễn phí. Từ phút thứ 6, thu 2.000 ₫ cho mỗi phút vượt 5 phút, tính theo số phút đã trôi qua tại lúc staff ghi nhận khách đến. Ví dụ trễ 6 phút thu 2.000 ₫, trễ 7 phút thu 4.000 ₫. Sau 30 phút kể từ giờ hẹn, lịch chưa ghi nhận khách đến bị hủy với lý do không đến. Thu phí đổi lịch và phí đến trễ trên ứng dụng với thanh toán qua tài khoản, hoặc tại quầy với thanh toán trực tiếp. Ghi mỗi khoản một lần. |
+| BR28 | Ghi nhận không đến theo tài khoản, dùng chung cho UC26 và UC27. Hai lần liên tiếp khóa quyền đặt hai loại lịch trong 7 ngày kể từ lần thứ hai. Một lượt đến hợp lệ đặt lại chuỗi về 0. Khách vẫn đăng nhập, mua hàng bình thường và xem lịch đã đặt. Hết 7 ngày, quyền đặt lịch tự mở lại. Chỉ hủy do không đến mới tính vào chuỗi. |

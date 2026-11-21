@@ -94,10 +94,11 @@ Thiết kế dưới đây bổ sung vào mô hình MVP khi triển khai [UC26](
 
 | Dữ liệu | Trường và ràng buộc chính |
 | --- | --- |
-| Khung nhận tại quán | Giờ bắt đầu/kết thúc, giới hạn số đơn, trạng thái mở. Khóa hàng khung giờ khi cấp chỗ hoặc trả chỗ. |
-| Phiếu nhận | FK đơn unique, FK khung giờ, mốc giờ hẹn, mã tra cứu unique, thời điểm dùng hoặc vô hiệu. Giữ phí và thanh toán trong đơn gốc. Chỉ giữ sức chứa cho đơn đã cấp chỗ và chưa hủy/từ chối. |
+| Phiếu nhận | FK đơn unique, mốc giờ hẹn, mã tra cứu unique, thời điểm khách đến, thời điểm dùng hoặc vô hiệu. Giờ nhận không có giới hạn số đơn. |
 | Bàn và phòng | Mã chỗ unique, tầng 1 hoặc 2, loại bàn/phòng họp, sức chứa và trạng thái phục vụ. Giữ chỗ đã có lịch sử để tra cứu. |
-| Đặt chỗ | FK khách và FK chỗ, mã đặt unique, tên và điện thoại liên hệ, số khách, `starts_at`, `ends_at`, trạng thái và khóa gửi lại duy nhất theo khách. Index theo chỗ, trạng thái và giờ bắt đầu. |
+| Đặt chỗ | FK khách và FK chỗ, mã đặt unique, tên và điện thoại liên hệ, số khách, `starts_at`, `ends_at`, thời điểm khách đến, kênh thu phí, trạng thái và khóa gửi lại duy nhất theo khách. Index theo chỗ, trạng thái và giờ bắt đầu. |
 | Lịch sử đặt chỗ | FK đặt chỗ, người thao tác, thời điểm, trạng thái trước/sau và lý do khi cần. |
+| Lịch sử đổi giờ và phụ phí | Liên kết đến đơn hẹn hoặc lịch đặt chỗ. Ghi giờ trước/sau khi đổi, lý do thu, số phút trễ nếu có, số tiền VND, kênh thu, trạng thái và tham chiếu thanh toán. Dùng khóa nghiệp vụ để chống thu lặp. |
+| Theo dõi đến hẹn | FK khách, nguồn UC26/UC27, kết quả đến hoặc không đến và thời điểm. Mỗi lượt chỉ ghi một kết quả. Lưu chuỗi không đến và thời điểm hết hạn chế đặt lịch riêng với trạng thái tài khoản của UC04. |
 
-UC26 cấp chỗ trong cùng transaction tạo đơn. Khi thay đổi hiệu lực phiếu, khóa và đối chiếu đơn cùng dữ liệu khung theo thứ tự nhất quán. Khung giờ đã có phiếu giữ nguyên mốc hẹn của khách. Hai giao dịch UC27 giữ cùng chỗ phải khóa hàng chỗ trước rồi kiểm tra giao nhau trên các lịch `confirmed` hoặc `checked_in` bằng điều kiện `existing.starts_at < requested.end` và `existing.ends_at > requested.start`. Dùng phép đọc thấy dữ liệu đã commit mới nhất sau khi lấy khóa. Kiểm chứng tranh chấp đồng thời trên MySQL thử nghiệm.
+UC26 lưu giờ hẹn và phiếu trong transaction tạo đơn. Hai giao dịch UC27 giữ cùng chỗ phải khóa hàng chỗ trước rồi kiểm tra giao nhau trên các lịch `confirmed` hoặc `checked_in` bằng điều kiện `existing.starts_at < requested.end` và `existing.ends_at > requested.start`. Dùng phép đọc thấy dữ liệu đã commit mới nhất sau khi lấy khóa. Việc ghi nhận đến, hủy do không đến hoặc đổi giờ cần kiểm tra lại trạng thái và khóa bản ghi lịch. Cập nhật kết quả đến hẹn và chuỗi theo khách trong cùng giao dịch với kết quả nghiệp vụ. Các kết quả lặp không tính hai lần. Kiểm chứng tranh chấp đồng thời trên MySQL thử nghiệm.
