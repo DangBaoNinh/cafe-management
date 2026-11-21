@@ -186,7 +186,9 @@
 - `composer ci:check` đạt Pint, PHPStan và 130 bài SQLite với 1.704 assertion. Bộ MySQL đạt 17 bài với 277 assertion. `npm run build` thành công. Không cần migration.
 - Hai phiên MySQL kiểm tra hai nhân viên cùng xác nhận, từ chối đồng thời với xác nhận và cả hai thứ tự giữa xác nhận và khách hủy. Mỗi lượt chỉ một thao tác thành công. Brave ở 360 px kiểm tra nhập lý do, CSRF, xác nhận, từ chối và cập nhật hàng đợi.
 
-### UC20 đã kiểm chứng, chờ nghiệm thu
+### UC20 đã nghiệm thu
+
+- Ngày 21/11/2026, người dùng nghiệm thu UC20 tại commit `f018aa4`. Tích hợp vào `develop` tại merge commit `6dc6cc7` sau khi chạy lại Pint, PHPStan, 136 bài SQLite, 18 bài MySQL, bản build và các kịch bản đối chiếu đồng thời.
 
 - Tại `/operations/payments`, nhân viên và quản trị viên đối chiếu khoản chuyển khoản của đơn chờ xác nhận hoặc đã xác nhận. Số tiền thực thu phải khớp tổng đơn và mã giao dịch chỉ được dùng một lần. Lưu trạng thái, tham chiếu, thời điểm, tác nhân và ghi chú trong cùng giao dịch. Khách chỉ thấy trạng thái thanh toán.
 - Quản trị viên ghi nhận giao dịch hoàn đã thực hiện ngoài hệ thống cho khoản `refund_pending` và nhập tham chiếu hoàn. Thu COD được ghi cùng bàn giao ở UC19, dùng cùng quy tắc đối chiếu số tiền với tổng đơn.
@@ -209,4 +211,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC20 chờ nghiệm thu và tích hợp vào `develop` để gỡ phụ thuộc của UC18.
+- UC18 đủ phụ thuộc để triển khai sau khi UC20 được tích hợp vào `develop`.
