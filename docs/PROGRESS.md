@@ -186,6 +186,14 @@
 - `composer ci:check` đạt Pint, PHPStan và 130 bài SQLite với 1.704 assertion. Bộ MySQL đạt 17 bài với 277 assertion. `npm run build` thành công. Không cần migration.
 - Hai phiên MySQL kiểm tra hai nhân viên cùng xác nhận, từ chối đồng thời với xác nhận và cả hai thứ tự giữa xác nhận và khách hủy. Mỗi lượt chỉ một thao tác thành công. Brave ở 360 px kiểm tra nhập lý do, CSRF, xác nhận, từ chối và cập nhật hàng đợi.
 
+### UC20 đã kiểm chứng, chờ nghiệm thu
+
+- Tại `/operations/payments`, nhân viên và quản trị viên đối chiếu khoản chuyển khoản của đơn chờ xác nhận hoặc đã xác nhận. Số tiền thực thu phải khớp tổng đơn và mã giao dịch chỉ được dùng một lần. Lưu trạng thái, tham chiếu, thời điểm, tác nhân và ghi chú trong cùng giao dịch. Khách chỉ thấy trạng thái thanh toán.
+- Quản trị viên ghi nhận giao dịch hoàn đã thực hiện ngoài hệ thống cho khoản `refund_pending` và nhập tham chiếu hoàn. Thu COD được ghi cùng bàn giao ở UC19, dùng cùng quy tắc đối chiếu số tiền với tổng đơn.
+- Đơn chuyển khoản 0 ₫ có thể được xác nhận thanh toán mà không cần mã giao dịch. Khi hủy hoặc từ chối đơn 0 ₫, thanh toán chuyển sang `voided` vì chưa phát sinh khoản thu.
+- Không cần migration. `composer ci:check` đạt Pint, PHPStan và 136 bài SQLite với 1.856 assertion. Bộ MySQL đạt 18 bài với 298 assertion. `npm run build` thành công. Brave ở 360 px kiểm tra đối chiếu sai và đúng số tiền, bảo vệ CSRF, quyền ghi nhận hoàn và mã tham chiếu dài.
+- Kiểm tra hai phiên MySQL cùng đối chiếu một đơn, nhập trùng mã cho hai đơn và cả hai thứ tự giữa đối chiếu và hủy. Đối chiếu một lần duy nhất cho mỗi khoản thu. Nếu đối chiếu thành công trước khi hủy, khoản tiền chuyển sang chờ hoàn.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -201,4 +209,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC18 bị chặn bởi UC20. Luồng đối chiếu để chuyển thanh toán chuyển khoản sang `paid` cần được triển khai, kiểm chứng và tích hợp vào `develop` trước khi bắt đầu UC18.
+- UC20 chờ nghiệm thu và tích hợp vào `develop` để gỡ phụ thuộc của UC18.
