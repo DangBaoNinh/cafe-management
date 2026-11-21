@@ -7,7 +7,7 @@
     </head>
     <body class="terrasse flex min-h-screen flex-col font-sans antialiased">
         <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-white focus:p-3">Đến nội dung chính</a>
-        <header class="terrasse-store-header">
+        <header id="store-header" class="terrasse-store-header" tabindex="-1">
             <nav aria-label="Điều hướng chính" class="terrasse-frame flex flex-wrap items-center justify-between gap-4 py-4">
                 <x-terrasse.brand :href="route('home')" />
 
@@ -44,11 +44,6 @@
         <main id="main-content" class="{{ $fullBleed ? 'flex-1' : 'terrasse-frame flex-1 py-8 sm:py-12' }}">
             {{ $slot }}
         </main>
-        <footer class="terrasse-store-footer">
-            <div class="terrasse-frame flex flex-wrap items-center justify-between gap-2 py-5 text-sm">
-                <a href="{{ route('home') }}" class="terrasse-store-link font-semibold">{{ config('app.name') }}</a>
-                <a href="{{ route('menu.index') }}" class="terrasse-store-link terrasse-muted">Thực đơn</a>
-            </div>
-        </footer>
+        <x-terrasse.store-footer />
     </body>
 </html>

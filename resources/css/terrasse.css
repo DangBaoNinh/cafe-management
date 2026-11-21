@@ -33,7 +33,17 @@
 .terrasse-store-header { border-bottom: 1px solid var(--terrasse-line); background: var(--color-cream); }
 .terrasse-store-header nav { min-height: 5rem; }
 .terrasse-store-link:hover, .terrasse-store-link[aria-current] { text-decoration: underline; text-underline-offset: .35rem; }
-.terrasse-store-footer { border-top: 1px solid var(--terrasse-line); }
+.terrasse-store-footer {
+    border-top: 2px solid #b58b64;
+    color: #fff2de;
+    background: linear-gradient(90deg, #432329 0%, #432329 45%, #432329b8 100%),
+        #432329 url("../assets/terrasse/paris-terrasse.jpg") right 68% / cover no-repeat;
+}
+.terrasse-store-footer .terrasse-brand-mark { color: var(--terrasse-gold); }
+.terrasse-store-footer :focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-footer-muted { color: #ead1bc; }
+.terrasse-footer-link:hover { color: var(--terrasse-gold); text-decoration: underline; text-underline-offset: .3em; }
+.terrasse-footer-bottom { border-top: 1px solid #9d7269; }
 
 .terrasse-hero {
     display: grid;
