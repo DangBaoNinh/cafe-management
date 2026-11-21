@@ -1,3 +1,5 @@
+import './storefront-chat';
+
 const appearanceKey = 'flux.appearance';
 const systemAppearance = window.matchMedia('(prefers-color-scheme: dark)');
 

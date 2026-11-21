@@ -45,6 +45,7 @@
             {{ $slot }}
         </main>
         <x-terrasse.store-footer />
+        <x-terrasse.storefront-chat />
 
         @if ($settings)
             @persist('toast')
