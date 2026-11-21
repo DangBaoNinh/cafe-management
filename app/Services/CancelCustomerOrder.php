@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
-use App\Enums\PaymentStatus;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -23,11 +22,7 @@ class CancelCustomerOrder
 
             $payment = $order->payment()->lockForUpdate()->first();
             $previousPaymentStatus = $payment?->status;
-            $nextPaymentStatus = match ($previousPaymentStatus) {
-                PaymentStatus::Pending => PaymentStatus::Voided,
-                PaymentStatus::Paid => PaymentStatus::RefundPending,
-                default => null,
-            };
+            $nextPaymentStatus = $previousPaymentStatus?->afterOrderReversal();
             if ($payment === null || $previousPaymentStatus === null || $nextPaymentStatus === null) {
                 throw ValidationException::withMessages([
                     'expected_status' => 'Không thể hủy đơn với trạng thái thanh toán hiện tại. Vui lòng liên hệ cửa hàng.',

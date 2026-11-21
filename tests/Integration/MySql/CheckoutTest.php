@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\MySql;
 
+use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\User;
@@ -75,9 +76,20 @@ class CheckoutTest extends MySqlTestCase
             $this->assertSame($coupon->id, $order->coupon_id);
 
             app(ShoppingCart::class)->add($first, $product->id, ['size_id' => $size->id], 1);
-            $this->submission($first, $coupon);
+            $afterCancellation = $this->submission($first, $coupon);
             $this->actingAs($second)->post(route('checkout.store'), $secondSubmission)->assertStatus(303);
-            $this->assertSame(30000, $second->orders()->sole()->total_vnd);
+            $secondOrder = $second->orders()->sole();
+            $this->assertSame(30000, $secondOrder->total_vnd);
+            $this->actingAs($first)->postJson(route('checkout.store'), $afterCancellation)
+                ->assertUnprocessable()->assertJsonValidationErrors('coupon_code');
+
+            $staff = User::factory()->create(['role' => UserRole::Staff]);
+            $this->actingAs($staff)->post(route('operations.orders.decide', $secondOrder->order_number), [
+                'expected_status' => 'pending', 'decision' => 'rejected', 'reason' => 'Hết nguyên liệu',
+            ])->assertStatus(303);
+            $this->assertSame('voided', $secondOrder->payment()->sole()->status->value);
+            $this->actingAs($first)->post(route('checkout.store'), $afterCancellation)->assertStatus(303);
+            $this->assertSame(30000, $first->orders()->where('status', 'pending')->sole()->total_vnd);
         } finally {
             $this->primary->disableQueryLog();
             $this->primary->rollBack();

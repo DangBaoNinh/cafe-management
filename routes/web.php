@@ -13,6 +13,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DeliveryFeeController;
+use App\Http\Controllers\OrderIntakeController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'customer.home')->name('home');
@@ -39,6 +40,12 @@ Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-custom
     Route::get('/', [CustomerOrderController::class, 'index'])->name('index');
     Route::get('{number}', [CustomerOrderController::class, 'show'])->name('show');
     Route::post('{number}/cancel', [CustomerOrderController::class, 'cancel'])->name('cancel');
+});
+
+Route::prefix('operations/orders')->name('operations.orders.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [OrderIntakeController::class, 'index'])->name('index');
+    Route::get('{number}', [OrderIntakeController::class, 'show'])->name('show');
+    Route::post('{number}/decision', [OrderIntakeController::class, 'decide'])->name('decide');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
