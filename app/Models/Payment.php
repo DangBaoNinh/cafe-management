@@ -40,6 +40,14 @@ class Payment extends Model
             || ($this->method === PaymentMethod::Cod && $this->status === PaymentStatus::Pending);
     }
 
+    public function allowsHandoff(): bool
+    {
+        return $this->status === match ($this->method) {
+            PaymentMethod::Cod => PaymentStatus::Pending,
+            PaymentMethod::BankTransfer => PaymentStatus::Paid,
+        };
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {

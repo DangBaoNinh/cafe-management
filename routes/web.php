@@ -14,6 +14,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DeliveryFeeController;
 use App\Http\Controllers\ManualPaymentController;
+use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
 use Illuminate\Support\Facades\Route;
@@ -49,10 +50,14 @@ Route::prefix('operations/orders')->name('operations.orders.')->middleware(['aut
     Route::get('{number}', [OrderIntakeController::class, 'show'])->name('show');
     Route::post('{number}/decision', [OrderIntakeController::class, 'decide'])->name('decide');
     Route::post('{number}/preparation', [OrderPreparationController::class, 'update'])->name('prepare');
+    Route::post('{number}/handoff', [OrderHandoffController::class, 'update'])->name('handoff');
 });
 
 Route::get('operations/preparation', [OrderPreparationController::class, 'index'])
     ->middleware(['auth', 'can:operate-orders'])->name('operations.preparation.index');
+
+Route::get('operations/handoff', [OrderHandoffController::class, 'index'])
+    ->middleware(['auth', 'can:operate-orders'])->name('operations.handoff.index');
 
 Route::prefix('operations/payments')->name('operations.payments.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('/', [ManualPaymentController::class, 'index'])->name('index');
