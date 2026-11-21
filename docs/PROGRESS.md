@@ -302,7 +302,9 @@
 
 - Đã chốt giờ hẹn cuối 22:30 và cách đối chiếu phụ phí trên màn hình tra mã cho UC26–UC27. Đặc tả đã sẵn sàng để triển khai.
 
-### UC26 đã kiểm thử, chờ nghiệm thu
+### UC26 đã nghiệm thu
+
+- Người dùng nghiệm thu UC26 đến commit `3edc935`. Đã tích hợp vào `develop` tại `29cff2a`. Kiểm tra lại UC26 đạt 12 bài với 225 assertion, gồm ca scheduler xử lý trễ một lượt vắng xảy ra trước lần đến gần nhất.
 
 - Checkout nhận giờ 07:00–22:30 theo bước 5 phút và kiểm tra hạn đặt trước 60 phút khi chốt đơn. Khách xem phiếu trong đơn, đổi giờ và xem phụ phí. Nhân viên lọc lịch theo ngày hoặc giờ, nhập mã, ghi nhận khách đến và bàn giao qua quy trình UC19.
 - Phí tại quầy được chốt trong giao dịch bàn giao. Kênh ứng dụng dùng nội dung chuyển khoản riêng và nhân viên đối chiếu sao kê. Lịch chưa ghi nhận đến hết hiệu lực sau 30 phút. Tác vụ `pickups:expire` hủy đơn và cập nhật chuỗi không đến, dùng quy tắc chung cấp tài khoản cho UC26–UC27.
