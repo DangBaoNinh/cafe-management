@@ -34,6 +34,12 @@ class Payment extends Model
         return $amount === $orderTotal && $amount === $this->amount_vnd;
     }
 
+    public function allowsPreparation(): bool
+    {
+        return $this->status === PaymentStatus::Paid
+            || ($this->method === PaymentMethod::Cod && $this->status === PaymentStatus::Pending);
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {

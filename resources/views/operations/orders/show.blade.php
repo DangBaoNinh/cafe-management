@@ -1,4 +1,4 @@
-<x-layouts::admin :title="'Tiếp nhận đơn '.$order->order_number">
+<x-layouts::admin :title="'Đơn '.$order->order_number">
     <section class="mx-auto max-w-3xl space-y-6">
         <header class="space-y-2">
             <flux:link :href="route('operations.orders.index')">Về hàng đợi</flux:link>
@@ -9,7 +9,7 @@
         @if (session('status'))
             <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
         @endif
-        @foreach (['expected_status', 'decision'] as $field)
+        @foreach (['expected_status', 'decision', 'target_status', 'payment'] as $field)
             @error($field)
                 <p role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ $message }}</p>
             @enderror
@@ -58,6 +58,8 @@
                     </form>
                 </details>
             </section>
+        @elseif (in_array($order->status, [\App\Enums\OrderStatus::Confirmed, \App\Enums\OrderStatus::Preparing], true))
+            @include('operations.orders.preparation-actions')
         @endif
     </section>
 </x-layouts::admin>

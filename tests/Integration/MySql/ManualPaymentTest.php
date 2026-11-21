@@ -56,6 +56,21 @@ class ManualPaymentTest extends MySqlTestCase
             $this->assertSame($reference, $payment->collection_reference);
             $this->assertSame('RE-'.$reference, $payment->refund_reference);
             $this->assertSame(3, $payment->statusHistories()->count());
+
+            $this->actingAs($staff)->post(route('operations.orders.decide', $second->order_number), [
+                'expected_status' => 'pending', 'decision' => 'confirmed',
+            ])->assertStatus(303);
+            $prepare = route('operations.orders.prepare', $second->order_number);
+            $start = ['expected_status' => 'confirmed', 'target_status' => 'preparing'];
+            $this->postJson($prepare, $start)->assertConflict()->assertJsonValidationErrors('payment');
+            $this->post(route('operations.payments.reconcile', $second->order_number), [
+                ...$transfer, 'collection_reference' => $reference.'-2',
+            ])->assertStatus(303);
+            $this->post($prepare, $start)->assertStatus(303);
+            $this->post($prepare, ['expected_status' => 'preparing', 'target_status' => 'ready'])->assertStatus(303);
+            $this->assertSame('ready', $second->refresh()->status->value);
+            $this->assertSame('paid', $rejectedPayment->refresh()->status->value);
+            $this->assertSame(['confirmed', 'preparing', 'ready'], $second->statusHistories()->orderBy('id')->pluck('to_status')->all());
         } finally {
             $this->primary->rollBack();
         }

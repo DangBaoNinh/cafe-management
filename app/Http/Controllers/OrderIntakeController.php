@@ -21,7 +21,12 @@ class OrderIntakeController extends Controller
             ->oldest()->orderBy('id')
             ->paginate(15);
 
-        return view('operations.orders.index', ['orders' => $orders]);
+        return view('operations.orders.index', [
+            'orders' => $orders,
+            'title' => 'Đơn chờ xác nhận',
+            'emptyMessage' => 'Chưa có đơn chờ xác nhận.',
+            'showOrderStatus' => false,
+        ]);
     }
 
     public function show(string $number): View

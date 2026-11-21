@@ -196,6 +196,13 @@
 - Không cần migration. `composer ci:check` đạt Pint, PHPStan và 136 bài SQLite với 1.856 assertion. Bộ MySQL đạt 18 bài với 298 assertion. `npm run build` thành công. Brave ở 360 px kiểm tra đối chiếu sai và đúng số tiền, bảo vệ CSRF, quyền ghi nhận hoàn và mã tham chiếu dài.
 - Kiểm tra hai phiên MySQL cùng đối chiếu một đơn, nhập trùng mã cho hai đơn và cả hai thứ tự giữa đối chiếu và hủy. Đối chiếu một lần duy nhất cho mỗi khoản thu. Nếu đối chiếu thành công trước khi hủy, khoản tiền chuyển sang chờ hoàn.
 
+### UC18 đã kiểm chứng, chờ nghiệm thu
+
+- Nhân viên và quản trị viên đang hoạt động vào **Pha chế** tại `/operations/preparation`. Danh sách gồm đơn đã xác nhận và đang pha chế, sắp theo thời gian đặt, 15 đơn mỗi trang. Đơn rời danh sách sau khi được đánh dấu sẵn sàng.
+- Backend chỉ cho chuyển `confirmed → preparing → ready`. COD chưa thu được bắt đầu pha chế. Chuyển khoản phải được đối chiếu ở UC20 và có trạng thái `paid`. Mỗi mốc ghi tác nhân, thời điểm, trạng thái trước và sau trong cùng giao dịch, rồi hiển thị trong tiến trình của chủ đơn.
+- Không cần migration. `composer ci:check` đạt Pint, PHPStan và 141 bài SQLite với 1.946 assertion. Bộ MySQL đạt 18 bài với 308 assertion. `npm run build` thành công. Brave ở 360 px kiểm tra hai mốc pha chế, chặn yêu cầu thiếu mã CSRF, chuyển khoản trước và sau đối chiếu, và tiến trình phía khách.
+- Hai phiên MySQL kiểm chứng yêu cầu lặp ở cả hai mốc bị từ chối sau khi chờ khóa. Nếu giao dịch mô phỏng hủy bởi quản trị viên ghi trước, yêu cầu pha chế bị từ chối. Nếu đối chiếu chuyển khoản ghi trước, yêu cầu pha chế dùng trạng thái thanh toán đã cập nhật.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -211,4 +218,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC18 đủ phụ thuộc để triển khai sau khi UC20 được tích hợp vào `develop`.
+- UC18 chờ nghiệm thu và tích hợp vào `develop` để gỡ phụ thuộc của UC19.
