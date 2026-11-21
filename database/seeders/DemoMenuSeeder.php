@@ -8,6 +8,7 @@ use App\Models\Topping;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LogicException;
 
 class DemoMenuSeeder extends Seeder
 {
@@ -100,7 +101,10 @@ class DemoMenuSeeder extends Seeder
                         ['code' => 'M', 'label' => 'Vừa (M)', 'price_vnd' => $mediumPrice],
                         ['code' => 'L', 'label' => 'Lớn (L)', 'price_vnd' => $largePrice],
                     ]);
-                    $product->toppings()->attach(array_map(fn (string $code) => $toppingIds[$code], $toppingCodes));
+                    $product->toppings()->attach(array_map(
+                        fn (string $code): int => $toppingIds[$code] ?? throw new LogicException("Mã topping mẫu không tồn tại: $code"),
+                        $toppingCodes,
+                    ));
                 }
             }
         });
