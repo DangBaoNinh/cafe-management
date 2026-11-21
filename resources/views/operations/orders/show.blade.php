@@ -12,7 +12,7 @@
         @if (session('status'))
             <p role="status" class="rounded-lg border border-coffee/15 bg-white p-4 text-sm">{{ session('status') }}</p>
         @endif
-        @foreach (['expected_status', 'decision', 'target_status', 'payment', 'fulfillment_type', 'method'] as $field)
+        @foreach (['expected_status', 'decision', 'target_status', 'payment', 'fulfillment_type', 'method', 'shipment', 'event'] as $field)
             @error($field)
                 <p role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ $message }}</p>
             @enderror
@@ -63,8 +63,12 @@
             </section>
         @elseif (in_array($order->status, [\App\Enums\OrderStatus::Confirmed, \App\Enums\OrderStatus::Preparing], true))
             @include('operations.orders.preparation-actions')
-        @elseif (($handoffTarget = $order->nextHandoffStatus()) !== null)
+        @elseif ($order->demoShipment === null && ($handoffTarget = $order->nextHandoffStatus()) !== null)
             @include('operations.orders.handoff-actions', ['target' => $handoffTarget])
+        @endif
+
+        @if (\App\Services\DemoDeliveryProvider::enabled() && $order->fulfillment_type === \App\Enums\FulfillmentType::Delivery)
+            @include('operations.orders.demo-shipment', ['shipment' => $order->demoShipment])
         @endif
     </section>
 </x-layouts::admin>

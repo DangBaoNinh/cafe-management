@@ -8,6 +8,9 @@
         <header class="space-y-2">
             <flux:link :href="route('admin.orders.index')">Về danh sách đơn</flux:link>
             <h1 class="text-2xl font-semibold wrap-anywhere sm:text-3xl">Đơn {{ $order->order_number }}</h1>
+            @if (\App\Services\DemoDeliveryProvider::enabled() && $order->demoShipment !== null)
+                <flux:link :href="route('operations.orders.show', $order->order_number)">Xem vận đơn mô phỏng</flux:link>
+            @endif
             <p class="text-sm">Đặt lúc <x-customer.order-time :date="$order->created_at" /></p>
             @if ($order->completed_at !== null)
                 <p class="text-sm">Hoàn tất lúc <x-customer.order-time :date="$order->completed_at" /></p>

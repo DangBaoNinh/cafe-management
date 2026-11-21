@@ -44,6 +44,12 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
+    /** @return HasOne<DemoShipment, $this> */
+    public function demoShipment(): HasOne
+    {
+        return $this->hasOne(DemoShipment::class);
+    }
+
     /** @return HasMany<OrderStatusHistory, $this> */
     public function statusHistories(): HasMany
     {
