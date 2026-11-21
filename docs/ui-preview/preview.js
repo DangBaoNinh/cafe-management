@@ -1,32 +1,31 @@
 const themes = {
-    phin: {
-        label: 'Cà phê pha phin',
-        title: ['Chậm lại,', 'thơm cả ngày.'],
-        description: 'Một ly cà phê phin đậm đà, chút sữa ngọt và thật nhiều đá. Chọn món bạn thích cho hôm nay.',
-        image: 'phin.jpg',
-        alt: 'Cà phê sữa đá pha bằng phin',
-        caption: 'Cà phê sữa đá',
-        color: '#f9f4ea',
+    terrasse: {
+        label: 'Cà phê theo phong cách Paris',
+        title: ['Một góc', 'Paris.'],
+        description: 'Dành một chút thời gian cho ly cà phê yêu thích, như ngồi bên hiên quán một sáng ở Paris.',
+        image: 'paris-terrasse.jpg',
+        alt: 'Tách cà phê và bánh sừng bò trên bàn đá bên hiên quán Paris',
+        color: '#f6efe3',
     },
-    pho: {
-        label: 'Cà phê và trà',
-        title: ['Hẹn nhau', 'một ly nhé!'],
-        description: 'Bạc xỉu béo nhẹ, cà phê sữa đậm vị hay matcha mát lạnh. Hôm nay bạn muốn uống gì?',
-        image: 'bac-xiu-hero.jpg',
-        alt: 'Ly bạc xỉu nhiều đá trên nền hồng san hô',
-        caption: 'Bạc xỉu',
-        color: '#fff4ee',
+    patisserie: {
+        label: 'Cảm hứng từ tiệm bánh Pháp',
+        title: ['Một sáng', 'thật dịu.'],
+        description: 'Ánh nắng qua cửa sổ và một ly bạc xỉu béo nhẹ. Bạn muốn bắt đầu ngày mới với món gì?',
+        image: 'paris-patisserie.jpg',
+        alt: 'Bánh sừng bò và cà phê sữa trên khăn vải dưới nắng sớm',
+        color: '#faf0ea',
     },
-    rang: {
-        label: 'Cà phê rang đậm',
-        title: ['Đậm vị,', 'thơm lâu.'],
-        description: 'Nếu thích hương rang và vị đắng nhẹ, hãy bắt đầu với cà phê phin của quán.',
-        image: 'dam-dem.jpg',
-        alt: 'Tách cà phê nóng trên bàn gỗ sẫm màu',
-        caption: 'Cà phê phin nóng',
-        color: '#171310',
+    salon: {
+        label: 'Cà phê sau hoàng hôn',
+        title: ['Một tối', 'chậm rãi.'],
+        description: 'Khi phố lên đèn, nhấp một ngụm cà phê đậm vị và để câu chuyện kéo dài thêm một chút.',
+        image: 'paris-salon.jpg',
+        alt: 'Tách espresso trên bàn đá xanh bên ngọn đèn vàng',
+        color: '#17251f',
     },
 };
+
+const previousThemes = { phin: 'terrasse', pho: 'patisserie', rang: 'salon' };
 
 const descriptions = {
     'ca-phe-sua': 'Cà phê phin đậm vị kết hợp với sữa đặc và đá.',
@@ -66,7 +65,8 @@ function filterProducts() {
 
 function showPage() {
     const [requestedTheme, requestedPage] = window.location.hash.slice(1).split('/');
-    const theme = Object.hasOwn(themes, requestedTheme) ? requestedTheme : 'phin';
+    const currentTheme = Object.hasOwn(previousThemes, requestedTheme) ? previousThemes[requestedTheme] : requestedTheme;
+    const theme = Object.hasOwn(themes, currentTheme) ? currentTheme : 'terrasse';
     const page = requestedPage === 'thuc-don' ? 'menu' : 'home';
     const isMenu = page === 'menu';
     const content = themes[theme];
@@ -91,9 +91,9 @@ function showPage() {
     }
 
     document.querySelector('#hero-label').textContent = content.label;
-    document.querySelector('#hero-title').replaceChildren(content.title[0], document.createElement('br'), content.title[1]);
+    document.querySelector('#hero-title-main').textContent = content.title[0];
+    document.querySelector('#hero-title-accent').textContent = content.title[1];
     document.querySelector('#hero-description').textContent = content.description;
-    document.querySelector('#hero-caption').textContent = content.caption;
     heroImage.src = `images/${content.image}`;
     heroImage.alt = content.alt;
     hero.hidden = isMenu;
@@ -108,7 +108,6 @@ function showPage() {
         heading = replacement;
     }
     heading.textContent = isMenu ? 'Thực đơn' : 'Món được yêu thích';
-    document.querySelector('#products-label').hidden = isMenu;
     document.querySelector('#all-drinks').hidden = isMenu;
     document.querySelector('#menu-controls').hidden = !isMenu;
     filterProducts();
