@@ -22,6 +22,7 @@ use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Controllers\StorefrontChatController;
 use App\Http\Middleware\EnsureDemoDeliveryEnabled;
 use App\Http\Middleware\EnsureDemoPaymentEnabled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -30,11 +31,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [CatalogController::class, 'home'])->name('home');
 Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
 Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
+Route::post('tro-chuyen', StorefrontChatController::class)
+    ->middleware('throttle:storefront-chat')->name('storefront-chat.reply');
 
 Route::view('dashboard', 'customer.account')->middleware('auth')->name('dashboard');
 
 Route::prefix('cart')->name('cart.')->middleware(['auth', 'can:manage-cart'])->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('from-chat', [StorefrontChatController::class, 'addToCart'])->name('add-from-chat');
     Route::get('delivery', DeliveryFeeController::class)->name('delivery');
     Route::patch('{item}', [CartController::class, 'update'])->whereNumber('item')->name('update');
     Route::delete('{item}', [CartController::class, 'destroy'])->whereNumber('item')->name('destroy');
