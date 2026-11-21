@@ -231,7 +231,9 @@
 - Hồ sơ hiển thị tên, email, trạng thái và tóm tắt đơn thuộc khách, gồm mã, giờ đặt, trạng thái và tổng tiền. Mã đơn mở chi tiết UC21. Liên kết chỉnh sửa tài khoản đi qua UC04 và yêu cầu xác nhận mật khẩu khi cần. UC22 chỉ đọc và không cần migration.
 - `composer ci:check` đạt Pint, PHPStan và 157 bài SQLite với 2.287 assertion. Bộ MySQL đạt 21 bài với 365 assertion. `npm run build` thành công. Brave ở 360 px kiểm tra lọc, dữ liệu dài không tràn ngang, liên kết đến đúng đơn, lỗi bộ lọc, xác nhận mật khẩu và từ chối nhân viên.
 
-### UC23 đã kiểm chứng, chờ nghiệm thu
+### UC23 đã nghiệm thu
+
+- Người dùng nghiệm thu UC23 tại commit `f7ea9f3`. Nhánh `feature/revenue-dashboard` đã tích hợp vào `develop` tại merge commit `63375bd` sau khi chạy lại Pint, PHPStan, SQLite, MySQL và bản build.
 
 - Trang tổng quan `/admin` dành cho quản trị viên hoạt động. Bộ lọc mặc định gồm 7 ngày gần nhất kể cả hôm nay, giới hạn 366 ngày tính cả hai đầu và dùng ngày Việt Nam. Backend lấy từ 00:00 ngày đầu đến trước 00:00 ngày sau ngày cuối, quy đổi sang UTC.
 - Doanh thu tổng và theo ngày hoàn tất chỉ tính đơn `completed` có thanh toán `paid`. Tách tạm tính, giảm giá, phí giao, tổng thu và số đơn đủ điều kiện. Phần trạng thái đếm theo ngày đặt. Ngày trống hiển thị 0 và báo cáo chỉ trả số liệu tổng hợp. Không cần migration.
@@ -252,4 +254,3 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC23 chờ nghiệm thu và tích hợp vào `develop`.
