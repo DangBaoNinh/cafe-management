@@ -1,38 +1,55 @@
+@props(['title' => null])
+
+@php
+    $canAdminister = auth()->user()?->can('access-admin');
+    $workspaceHome = $canAdminister ? 'admin.dashboard' : 'operations.orders.index';
+    $sections = [
+        'Quản trị' => $canAdminister ? [
+            ['admin.dashboard', 'admin.dashboard', 'Tổng quan quản trị'],
+            ['admin.orders.index', 'admin.orders.*', 'Quản lý đơn hàng'],
+            ['admin.customers.index', 'admin.customers.*', 'Tra cứu khách hàng'],
+            ['admin.accounts.index', 'admin.accounts.*', 'Quản lý tài khoản'],
+        ] : [],
+        'Vận hành' => [
+            ['operations.orders.index', 'operations.orders.*', 'Đơn chờ xác nhận'],
+            ['operations.preparation.index', 'operations.preparation.*', 'Pha chế'],
+            ['operations.handoff.index', 'operations.handoff.*', 'Bàn giao'],
+            ['operations.payments.index', 'operations.payments.*', 'Đối chiếu thanh toán'],
+        ],
+        'Cửa hàng' => $canAdminister ? [
+            ['admin.categories.index', 'admin.categories.*', 'Quản lý danh mục'],
+            ['admin.products.index', 'admin.products.*', 'Quản lý sản phẩm'],
+            ['admin.toppings.index', 'admin.toppings.*', 'Quản lý topping'],
+            ['admin.delivery-settings.edit', 'admin.delivery-settings.*', 'Cấu hình giao hàng'],
+            ['admin.coupons.index', 'admin.coupons.*', 'Mã giảm giá'],
+        ] : [],
+    ];
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-cream font-sans text-coffee antialiased">
-        <header class="bg-coffee text-white">
-            <nav aria-label="Điều hướng cửa hàng" class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
-                @can('access-admin')
-                    <a href="{{ route('admin.dashboard') }}" class="font-semibold">{{ config('app.name') }} · Quản trị</a>
-                @else
-                    <a href="{{ route('operations.orders.index') }}" class="font-semibold">{{ config('app.name') }} · Vận hành</a>
-                @endcan
-                <div class="flex flex-wrap gap-4 text-sm">
-                    <a href="{{ route('operations.orders.index') }}" class="hover:underline">Đơn chờ xác nhận</a>
-                    <a href="{{ route('operations.preparation.index') }}" class="hover:underline">Pha chế</a>
-                    <a href="{{ route('operations.handoff.index') }}" class="hover:underline">Bàn giao</a>
-                    <a href="{{ route('operations.payments.index') }}" class="hover:underline">Đối chiếu thanh toán</a>
-                    @can('access-admin')
-                        <a href="{{ route('admin.orders.index') }}" class="hover:underline">Quản lý đơn hàng</a>
-                        <a href="{{ route('admin.customers.index') }}" class="hover:underline">Tra cứu khách hàng</a>
-                        <a href="{{ route('admin.accounts.index') }}" class="hover:underline">Quản lý tài khoản</a>
-                        <a href="{{ route('admin.categories.index') }}" class="hover:underline">Quản lý danh mục</a>
-                        <a href="{{ route('admin.products.index') }}" class="hover:underline">Quản lý sản phẩm</a>
-                        <a href="{{ route('admin.toppings.index') }}" class="hover:underline">Quản lý topping</a>
-                        <a href="{{ route('admin.delivery-settings.edit') }}" class="hover:underline">Cấu hình giao hàng</a>
-                        <a href="{{ route('admin.coupons.index') }}" class="hover:underline">Mã giảm giá</a>
-                    @endcan
-                    <a href="{{ route('home') }}" class="hover:underline">Về trang chủ</a>
+    <body class="terrasse font-sans antialiased">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-white focus:p-3">Đến nội dung chính</a>
+        <div class="terrasse-workspace">
+            <aside class="terrasse-sidebar min-w-0 px-4 py-4 lg:px-4 lg:py-7">
+                <x-terrasse.brand :href="route($workspaceHome)" :caption="$canAdminister ? 'Quản trị' : 'Vận hành'" class="mb-4 ms-1 lg:mb-7" />
+                <div class="hidden lg:block">
+                    @include('layouts.terrasse.internal-nav')
                 </div>
-            </nav>
-        </header>
+                <details class="lg:hidden">
+                    <summary class="cursor-pointer rounded border border-white/25 px-3 py-2 text-sm font-semibold">Điều hướng nội bộ</summary>
+                    <div class="mt-3">
+                        @include('layouts.terrasse.internal-nav')
+                    </div>
+                </details>
+            </aside>
 
-        <main class="mx-auto max-w-6xl px-5 py-8 sm:px-8">
-            {{ $slot }}
-        </main>
+            <main id="main-content" class="mx-auto w-full min-w-0 max-w-screen-2xl px-4 py-7 sm:px-8 lg:px-9 lg:py-10">
+                {{ $slot }}
+            </main>
+        </div>
     </body>
 </html>

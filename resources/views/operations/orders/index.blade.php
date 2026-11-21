@@ -1,41 +1,43 @@
 <x-layouts::admin :title="$title">
-    <section class="mx-auto max-w-3xl space-y-6">
-        <h1 class="text-2xl font-semibold sm:text-3xl">{{ $title }}</h1>
+    <section class="space-y-6">
+        <header class="space-y-2 border-b border-coffee/15 pb-5">
+            <h1 class="font-semibold">{{ $title }}</h1>
+            <p class="terrasse-muted text-sm">{{ number_format($orders->total(), 0, ',', '.') }} đơn hàng</p>
+        </header>
 
         @if ($orders->isEmpty())
             <p class="rounded-xl border border-coffee/15 bg-white p-5">
                 {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : $emptyMessage }}
             </p>
         @else
-            <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
+            <ul class="grid gap-4 md:grid-cols-2">
                 @foreach ($orders as $order)
-                    <li class="space-y-3 p-4 sm:p-5">
-                        <div class="flex flex-wrap items-baseline justify-between gap-2">
-                            <h2 class="min-w-0 font-semibold wrap-anywhere">
-                                <flux:link :href="route('operations.orders.show', $order->order_number)">{{ $order->order_number }}</flux:link>
-                            </h2>
-                            <strong><x-customer.vnd :amount="$order->total_vnd" /></strong>
-                        </div>
-                        <dl @class(['grid gap-x-4 gap-y-2 text-sm', 'sm:grid-cols-4' => $showOrderStatus, 'sm:grid-cols-3' => ! $showOrderStatus])>
-                            <div>
-                                <dt class="font-medium">Giờ đặt</dt>
-                                <dd><x-customer.order-time :date="$order->created_at" /></dd>
-                            </div>
-                            <div>
-                                <dt class="font-medium">Cách nhận</dt>
-                                <dd>{{ $order->fulfillment_type->label() }}</dd>
-                            </div>
-                            @if ($showOrderStatus)
-                                <div>
-                                    <dt class="font-medium">Trạng thái đơn</dt>
-                                    <dd>{{ $order->status->label() }}</dd>
-                                </div>
+                    <li class="min-w-0">
+                        <x-terrasse.order-card :$order :href="route('operations.orders.show', $order->order_number)" :amount="$order->total_vnd">
+                            @if ($order->items->isNotEmpty())
+                                <p class="terrasse-muted text-sm wrap-anywhere">
+                                    @foreach ($order->items->sortBy('id')->take(3) as $item)
+                                        {{ $item->quantity }} × {{ $item->product_name }}@unless($loop->last) · @endunless
+                                    @endforeach
+                                    @if ($order->items->count() > 3)
+                                        · +{{ $order->items->count() - 3 }} dòng món
+                                    @endif
+                                </p>
                             @endif
-                            <div>
-                                <dt class="font-medium">Thanh toán</dt>
-                                <dd>{{ $order->payment?->status->label() ?? 'Chưa có thông tin' }}</dd>
-                            </div>
-                        </dl>
+                            <dl class="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                    <dt class="terrasse-muted text-xs">Cách nhận</dt>
+                                    <dd class="mt-1 font-semibold">{{ $order->fulfillment_type->label() }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="terrasse-muted text-xs">Thanh toán</dt>
+                                    <dd class="mt-1 font-semibold">{{ $order->payment?->status->label() ?? 'Chưa có thông tin' }}</dd>
+                                    @if ($order->payment)
+                                        <dd class="terrasse-muted mt-1 text-xs">{{ $order->payment->method->label() }}</dd>
+                                    @endif
+                                </div>
+                            </dl>
+                        </x-terrasse.order-card>
                     </li>
                 @endforeach
             </ul>

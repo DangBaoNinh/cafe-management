@@ -1,43 +1,53 @@
+@props(['title' => null, 'fullBleed' => false])
+
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="flex min-h-screen flex-col bg-cream font-sans text-coffee antialiased">
-        <header class="border-b border-coffee/15 bg-white">
-            <nav aria-label="Điều hướng chính" class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
-                <a href="{{ route('home') }}" class="text-lg font-semibold">{{ config('app.name') }}</a>
+    <body class="terrasse flex min-h-screen flex-col font-sans antialiased">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-white focus:p-3">Đến nội dung chính</a>
+        <header class="terrasse-store-header">
+            <nav aria-label="Điều hướng chính" class="terrasse-frame flex flex-wrap items-center justify-between gap-4 py-4">
+                <x-terrasse.brand :href="route('home')" />
 
                 <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
-                    <a href="{{ route('menu.index') }}"
-                        @if (request()->routeIs('menu.*')) aria-current="true" @endif
-                        class="hover:underline aria-[current=true]:underline">Thực đơn</a>
+                    <a href="{{ route('home') }}" @if (request()->routeIs('home')) aria-current="page" @endif
+                        class="terrasse-store-link">Trang chủ</a>
+                    <a href="{{ route('menu.index') }}" @if (request()->routeIs('menu.*')) aria-current="true" @endif
+                        class="terrasse-store-link">Thực đơn</a>
                     @auth
                         @can('manage-cart')
                             <a href="{{ route('cart.index') }}"
                                 @if (request()->routeIs('cart.*')) aria-current="page" @endif
-                                class="hover:underline aria-[current=page]:underline">Giỏ hàng</a>
+                                class="terrasse-store-link">Giỏ hàng</a>
                         @endcan
                         @can('access-customer-orders')
                             <a href="{{ route('orders.index') }}"
                                 @if (request()->routeIs('orders.*')) aria-current="page" @endif
-                                class="hover:underline aria-[current=page]:underline">Đơn của tôi</a>
+                                class="terrasse-store-link">Đơn của tôi</a>
                         @endcan
-                        <a href="{{ route('dashboard') }}" class="hover:underline">Tài khoản</a>
+                        <a href="{{ route('dashboard') }}" class="terrasse-store-link">Tài khoản</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="cursor-pointer hover:underline">Đăng xuất</button>
+                            <button type="submit" class="terrasse-store-link cursor-pointer">Đăng xuất</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="hover:underline">Đăng nhập</a>
-                        <a href="{{ route('register') }}" class="hover:underline">Đăng ký</a>
+                        <a href="{{ route('login') }}" class="terrasse-store-link">Đăng nhập</a>
+                        <a href="{{ route('register') }}" class="terrasse-store-link">Đăng ký</a>
                     @endauth
                 </div>
             </nav>
         </header>
 
-        <main class="mx-auto w-full max-w-5xl flex-1 px-5 py-16 sm:px-8 sm:py-24">
+        <main id="main-content" class="{{ $fullBleed ? 'flex-1' : 'terrasse-frame flex-1 py-8 sm:py-12' }}">
             {{ $slot }}
         </main>
+        <footer class="terrasse-store-footer">
+            <div class="terrasse-frame flex flex-wrap items-center justify-between gap-2 py-5 text-sm">
+                <a href="{{ route('home') }}" class="terrasse-store-link font-semibold">{{ config('app.name') }}</a>
+                <a href="{{ route('menu.index') }}" class="terrasse-store-link terrasse-muted">Thực đơn</a>
+            </div>
+        </footer>
     </body>
 </html>

@@ -27,7 +27,7 @@ use App\Http\Middleware\EnsureDemoPaymentEnabled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'customer.home')->name('home');
+Route::get('/', [CatalogController::class, 'home'])->name('home');
 Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
 Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
 

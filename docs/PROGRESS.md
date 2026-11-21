@@ -259,6 +259,11 @@
 
 - Đã nghiệm thu và tích hợp vào `develop` toàn bộ 23 UC MVP, hai UC mở rộng mô phỏng và ba nhiệm vụ kỹ thuật trong sổ công việc.
 
+## Giao diện Terrasse
+
+- Đã chốt phong cách Terrasse và triển khai trên nhánh `feature/storefront-templates` cho trang chủ, thực đơn và layout đặt món của khách hàng, cùng layout quản trị và vận hành. Tổng quan quản trị dùng số liệu báo cáo thật. Hàng đợi vận hành hiển thị thẻ đơn từ dữ liệu hiện có.
+- `npm run build` thành công. SQLite đạt 173 bài kiểm thử với 2.554 assertion. Báo cáo doanh thu trên MySQL thử nghiệm đạt 1 bài với 13 assertion. Đã xác nhận trên Edge tại 320, 390 và 1440 px, gồm chuyển một đơn thử từ chờ xác nhận sang hàng đợi pha chế.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.

@@ -17,7 +17,7 @@ class OrderIntakeController extends Controller
     {
         $orders = Order::query()
             ->where('status', OrderStatus::Pending)
-            ->with('payment:id,order_id,method,status')
+            ->with(['payment:id,order_id,method,status', 'items:id,order_id,product_name,quantity'])
             ->oldest()->orderBy('id')
             ->paginate(15);
 
@@ -25,7 +25,6 @@ class OrderIntakeController extends Controller
             'orders' => $orders,
             'title' => 'Đơn chờ xác nhận',
             'emptyMessage' => 'Chưa có đơn chờ xác nhận.',
-            'showOrderStatus' => false,
         ]);
     }
 

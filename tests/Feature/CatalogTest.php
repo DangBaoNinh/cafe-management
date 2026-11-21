@@ -30,7 +30,8 @@ class CatalogTest extends TestCase
         $show = route('menu.show', $product->slug);
         $imageUrl = Storage::disk('public')->url($product->image_path);
 
-        $this->get(route('home'))->assertOk()->assertSee($index)->assertSee('Xem thực đơn');
+        $this->get(route('home'))->assertOk()->assertSee($index)->assertSee('Xem thực đơn')
+            ->assertSee($show)->assertSee('Từ 35.000 ₫')->assertDontSee('10.000');
         $this->get($index)->assertOk()
             ->assertSeeInOrder(['Tất cả', 'Trà', 'Cà phê', 'Cà phê sữa đậm'])
             ->assertSee($imageUrl)->assertSee($show)->assertSee('Từ 35.000 ₫')->assertDontSee('10.000');
@@ -58,9 +59,11 @@ class CatalogTest extends TestCase
         $this->addSize($visible, 'm', 'Vừa', 0);
 
         $menu = $this->get(route('menu.index'))->assertOk()->assertSee('eligible-product')->assertSee('Từ 0 ₫');
+        $home = $this->get(route('home'))->assertOk()->assertSee('eligible-product')->assertSee('Từ 0 ₫');
         $menu->assertDontSee('Danh mục nội bộ');
         foreach ([$hidden, $inHiddenCategory, $withoutSizes, $onlyInactiveSizes] as $ineligible) {
             $menu->assertDontSee($ineligible->slug);
+            $home->assertDontSee($ineligible->slug);
             $this->get(route('menu.show', $ineligible->slug))->assertNotFound();
         }
 
