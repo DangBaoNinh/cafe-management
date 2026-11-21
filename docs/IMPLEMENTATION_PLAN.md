@@ -28,7 +28,7 @@ Review [phân tích nghiệp vụ](BUSINESS_ANALYSIS.md), [quy tắc](BUSINESS_R
 
 - UC24–UC25 hỗ trợ mô phỏng tích hợp. Kết nối nhà cung cấp thật cần yêu cầu và thông tin cấu hình riêng.
 - [UC26](use-cases/UC26.md) mở rộng checkout và bàn giao tại quán. Kiểm chứng biên giờ, không giới hạn đơn theo giờ nhận, phí, hiệu lực phiếu và hồi quy nhận ngay/giao hàng.
-- [UC27](use-cases/UC27.md) dùng cấu hình 10 bàn và 1 phòng mỗi tầng. Kiểm chứng sức chứa, chống chồng lịch, đổi lịch và check-in trên MySQL thử nghiệm.
+- [UC27](use-cases/UC27.md) dùng cấu hình 10 bàn và 1 phòng mỗi tầng. Kiểm chứng sơ đồ từng tầng, chống đặt chỗ đã giữ/đang sử dụng, đổi lịch, check-in và trả chỗ trên MySQL thử nghiệm.
 - Hai UC dùng chung tính phí, theo dõi vắng mặt và kiểm tra quyền đặt lịch. Kiểm thử chuỗi không đến xen kẽ hai loại lịch và mua hàng bình thường trong thời gian hạn chế.
 
 Mỗi UC có nhánh riêng từ `develop`, kiểm thử, commit và báo cáo. Chờ nghiệm thu và yêu cầu merge trước khi cập nhật `ACCEPTED` sau tích hợp.
