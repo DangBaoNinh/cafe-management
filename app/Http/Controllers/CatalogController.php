@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,6 +20,17 @@ class CatalogController extends Controller
         'price_asc' => 'Giá thấp đến cao',
         'price_desc' => 'Giá cao đến thấp',
     ];
+
+    public function home(): View
+    {
+        $products = $this->pricedCatalog()
+            ->orderBy('name')
+            ->orderBy('id')
+            ->limit(3)
+            ->get();
+
+        return view('customer.home', compact('products'));
+    }
 
     public function index(Request $request): View|Response
     {
@@ -50,9 +62,7 @@ class CatalogController extends Controller
         $page = (int) ($filters['page'] ?? 1);
         unset($filters['page']);
 
-        $query = Product::visibleInCatalog()
-            ->with('category')
-            ->withMin('activeSizes as starting_price_vnd', 'price_vnd')
+        $query = $this->pricedCatalog()
             ->when($selectedCategory, fn ($query, Category $category) => $query->whereBelongsTo($category));
 
         if (isset($filters['q'])) {
@@ -109,6 +119,14 @@ class CatalogController extends Controller
         }
 
         return view('customer.menu.show', compact('product', 'sizes', 'filters'));
+    }
+
+    /** @return Builder<Product> */
+    private function pricedCatalog(): Builder
+    {
+        return Product::visibleInCatalog()
+            ->with('category')
+            ->withMin('activeSizes as starting_price_vnd', 'price_vnd');
     }
 
     private function filterValidator(Request $request): Validator

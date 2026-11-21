@@ -16,14 +16,13 @@ class OrderPreparationController extends Controller
     {
         $orders = Order::query()
             ->whereIn('status', [OrderStatus::Confirmed->value, OrderStatus::Preparing->value])
-            ->with('payment:id,order_id,method,status')
+            ->with(['payment:id,order_id,method,status', 'items:id,order_id,product_name,quantity'])
             ->oldest()->orderBy('id')->paginate(15);
 
         return view('operations.orders.index', [
             'orders' => $orders,
             'title' => 'Pha chế',
             'emptyMessage' => 'Chưa có đơn cần pha chế.',
-            'showOrderStatus' => true,
         ]);
     }
 

@@ -1,0 +1,101 @@
+.terrasse {
+    --color-coffee: #432329;
+    --color-cream: #f6efe3;
+    --color-accent: #762d39;
+    --color-accent-content: #762d39;
+    --color-accent-foreground: #fff6e8;
+    --terrasse-ink: #341a1b;
+    --terrasse-muted: #705450;
+    --terrasse-line: #dcc9b6;
+    --terrasse-paper: #fffaf2;
+    --terrasse-gold: #ffd6a0;
+    --terrasse-display: "EB Garamond", Georgia, serif;
+
+    background-color: var(--color-cream);
+    color: var(--terrasse-ink);
+}
+
+.terrasse h1, .terrasse-display {
+    font-family: var(--terrasse-display);
+    letter-spacing: -.04em;
+    line-height: 1.04;
+}
+
+.terrasse h1 { font-size: clamp(2.5rem, 5vw, 4.25rem); }
+.terrasse :where(input, textarea, select, [data-flux-control]) { color-scheme: light; }
+.terrasse :focus-visible { outline-offset: 4px; }
+.terrasse-frame { width: min(100% - 2rem, 76rem); margin-inline: auto; }
+.terrasse-panel { background: var(--terrasse-paper); border: 1px solid var(--terrasse-line); }
+.terrasse-muted { color: var(--terrasse-muted); }
+
+.terrasse-brand { display: inline-flex; align-items: center; gap: .75rem; min-width: 0; font: 650 clamp(1.45rem, 3vw, 2.1rem)/1 var(--terrasse-display); }
+.terrasse-brand-mark { display: grid; flex: 0 0 1.95rem; aspect-ratio: 1; place-items: center; border: 1px solid currentColor; outline: 1px solid currentColor; outline-offset: 2px; border-radius: 50%; color: var(--color-accent); font-style: italic; font-size: 1.25rem; }
+.terrasse-store-header { border-bottom: 1px solid var(--terrasse-line); background: var(--color-cream); }
+.terrasse-store-header nav { min-height: 5rem; }
+.terrasse-store-link:hover, .terrasse-store-link[aria-current] { text-decoration: underline; text-underline-offset: .35rem; }
+.terrasse-store-footer { border-top: 1px solid var(--terrasse-line); }
+
+.terrasse-hero {
+    display: grid;
+    align-items: center;
+    min-height: clamp(32rem, 44vw, 41rem);
+    background: linear-gradient(90deg, #261415ed, #2614158c 35%, transparent 70%),
+        #261415 url("../assets/terrasse/paris-terrasse.jpg") center 60% / cover no-repeat;
+    color: #fff4df;
+}
+.terrasse-hero-copy { padding-block: clamp(2rem, 6vw, 6rem); }
+.terrasse-hero-kicker { color: var(--terrasse-gold); font-size: .73rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.terrasse-hero h1 { margin-top: 1.15rem; font-size: clamp(4.5rem, 9vw, 9rem); font-weight: 500; line-height: .85; }
+.terrasse-hero h1 em { display: block; margin-top: .08em; color: var(--terrasse-gold); }
+.terrasse-hero-description { max-width: 24rem; margin-top: 1.65rem; color: #f1ded0; line-height: 1.7; }
+.terrasse-hero-cta { display: inline-flex; align-items: center; gap: 1.5rem; margin-top: 1.6rem; padding: .9rem 1.1rem; border: 1px solid transparent; background: var(--terrasse-gold); color: #261415; font-size: .9rem; font-weight: 600; }
+.terrasse-hero-cta:hover { background: #ffe3c0; }
+.terrasse-hero-cta:focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-product-card { display: flex; height: 100%; flex-direction: column; overflow: hidden; border-top: 3px solid var(--color-accent); }
+.terrasse-product-card:hover { border-color: var(--color-accent); }
+.terrasse-product-card h2, .terrasse-product-card h3 { font-family: var(--terrasse-display); font-weight: 650; font-size: 1.65rem; line-height: 1.08; }
+
+.terrasse-workspace { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: 100vh; }
+.terrasse-sidebar { background: var(--color-coffee); color: #fcebd9; }
+.terrasse-sidebar .terrasse-brand-mark { color: var(--terrasse-gold); }
+.terrasse-sidebar :focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-sidebar a[aria-current], .terrasse-sidebar a:hover, .terrasse-sidebar button:hover { background: #60353d; }
+.terrasse-sidebar a[aria-current] { border-inline-start-color: var(--terrasse-gold); color: #fff1de; font-weight: 600; }
+.terrasse-sidebar-caption { color: #e8c4ae; font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.terrasse-revenue-total { color: #fff1d9; background: linear-gradient(95deg, #432329fc 25%, #432329b5), url("../assets/terrasse/paris-terrasse.jpg") right 61% / cover; }
+.terrasse-report-chart {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(2.6rem, 1fr);
+    min-width: max-content;
+    column-gap: .4rem;
+    background: repeating-linear-gradient(to top, var(--terrasse-line) 0 1px, transparent 1px 25%) top / 100% 10rem no-repeat;
+}
+.terrasse-report-chart li { position: relative; display: grid; grid-template-rows: 10rem auto; align-items: end; justify-items: center; }
+.terrasse-report-bar { display: block; width: min(78%, 3.25rem); height: var(--bar-height); background: #b2747f; border-radius: .25rem .25rem 0 0; }
+.terrasse-report-chart li:last-child .terrasse-report-bar { background: var(--color-accent); }
+
+.terrasse-status { --status-ink: #605350; --status-bg: #efe6df; }
+.terrasse-status[data-tone="amber"] { --status-ink: #784413; --status-bg: #f6e6c9; }
+.terrasse-status[data-tone="rose"] { --status-ink: #823447; --status-bg: #f2dce0; }
+.terrasse-status[data-tone="green"] { --status-ink: #365e48; --status-bg: #e4eddf; }
+.terrasse-status[data-tone="blue"] { --status-ink: #395d78; --status-bg: #e3ebf2; }
+.terrasse-pill { display: inline-flex; align-items: center; gap: .4rem; padding: .22rem .6rem; border-radius: 1rem; color: var(--status-ink); background: var(--status-bg); font-size: .75rem; font-weight: 600; }
+.terrasse-pill::before { flex: 0 0 .35rem; aspect-ratio: 1; border-radius: 50%; background: currentColor; content: ""; }
+.terrasse-work-card { border-top: 3px solid var(--color-accent); }
+
+@media (max-width: 63.999rem) {
+    .terrasse-workspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+}
+
+@media (max-width: 39.999rem) {
+    .terrasse-store-header nav { min-height: 0; }
+    .terrasse-hero {
+        align-items: start;
+        min-height: 36rem;
+        background-image: linear-gradient(180deg, #261415 0%, #261415bc 37%, transparent 75%), url("../assets/terrasse/paris-terrasse.jpg");
+        background-position: center, 73% center;
+    }
+    .terrasse-hero h1 { font-size: clamp(3.7rem, 15vw, 5rem); }
+    .terrasse-hero-description { max-width: 22rem; margin-top: 1.2rem; }
+}

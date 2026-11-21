@@ -1,13 +1,17 @@
 @use('App\Enums\OrderStatus')
 
 <x-layouts::admin title="Tổng quan quản trị">
+    @php
+        $placedOrders = array_sum($statuses);
+        $peakRevenue = max(1, max(array_column($daily, 'total')));
+    @endphp
     <div class="space-y-8">
-        <header class="space-y-1">
+        <header class="space-y-2 border-b border-coffee/15 pb-5">
             <h1 class="text-2xl font-semibold sm:text-3xl">Tổng quan quản trị</h1>
-            <p class="text-sm">Khoảng ngày theo giờ Việt Nam (UTC+7), tối đa {{ $maxDays }} ngày.</p>
+            <p class="terrasse-muted text-sm">Doanh thu và tình trạng đơn hàng của quán.</p>
         </header>
 
-        <form method="GET" action="{{ route('admin.dashboard') }}" class="grid gap-4 rounded-xl border border-coffee/15 bg-white p-4 sm:grid-cols-[1fr_1fr_auto]">
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="terrasse-panel grid items-start gap-4 rounded-md p-4 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_auto]">
             <div class="min-w-0 space-y-2">
                 <label class="block text-sm font-medium" for="revenue-from">Từ ngày</label>
                 <flux:input id="revenue-from" name="from" type="date" :value="is_string(old('from')) ? old('from') : $from->toDateString()" required />
@@ -18,59 +22,81 @@
                 <flux:input id="revenue-to" name="to" type="date" :value="is_string(old('to')) ? old('to') : $to->toDateString()" required />
                 <flux:error name="to" />
             </div>
-            <div class="flex flex-wrap items-center gap-4 sm:mt-7 sm:self-start">
+            <div class="flex flex-wrap items-center gap-4 sm:col-span-2 xl:col-span-1 xl:mt-7">
                 <flux:button type="submit" variant="primary">Xem báo cáo</flux:button>
                 <flux:link :href="route('admin.dashboard')">7 ngày gần nhất</flux:link>
             </div>
+            <p class="terrasse-muted text-xs sm:col-span-full">Khoảng ngày theo giờ Việt Nam (UTC+7), tối đa {{ $maxDays }} ngày.</p>
         </form>
 
         <section aria-labelledby="revenue-heading" class="space-y-4">
             <header class="space-y-1">
-                <h2 id="revenue-heading" class="text-xl font-semibold">Doanh thu</h2>
-                <p class="text-sm">{{ $from->format('d/m/Y') }} – {{ $to->format('d/m/Y') }} · Theo ngày hoàn tất của đơn đã thanh toán.</p>
+                <h2 id="revenue-heading" class="terrasse-display text-3xl font-semibold">Doanh thu</h2>
+                <p class="terrasse-muted text-sm">{{ $from->format('d/m/Y') }} – {{ $to->format('d/m/Y') }} · Theo ngày hoàn tất của đơn đã thanh toán.</p>
             </header>
-            <dl class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="rounded-xl bg-coffee p-5 text-white sm:col-span-2 lg:col-span-4">
+            <dl class="grid grid-cols-2 gap-3 xl:grid-cols-5">
+                <div class="terrasse-revenue-total col-span-2 rounded-md p-4 xl:col-span-1">
                     <dt class="text-sm">Tổng thu</dt>
-                    <dd class="mt-1 text-3xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['total']" /></dd>
+                    <dd class="terrasse-display mt-2 text-3xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['total']" /></dd>
                 </div>
-                <div class="rounded-xl border border-coffee/15 bg-white p-4">
+                <div class="terrasse-panel rounded-md p-4">
                     <dt class="text-sm">Đơn hoàn tất đã thanh toán</dt>
-                    <dd class="mt-1 text-xl font-semibold tabular-nums">{{ number_format($totals['orders'], 0, ',', '.') }}</dd>
+                    <dd class="terrasse-display mt-2 text-3xl font-semibold tabular-nums">{{ number_format($totals['orders'], 0, ',', '.') }}</dd>
                 </div>
-                <div class="rounded-xl border border-coffee/15 bg-white p-4">
+                <div class="terrasse-panel rounded-md p-4">
                     <dt class="text-sm">Tạm tính</dt>
-                    <dd class="mt-1 text-xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['subtotal']" /></dd>
+                    <dd class="terrasse-display mt-2 text-3xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['subtotal']" /></dd>
                 </div>
-                <div class="rounded-xl border border-coffee/15 bg-white p-4">
+                <div class="terrasse-panel rounded-md p-4">
                     <dt class="text-sm">Giảm giá</dt>
-                    <dd class="mt-1 text-xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['discount']" /></dd>
+                    <dd class="terrasse-display mt-2 text-3xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['discount']" /></dd>
                 </div>
-                <div class="rounded-xl border border-coffee/15 bg-white p-4">
+                <div class="terrasse-panel rounded-md p-4">
                     <dt class="text-sm">Phí giao</dt>
-                    <dd class="mt-1 text-xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['delivery']" /></dd>
+                    <dd class="terrasse-display mt-2 text-3xl font-semibold tabular-nums wrap-anywhere"><x-customer.vnd :amount="$totals['delivery']" /></dd>
                 </div>
             </dl>
         </section>
 
-        <section aria-labelledby="status-heading" class="space-y-4">
-            <header class="space-y-1">
-                <h2 id="status-heading" class="text-xl font-semibold">Trạng thái đơn theo ngày đặt</h2>
-                <p class="text-sm">Tổng số đơn đặt trong khoảng đã chọn: {{ number_format(array_sum($statuses), 0, ',', '.') }}.</p>
-            </header>
-            <dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                @foreach (OrderStatus::cases() as $status)
-                    <div class="rounded-xl border border-coffee/15 bg-white p-3 sm:p-4">
-                        <dt class="text-sm">{{ $status->label() }}</dt>
-                        <dd class="mt-1 text-lg font-semibold tabular-nums">{{ number_format($statuses[$status->value], 0, ',', '.') }}</dd>
+        <div class="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <section aria-labelledby="revenue-chart-heading" class="terrasse-panel min-w-0 space-y-3 rounded-md p-4 sm:p-5">
+                <h2 id="revenue-chart-heading" class="terrasse-display text-3xl font-semibold">Biểu đồ doanh thu</h2>
+                @if ($totals['orders'] === 0)
+                    <p class="terrasse-muted text-sm">Chưa có đơn hoàn tất đã thanh toán trong khoảng này.</p>
+                @else
+                    <div role="region" aria-labelledby="revenue-chart-heading" tabindex="0" class="overflow-x-auto pb-2">
+                        <ul class="terrasse-report-chart">
+                            @foreach ($daily as $date => $day)
+                                <li title="{{ $date }} · {{ number_format($day['total'], 0, ',', '.') }} ₫">
+                                    <span class="terrasse-report-bar" style="--bar-height: {{ round($day['total'] * 100 / $peakRevenue, 2) }}%" aria-hidden="true"></span>
+                                    <time datetime="{{ $date }}" class="terrasse-muted border-t border-coffee/15 pt-1 text-xs">{{ Illuminate\Support\Facades\Date::parse($date)->format('d/m') }}</time>
+                                    <span class="sr-only"><x-customer.vnd :amount="$day['total']" /></span>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
-                @endforeach
-            </dl>
-        </section>
+                @endif
+            </section>
+
+            <section aria-labelledby="status-heading" class="terrasse-panel space-y-4 rounded-md p-4 sm:p-5">
+                <header class="space-y-1">
+                    <h2 id="status-heading" class="terrasse-display text-3xl font-semibold">Trạng thái đơn theo ngày đặt</h2>
+                    <p class="terrasse-muted text-sm">Tổng số đơn đặt trong khoảng đã chọn: {{ number_format($placedOrders, 0, ',', '.') }}.</p>
+                </header>
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2">
+                    @foreach (OrderStatus::cases() as $status)
+                        <div class="flex items-center justify-between gap-2 border-b border-coffee/10 pb-2">
+                            <dt><x-terrasse.status :$status /></dt>
+                            <dd class="text-sm font-semibold tabular-nums">{{ number_format($statuses[$status->value], 0, ',', '.') }}</dd>
+                        </div>
+                    @endforeach
+                </dl>
+            </section>
+        </div>
 
         <section class="space-y-4">
-            <h2 id="daily-revenue-heading" class="text-xl font-semibold">Doanh thu theo ngày</h2>
-            <div role="region" aria-labelledby="daily-revenue-heading" tabindex="0" class="max-w-full overflow-x-auto rounded-xl border border-coffee/15 bg-white focus-visible:outline-2 focus-visible:outline-coffee">
+            <h2 id="daily-revenue-heading" class="terrasse-display text-3xl font-semibold">Doanh thu theo ngày</h2>
+            <div role="region" aria-labelledby="daily-revenue-heading" tabindex="0" class="terrasse-panel max-w-full overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-coffee">
                 <table class="w-full text-sm whitespace-nowrap">
                     <thead class="border-b border-coffee/15 bg-coffee/5">
                         <tr class="text-right">

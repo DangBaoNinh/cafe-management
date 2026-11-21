@@ -3,10 +3,13 @@
 
 <x-layouts::admin title="Quản lý đơn hàng">
     <section class="space-y-6">
-        <h1 class="text-2xl font-semibold sm:text-3xl">Quản lý đơn hàng</h1>
+        <header class="space-y-2 border-b border-coffee/15 pb-5">
+            <h1 class="font-semibold">Quản lý đơn hàng</h1>
+            <p class="terrasse-muted text-sm">Tra cứu đơn, cách nhận và tình trạng thanh toán.</p>
+        </header>
 
-        <form method="GET" action="{{ route('admin.orders.index') }}" class="space-y-4 rounded-xl border border-coffee/15 bg-white p-4">
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <form method="GET" action="{{ route('admin.orders.index') }}" class="terrasse-panel space-y-4 rounded-md p-4">
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
                 <div class="min-w-0 space-y-2">
                     <label class="block text-sm font-medium" for="order-number">Mã đơn</label>
                     <flux:input id="order-number" name="number" :value="$filters['number'] ?? ''" placeholder="Mã hoặc đầu mã" maxlength="32" />
@@ -56,36 +59,44 @@
                 {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : 'Không tìm thấy đơn hàng.' }}
             </p>
         @else
-            <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
-                @foreach ($orders as $order)
-                    <li class="space-y-3 p-4 sm:p-5">
-                        <div class="flex flex-wrap items-baseline justify-between gap-2">
-                            <h2 class="min-w-0 font-semibold wrap-anywhere">
-                                <flux:link :href="route('admin.orders.show', $order->order_number)">{{ $order->order_number }}</flux:link>
-                            </h2>
-                            <strong><x-customer.vnd :amount="$order->total_vnd" /></strong>
-                        </div>
-                        <dl class="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                            <div>
-                                <dt class="font-medium">Giờ đặt</dt>
-                                <dd><x-customer.order-time :date="$order->created_at" /></dd>
-                            </div>
-                            <div class="wrap-anywhere">
-                                <dt class="font-medium">{{ $order->fulfillment_type->label() }}</dt>
-                                <dd>{{ $order->recipient_name }}</dd>
-                            </div>
-                            <div>
-                                <dt class="font-medium">Trạng thái đơn</dt>
-                                <dd>{{ $order->status->label() }}</dd>
-                            </div>
-                            <div>
-                                <dt class="font-medium">{{ $order->payment?->method->label() ?? 'Thanh toán' }}</dt>
-                                <dd>{{ $order->payment?->status->label() ?? 'Chưa có thông tin' }}</dd>
-                            </div>
-                        </dl>
-                    </li>
-                @endforeach
-            </ul>
+            <div class="terrasse-panel max-w-full overflow-x-auto rounded-md" role="region" aria-label="Danh sách đơn hàng" tabindex="0">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-coffee/5 whitespace-nowrap">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">Mã đơn</th>
+                            <th scope="col" class="px-4 py-3">Giờ đặt</th>
+                            <th scope="col" class="px-4 py-3">Cách nhận</th>
+                            <th scope="col" class="px-4 py-3">Trạng thái đơn</th>
+                            <th scope="col" class="px-4 py-3">Thanh toán</th>
+                            <th scope="col" class="px-4 py-3 text-right">Tổng tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-coffee/15">
+                        @foreach ($orders as $order)
+                            <tr>
+                                <th scope="row" class="px-4 py-3 whitespace-nowrap">
+                                    <flux:link :href="route('admin.orders.show', $order->order_number)">{{ $order->order_number }}</flux:link>
+                                </th>
+                                <td class="px-4 py-3 whitespace-nowrap"><x-customer.order-time :date="$order->created_at" /></td>
+                                <td class="min-w-36 px-4 py-3 wrap-anywhere">
+                                    {{ $order->fulfillment_type->label() }}
+                                    <span class="terrasse-muted block text-xs">{{ $order->recipient_name }}</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap"><x-terrasse.status :status="$order->status" /></td>
+                                <td class="min-w-36 px-4 py-3">
+                                    @if ($order->payment)
+                                        <x-terrasse.status :status="$order->payment->status" />
+                                        <span class="terrasse-muted block text-xs">{{ $order->payment->method->label() }}</span>
+                                    @else
+                                        <span class="terrasse-muted text-xs">Chưa có thông tin</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-right font-semibold whitespace-nowrap tabular-nums"><x-customer.vnd :amount="$order->total_vnd" /></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
 
         {{ $orders->links() }}

@@ -16,6 +16,9 @@
                 <flux:button :href="route('operations.handoff.index')">Bàn giao</flux:button>
                 <flux:button :href="route('operations.payments.index')">Đối chiếu thanh toán</flux:button>
             @endcan
+            @can('access-admin')
+                <flux:button :href="route('admin.dashboard')" variant="primary">Tổng quan quản trị</flux:button>
+            @endcan
         </div>
     </section>
 </x-layouts::app>

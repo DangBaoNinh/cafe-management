@@ -18,14 +18,13 @@ class OrderHandoffController extends Controller
     {
         $orders = Order::query()
             ->whereIn('status', [OrderStatus::Ready->value, OrderStatus::OutForDelivery->value])
-            ->with('payment:id,order_id,status')
+            ->with(['payment:id,order_id,method,status', 'items:id,order_id,product_name,quantity'])
             ->oldest()->orderBy('id')->paginate(15);
 
         return view('operations.orders.index', [
             'orders' => $orders,
             'title' => 'Bàn giao',
             'emptyMessage' => 'Chưa có đơn cần bàn giao.',
-            'showOrderStatus' => true,
         ]);
     }
 
