@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DeliverySettingsController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductOptionController;
 use App\Http\Controllers\Admin\ProductSizeController;
@@ -68,6 +69,9 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{number}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('orders/{number}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('delivery-settings', [DeliverySettingsController::class, 'edit'])->name('delivery-settings.edit');
     Route::patch('delivery-settings', [DeliverySettingsController::class, 'update'])->name('delivery-settings.update');
     Route::resource('categories', CategoryController::class)->only(['index', 'create', 'store', 'edit', 'update']);
