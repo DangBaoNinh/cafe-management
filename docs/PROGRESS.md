@@ -247,6 +247,12 @@
 - Sự kiện ký HMAC phải khớp kết quả, tham chiếu và số tiền VND của phiên. Callback và đối chiếu dùng cùng giao dịch để đánh dấu sự kiện và ghi lịch sử một lần. Khi thiếu callback, quản trị viên đối chiếu trong **Đối chiếu thanh toán**. Nếu giao dịch dương được báo sau khi hủy hoặc từ chối đơn, thanh toán chuyển sang chờ hoàn mô phỏng.
 - Migration mới chỉ tạo bảng `demo_payment_sessions` và đã chạy trên MySQL local. `composer ci:check` đạt Pint, PHPStan và 167 bài SQLite với 2.444 assertion. Bộ MySQL đạt 23 bài với 395 assertion. `npm run build` thành công. Brave 360 px kiểm tra checkout, thử lại, thiếu callback, quyền đối chiếu qua giao diện, CSRF, callback thiếu chữ ký và độ rộng trang. Bản Word đã cập nhật phần UC24.
 
+### UC25 mô phỏng đã kiểm chứng, chờ nghiệm thu
+
+- Nhân viên và quản trị viên mở đơn giao sẵn sàng từ **Bàn giao** để tạo vận đơn mô phỏng ở `local` và `testing`. Gửi lại trả cùng mã. Kịch bản mất kết nối trước khi tạo cho phép thử lại hoặc bàn giao thủ công. Đơn nhận tại quán tiếp tục theo UC19.
+- Sự kiện có chữ ký HMAC cập nhật lần lượt mốc nhận từ quán và giao khách. Từ chối chữ ký sai, sự kiện sai thứ tự hoặc sai số tiền COD. Đánh dấu mốc vận đơn, cập nhật đơn, ghi nhận COD và lịch sử cùng giao dịch. Sự kiện đã áp dụng gửi lại không ghi thêm lịch sử.
+- Migration mới chỉ tạo bảng `demo_shipments` và đã chạy trên MySQL local. `composer ci:check` đạt Pint, PHPStan, 173 bài SQLite với 2.544 assertion, gồm hoàn tác đơn và COD khi cập nhật vận đơn lỗi. Bộ MySQL đạt 24 bài với 417 assertion. `npm run build` thành công. Brave 360 px kiểm tra mất kết nối, vận đơn, hai mốc, sai COD, CSRF, chữ ký, tiến trình khách và đơn nhận tại quán. Đã đồng bộ phần UC25 trong bản Word.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -262,3 +268,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
+- UC25 chờ nghiệm thu bản mô phỏng và tích hợp vào `develop`.

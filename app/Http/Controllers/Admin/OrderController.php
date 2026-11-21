@@ -45,6 +45,7 @@ class OrderController extends Controller
     public function show(string $number): View
     {
         $order = Order::query()->where('order_number', $number)->with([
+            'demoShipment:id,order_id',
             'items' => fn (HasMany $items) => $items->orderBy('id'),
             'items.toppings' => fn (HasMany $toppings) => $toppings->orderBy('id'),
             'statusHistories' => fn (HasMany $histories) => $histories->with('actor:id,name')->oldest()->orderBy('id'),

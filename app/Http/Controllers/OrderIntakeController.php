@@ -37,6 +37,7 @@ class OrderIntakeController extends Controller
                 'items' => fn (HasMany $items) => $items->orderBy('id'),
                 'items.toppings' => fn (HasMany $toppings) => $toppings->orderBy('id'),
                 'payment:id,order_id,method,status',
+                'demoShipment',
             ])->firstOrFail();
 
         return view('operations.orders.show', ['order' => $order]);

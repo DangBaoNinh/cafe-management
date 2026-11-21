@@ -16,11 +16,13 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DeliveryFeeController;
+use App\Http\Controllers\DemoDeliveryController;
 use App\Http\Controllers\DemoPaymentController;
 use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Middleware\EnsureDemoDeliveryEnabled;
 use App\Http\Middleware\EnsureDemoPaymentEnabled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
@@ -59,12 +61,19 @@ Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-custom
 Route::post('payments/demo/callback', [DemoPaymentController::class, 'callback'])
     ->middleware(EnsureDemoPaymentEnabled::class)->withoutMiddleware(PreventRequestForgery::class)->name('payments.demo.callback');
 
+Route::post('deliveries/demo/callback', [DemoDeliveryController::class, 'callback'])
+    ->middleware(EnsureDemoDeliveryEnabled::class)->withoutMiddleware(PreventRequestForgery::class)->name('deliveries.demo.callback');
+
 Route::prefix('operations/orders')->name('operations.orders.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('/', [OrderIntakeController::class, 'index'])->name('index');
     Route::get('{number}', [OrderIntakeController::class, 'show'])->name('show');
     Route::post('{number}/decision', [OrderIntakeController::class, 'decide'])->name('decide');
     Route::post('{number}/preparation', [OrderPreparationController::class, 'update'])->name('prepare');
     Route::post('{number}/handoff', [OrderHandoffController::class, 'update'])->name('handoff');
+    Route::prefix('{number}/demo-shipment')->name('demo-shipment.')->middleware(EnsureDemoDeliveryEnabled::class)->group(function () {
+        Route::post('/', [DemoDeliveryController::class, 'create'])->name('create');
+        Route::post('events', [DemoDeliveryController::class, 'simulate'])->name('simulate');
+    });
 });
 
 Route::get('operations/preparation', [OrderPreparationController::class, 'index'])
