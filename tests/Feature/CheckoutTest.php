@@ -259,6 +259,23 @@ class CheckoutTest extends TestCase
             ->assertOk()->assertSee('Tổng tiền bằng 0 ₫. Bạn không cần chuyển khoản.')->assertDontSee('00123456');
     }
 
+    public function test_checkout_exposes_the_demo_gateway_only_in_local_and_testing(): void
+    {
+        [$user] = $this->basket();
+        $this->actingAs($user)->get(route('checkout.create'))->assertOk()->assertSee('Cổng thanh toán mô phỏng');
+        $details = ['method' => 'demo_gateway'];
+        $this->app->instance('env', 'production');
+        $this->get(route('checkout.create'))->assertOk()->assertDontSee('Cổng thanh toán mô phỏng');
+        $this->postJson(route('checkout.review'), $this->details($details), ['Sec-Fetch-Site' => 'same-origin'])
+            ->assertUnprocessable()->assertJsonValidationErrors('method');
+
+        $this->app->instance('env', 'testing');
+        $this->post(route('checkout.store'), $this->review($user, $details))->assertStatus(303);
+        $order = $user->orders()->sole();
+        $this->assertDatabaseHas('payments', ['order_id' => $order->id, 'method' => 'demo_gateway', 'status' => 'pending']);
+        $this->get(route('checkout.confirmation', $order->order_number))->assertOk()->assertSee('Mở cổng thanh toán mô phỏng');
+    }
+
     private function review(User $user, array $overrides = []): array
     {
         $review = $this->actingAs($user)->post(route('checkout.review'), $this->details($overrides))

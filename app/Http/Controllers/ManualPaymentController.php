@@ -7,17 +7,21 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Http\Requests\ReconcileTransferRequest;
 use App\Http\Requests\RecordRefundRequest;
+use App\Models\DemoPaymentSession;
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\DemoPaymentGateway;
 use App\Services\ManualPayment;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 
 class ManualPaymentController extends Controller
 {
     public function index(): View
     {
+        $showDemo = DemoPaymentGateway::enabled() && Gate::allows('access-admin');
         $payments = Payment::query()
             ->with('order:id,order_number,status,created_at')
             ->where(fn (Builder $query) => $query
@@ -25,7 +29,12 @@ class ManualPaymentController extends Controller
                     ->where('method', PaymentMethod::BankTransfer)
                     ->where('status', PaymentStatus::Pending)
                     ->whereHas('order', fn (Builder $orders) => $orders->whereIn('status', OrderStatus::transferReconciliationValues())))
-                ->orWhere('status', PaymentStatus::RefundPending))
+                ->orWhere('status', PaymentStatus::RefundPending)
+                ->when($showDemo, fn (Builder $query) => $query->orWhere(
+                    fn (Builder $query) => $query->where('method', PaymentMethod::DemoGateway)
+                        ->whereHas('demoSessions', fn (Builder $sessions) => $sessions
+                            ->where('result', DemoPaymentSession::SUCCEEDED)->whereNull('applied_at')),
+                )))
             ->oldest('updated_at')->orderBy('id')->paginate(15);
 
         return view('operations.payments.index', ['payments' => $payments]);
@@ -41,7 +50,11 @@ class ManualPaymentController extends Controller
             && $payment->status === PaymentStatus::Pending
             && in_array($payment->order->status->value, OrderStatus::transferReconciliationValues(), true);
 
-        return view('operations.payments.show', ['payment' => $payment, 'canReconcile' => $canReconcile]);
+        $canReconcileDemo = DemoPaymentGateway::enabled() && Gate::allows('access-admin')
+            && $payment->method === PaymentMethod::DemoGateway
+            && in_array($payment->status, [PaymentStatus::Pending, PaymentStatus::Voided], true);
+
+        return view('operations.payments.show', compact('payment', 'canReconcile', 'canReconcileDemo'));
     }
 
     public function reconcile(ReconcileTransferRequest $request, string $number, ManualPayment $payments): RedirectResponse

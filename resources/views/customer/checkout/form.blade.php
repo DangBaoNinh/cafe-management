@@ -62,6 +62,9 @@
                 @if ($bankAvailable)
                     <flux:select.option value="bank_transfer" :selected="$method === 'bank_transfer'">{{ \App\Enums\PaymentMethod::BankTransfer->label() }}</flux:select.option>
                 @endif
+                @if (\App\Services\DemoPaymentGateway::enabled())
+                    <flux:select.option value="demo_gateway" :selected="$method === 'demo_gateway'">{{ \App\Enums\PaymentMethod::DemoGateway->label() }}</flux:select.option>
+                @endif
             </flux:select>
 
             <flux:input name="coupon_code" label="Mã giảm giá (nếu có)" maxlength="40"

@@ -133,6 +133,9 @@ class Checkout
         $subtotal = $basket['subtotal'];
         $discount = $this->discount($user, $details->couponCode, $coupon, $subtotal);
         [$address, $fee] = $this->delivery($user, $details);
+        if ($details->method === PaymentMethod::DemoGateway && ! DemoPaymentGateway::enabled()) {
+            throw $this->invalid('method', 'Cổng thanh toán mô phỏng không khả dụng.');
+        }
         $transfer = $details->method === PaymentMethod::BankTransfer ? $this->bankDetails() : null;
         if ($details->method === PaymentMethod::BankTransfer && $transfer === null) {
             throw $this->invalid('method', 'Cửa hàng chưa cấu hình chuyển khoản. Vui lòng chọn thanh toán khi nhận.');

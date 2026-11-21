@@ -239,6 +239,12 @@
 - Doanh thu tổng và theo ngày hoàn tất chỉ tính đơn `completed` có thanh toán `paid`. Tách tạm tính, giảm giá, phí giao, tổng thu và số đơn đủ điều kiện. Phần trạng thái đếm theo ngày đặt. Ngày trống hiển thị 0 và báo cáo chỉ trả số liệu tổng hợp. Không cần migration.
 - `composer ci:check` đạt Pint, PHPStan và 161 bài SQLite với 2.339 assertion. Bộ MySQL đạt 22 bài với 378 assertion. `npm run build` thành công. Brave ở 360 và 1.280 px kiểm tra bộ lọc, số liệu, lỗi ngày, quyền và cuộn ngang trong bảng.
 
+### UC24 mô phỏng đã kiểm chứng, chờ nghiệm thu
+
+- Dùng cổng mô phỏng cho đồ án theo phạm vi người dùng xác nhận, khả dụng ở `local` và `testing`. Chủ đơn chọn **Cổng thanh toán mô phỏng** khi checkout, mở phiên, mô phỏng thành công hoặc thất bại và có thể mở lại phiên bỏ dở.
+- Sự kiện ký HMAC phải khớp kết quả, tham chiếu và số tiền VND của phiên. Callback và đối chiếu dùng cùng giao dịch để đánh dấu sự kiện và ghi lịch sử một lần. Khi thiếu callback, quản trị viên đối chiếu trong **Đối chiếu thanh toán**. Nếu giao dịch dương được báo sau khi hủy hoặc từ chối đơn, thanh toán chuyển sang chờ hoàn mô phỏng.
+- Migration mới chỉ tạo bảng `demo_payment_sessions` và đã chạy trên MySQL local. `composer ci:check` đạt Pint, PHPStan và 167 bài SQLite với 2.444 assertion. Bộ MySQL đạt 23 bài với 395 assertion. `npm run build` thành công. Brave 360 px kiểm tra checkout, thử lại, thiếu callback, quyền đối chiếu qua giao diện, CSRF, callback thiếu chữ ký và độ rộng trang. Bản Word đã cập nhật phần UC24.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -254,4 +260,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC24 bị chặn dù UC19 và UC20 đã nghiệm thu trên `develop`. Cần chốt nhà cung cấp, xác nhận quyền truy cập sandbox và có tài liệu tạo phiên, xác thực callback và tra cứu giao dịch. Dùng hợp đồng của nhà cung cấp để chốt thiết kế lưu sự kiện trước khi triển khai.
+- UC24 chờ nghiệm thu bản mô phỏng và tích hợp vào `develop`.

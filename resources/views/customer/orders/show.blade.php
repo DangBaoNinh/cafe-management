@@ -37,7 +37,11 @@
 
         @if ($payment?->status === \App\Enums\PaymentStatus::RefundPending)
             <p class="rounded-xl border border-coffee/15 bg-white p-4">
-                Cửa hàng sẽ xử lý hoàn tiền thủ công. Vui lòng liên hệ cửa hàng và cung cấp mã đơn {{ $order->order_number }} để được hỗ trợ.
+                @if ($payment->method === \App\Enums\PaymentMethod::DemoGateway)
+                    Giao dịch mô phỏng đang chờ quản trị viên ghi nhận hoàn tiền.
+                @else
+                    Cửa hàng sẽ xử lý hoàn tiền thủ công. Vui lòng liên hệ cửa hàng và cung cấp mã đơn {{ $order->order_number }} để được hỗ trợ.
+                @endif
             </p>
         @endif
 
@@ -45,6 +49,8 @@
             && $payment->status === \App\Enums\PaymentStatus::Pending && $order->total_vnd > 0)
             <flux:link :href="route('checkout.confirmation', $order->order_number)">Xem hướng dẫn chuyển khoản</flux:link>
         @endif
+
+        <x-customer.start-demo-payment :order="$order" :payment="$payment" />
 
         @if ($order->status === \App\Enums\OrderStatus::Pending)
             <details class="rounded-xl border border-coffee/15 bg-white p-4" @if ($errors->hasAny(['reason', 'confirm'])) open @endif>
