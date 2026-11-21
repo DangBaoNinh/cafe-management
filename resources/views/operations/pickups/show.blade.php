@@ -26,7 +26,7 @@
         <section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <h2 class="text-lg font-semibold">Phụ phí</h2>
             @forelse ($pickup->fees as $fee)
-                @include('operations.pickups.fee')
+                @include('operations.bookings.fee', ['canSettle' => $pickup->isOpen($order), 'feeRoutes' => 'operations.pickups', 'bookingCode' => $pickup->code])
             @empty
                 <p class="text-sm">Chưa phát sinh phụ phí.</p>
             @endforelse

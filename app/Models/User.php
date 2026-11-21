@@ -78,6 +78,12 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    /** @return HasMany<Reservation, $this> */
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
     /**
      * Get the user's initials
      */

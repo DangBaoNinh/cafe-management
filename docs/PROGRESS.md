@@ -312,6 +312,13 @@
 - `composer ci:check` đạt Pint, PHPStan và 191 bài SQLite với 2.847 assertion. Bộ MySQL đạt 25 bài với 439 assertion. `npm run build` thành công.
 - Hướng dẫn vận hành scheduler và đối chiếu chuyển khoản nằm trong [README](../README.md#lịch-nhận-tại-quán).
 
+### UC27 đã kiểm thử, chờ nghiệm thu
+
+- Đã triển khai chọn bàn hoặc phòng họp trên sơ đồ hai tầng, đặt chỗ theo sức chứa và giờ, tra lịch, check-in bằng mã, ghi khách đến trực tiếp và xác nhận trả chỗ. Admin quản lý trạng thái phục vụ và khung nhận lịch mới trong giới hạn BR25.
+- UC27 dùng chung quy tắc giờ, phụ phí và chuỗi vắng mặt với UC26. Scheduler `bookings:expire` xử lý hai loại lịch theo thứ tự thời điểm vắng mặt. Chỗ đã check-in vẫn được giữ cho đến khi nhân viên xác nhận khách rời đi.
+- `composer ci:check` đạt Pint, PHPStan và 200 bài SQLite với 3.083 assertion. Bộ MySQL đạt 26 bài với 453 assertion. MySQL 8.4 riêng xác minh bốn tranh chấp giữa hai yêu cầu giữ cùng chỗ, đổi giờ và yêu cầu từ sơ đồ cũ, check-in và hủy quá hạn, trả chỗ và đặt lại.
+- `npm run build` thành công. Brave ở khổ 360 px kiểm chứng sơ đồ hai tầng, lọc chỗ theo sức chứa, đặt chỗ, phiếu xác nhận và trạng thái đã giữ. Hai migration UC27 đã chạy trên MySQL local.
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

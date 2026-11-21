@@ -22,6 +22,8 @@ use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReservationOperationsController;
 use App\Http\Controllers\ScheduledPickupController;
 use App\Http\Controllers\StorefrontChatController;
 use App\Http\Middleware\EnsureDemoDeliveryEnabled;
@@ -67,6 +69,15 @@ Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-custom
 Route::post('payments/demo/callback', [DemoPaymentController::class, 'callback'])
     ->middleware(EnsureDemoPaymentEnabled::class)->withoutMiddleware(PreventRequestForgery::class)->name('payments.demo.callback');
 
+Route::prefix('reservations')->name('reservations.')->middleware(['auth', 'can:access-customer-orders'])->group(function () {
+    Route::get('/', [ReservationController::class, 'index'])->name('index');
+    Route::get('create', [ReservationController::class, 'create'])->name('create');
+    Route::post('/', [ReservationController::class, 'store'])->name('store');
+    Route::get('{code}', [ReservationController::class, 'show'])->name('show');
+    Route::post('{code}/reschedule', [ReservationController::class, 'reschedule'])->name('reschedule');
+    Route::post('{code}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
+});
+
 Route::post('deliveries/demo/callback', [DemoDeliveryController::class, 'callback'])
     ->middleware(EnsureDemoDeliveryEnabled::class)->withoutMiddleware(PreventRequestForgery::class)->name('deliveries.demo.callback');
 
@@ -106,6 +117,23 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
     Route::post('{number}/refund', [ManualPaymentController::class, 'refund'])->middleware('can:access-admin')->name('refund');
     Route::post('{number}/demo-reconcile', [DemoPaymentController::class, 'reconcile'])
         ->middleware([EnsureDemoPaymentEnabled::class, 'can:access-admin'])->name('demo-reconcile');
+});
+
+Route::prefix('operations/reservations')->name('operations.reservations.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [ReservationOperationsController::class, 'index'])->name('index');
+    Route::get('seats', [ReservationOperationsController::class, 'seats'])->name('seats');
+    Route::post('hours', [ReservationOperationsController::class, 'hours'])->middleware('can:access-admin')->name('hours');
+    Route::post('seats/{seat}/walk-in', [ReservationOperationsController::class, 'walkIn'])->whereNumber('seat')->name('walk-in');
+    Route::post('seats/{seat}/active', [ReservationOperationsController::class, 'seatActive'])->whereNumber('seat')->middleware('can:access-admin')->name('seat-active');
+    Route::post('lookup', [ReservationOperationsController::class, 'lookup'])->name('lookup');
+    Route::get('{code}', [ReservationOperationsController::class, 'show'])->name('show');
+    Route::post('{code}/check-in', [ReservationOperationsController::class, 'checkIn'])->name('check-in');
+    Route::post('{code}/release', [ReservationOperationsController::class, 'release'])->name('release');
+    Route::post('{code}/cancel', [ReservationOperationsController::class, 'cancel'])->name('cancel');
+    Route::post('{code}/collect', [ReservationOperationsController::class, 'collect'])->name('collect');
+    Route::post('{code}/fees/{fee}/resolve', [ReservationOperationsController::class, 'resolve'])->whereNumber('fee')->name('resolve');
+    Route::post('{code}/fees/{fee}/counter', [ReservationOperationsController::class, 'moveToCounter'])->whereNumber('fee')->name('counter');
+    Route::post('{code}/fees/{fee}/refund', [ReservationOperationsController::class, 'refund'])->whereNumber('fee')->middleware('can:access-admin')->name('refund');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {

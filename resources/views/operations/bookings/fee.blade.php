@@ -9,11 +9,11 @@
             <p class="text-sm wrap-anywhere">Mã giao dịch · {{ $fee->bank_reference }}</p>
         @endif
     </div>
-    @php($awaitingTransfer = $pickup->isOpen($order) && $fee->status === 'pending')
+    @php($awaitingTransfer = $canSettle && $fee->status === 'pending')
     @if ($fee->channel === 'app' && ($awaitingTransfer || ($fee->status === 'voided' && $fee->transfer_result === null)))
         <details class="space-y-3">
             <summary class="cursor-pointer text-sm font-semibold">Đối chiếu qua sao kê</summary>
-            <form method="POST" action="{{ route('operations.pickups.resolve', [$pickup->code, $fee->id]) }}" class="space-y-3">
+            <form method="POST" action="{{ route($feeRoutes.'.resolve', [$bookingCode, $fee->id]) }}" class="space-y-3">
                 @csrf
                 <input type="hidden" name="result" value="paid">
                 <div class="grid gap-3 sm:grid-cols-3">
@@ -24,7 +24,7 @@
                 <flux:button type="submit">{{ $awaitingTransfer ? 'Xác nhận đã thu' : 'Ghi nhận tiền đến để hoàn' }}</flux:button>
             </form>
             @if ($awaitingTransfer)
-                <form method="POST" action="{{ route('operations.pickups.resolve', [$pickup->code, $fee->id]) }}" class="space-y-3">
+                <form method="POST" action="{{ route($feeRoutes.'.resolve', [$bookingCode, $fee->id]) }}" class="space-y-3">
                     @csrf
                     <flux:select name="result" label="Kết quả khi chưa thu tiền" required>
                         <flux:select.option value="">Chọn kết quả đã xác minh</flux:select.option>
@@ -36,13 +36,13 @@
                 </form>
             @endif
         </details>
-    @elseif ($pickup->isOpen($order) && $fee->channel === 'app' && $fee->status === 'failed')
-        <form method="POST" action="{{ route('operations.pickups.counter', [$pickup->code, $fee->id]) }}">
+    @elseif ($canSettle && $fee->channel === 'app' && $fee->status === 'failed')
+        <form method="POST" action="{{ route($feeRoutes.'.counter', [$bookingCode, $fee->id]) }}">
             @csrf
             <flux:button type="submit">Chuyển sang hóa đơn tại quầy</flux:button>
         </form>
     @elseif ($fee->status === 'refund_pending' && auth()->user()?->can('access-admin'))
-        <form method="POST" action="{{ route('operations.pickups.refund', [$pickup->code, $fee->id]) }}" class="space-y-3">
+        <form method="POST" action="{{ route($feeRoutes.'.refund', [$bookingCode, $fee->id]) }}" class="space-y-3">
             @csrf
             <flux:input name="refund_reference" label="Mã giao dịch hoàn tiền đã thực hiện" maxlength="100" required />
             <flux:button type="submit">Ghi nhận đã hoàn</flux:button>
