@@ -271,6 +271,11 @@
 - Bản tích hợp đạt Pint, PHPStan, 176 bài SQLite với 2.569 assertion, 24 bài MySQL với 417 assertion và `npm run build`.
 - Đã xử lý xung đột với nhánh tài liệu Git Flow cũ và giữ hướng dẫn dự án hiện hành.
 
+## Đồng bộ giao diện Terrasse
+
+- Đã nghiệm thu các thay đổi từ `feature/terrasse-account` tại `2f73b27`. Trang tài khoản, cài đặt và chân trang cửa hàng dùng giao diện Terrasse. Chế độ sáng, tối và theo hệ thống được dùng chung giữa cửa hàng, khu quản trị và khu vận hành.
+- Đã kiểm tra trên Edge tại 360 và 1440 px với dữ liệu thử. Chế độ hiển thị đồng bộ giữa hai tab, quyền truy cập và chuyển hướng đăng nhập đúng theo vai trò, các trang đã kiểm tra không cuộn ngang toàn trang. Build, Pint, PHPStan, 177 bài SQLite với 2.605 assertion và 24 bài MySQL với 417 assertion đều đạt.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
