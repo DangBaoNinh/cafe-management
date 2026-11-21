@@ -89,7 +89,26 @@ class CheckoutTest extends MySqlTestCase
             ])->assertStatus(303);
             $this->assertSame('voided', $secondOrder->payment()->sole()->status->value);
             $this->actingAs($first)->post(route('checkout.store'), $afterCancellation)->assertStatus(303);
-            $this->assertSame(30000, $first->orders()->where('status', 'pending')->sole()->total_vnd);
+            $thirdOrder = $first->orders()->where('status', 'pending')->sole();
+            $this->assertSame(30000, $thirdOrder->total_vnd);
+
+            app(ShoppingCart::class)->add($second, $product->id, ['size_id' => $size->id], 1);
+            $review = [
+                'cart_version' => $second->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'cod',
+                'recipient_name' => 'Khách thử', 'phone' => '0901234567', 'coupon_code' => $coupon->code,
+            ];
+            $this->actingAs($second)->postJson(route('checkout.review'), $review)
+                ->assertUnprocessable()->assertJsonValidationErrors('coupon_code');
+            $admin = User::factory()->create(['role' => UserRole::Admin]);
+            $this->actingAs($admin)->post(route('admin.orders.cancel', $thirdOrder->order_number), [
+                'expected_status' => 'pending', 'reason' => 'Không thể phục vụ món',
+            ])->assertStatus(303);
+            $this->assertSame('cancelled', $thirdOrder->refresh()->status->value);
+            $this->assertSame('voided', $thirdOrder->payment()->sole()->status->value);
+            $this->assertSame($admin->id, $thirdOrder->statusHistories()->where('to_status', 'cancelled')->sole()->actor_id);
+            $afterAdminCancellation = $this->submission($second, $coupon);
+            $this->post(route('checkout.store'), $afterAdminCancellation)->assertStatus(303);
+            $this->assertSame(30000, $second->orders()->where('status', 'pending')->sole()->total_vnd);
         } finally {
             $this->primary->disableQueryLog();
             $this->primary->rollBack();

@@ -25,6 +25,11 @@ enum OrderStatus: string
         return [self::Pending->value, self::Confirmed->value];
     }
 
+    public function allowsAdminCancellation(): bool
+    {
+        return in_array($this, [self::Pending, self::Confirmed, self::Preparing, self::Ready], true);
+    }
+
     public function label(): string
     {
         return match ($this) {
