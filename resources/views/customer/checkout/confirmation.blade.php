@@ -4,6 +4,10 @@
         <div class="space-y-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <p class="font-semibold wrap-anywhere">Mã đơn {{ $order->order_number }}</p>
             <p>{{ $order->fulfillment_type->label() }} · {{ $payment->method->label() }}</p>
+            @if ($pickup !== null)
+                <p>Giờ hẹn · <x-customer.order-time :date="$pickup->scheduled_at" /></p>
+                <p>Mã tra cứu <strong class="font-mono">{{ $pickup->code }}</strong> · {{ $pickup->label($order) }}</p>
+            @endif
         </div>
 
         <x-customer.order-totals :subtotal="$order->subtotal_vnd" :discount="$order->discount_vnd"

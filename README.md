@@ -87,5 +87,11 @@ php artisan test --testsuite=MySQL # Transaction và khóa hàng trên MySQL
 
 Bộ MySQL tự chạy migration tiến trên `coffee_shop_test`. Các bản ghi kiểm tra rollback nằm trong transaction và bài kiểm tra khóa dùng một dòng migration có sẵn. Bộ mặc định dùng SQLite với mailer `array`. GitHub Actions chạy cả hai bộ với một MySQL service dùng riêng cho lần chạy CI.
 
+### Lịch nhận tại quán
+
+Chạy `php artisan schedule:work` cùng ứng dụng khi thử trên Laragon. Trên máy triển khai, cấu hình trình lập lịch gọi `php artisan schedule:run` mỗi phút. Tác vụ `pickups:expire` hủy các đơn quá hạn nhận và áp dụng chính sách không đến.
+
+Kênh thu phụ phí qua ứng dụng dùng cấu hình chuyển khoản hiện có. Khách xem số tiền và nội dung chuyển khoản riêng của khoản phí trên phiếu. Nhân viên căn cứ vào sao kê để xác nhận tiền đã nhận hoặc ghi nhận kết quả cuối của giao dịch trước khi chuyển sang thu tại quầy.
+
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md)
 - [Tiến độ và kết quả kiểm tra](docs/PROGRESS.md)

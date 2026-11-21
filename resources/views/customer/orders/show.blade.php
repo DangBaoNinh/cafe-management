@@ -13,6 +13,9 @@
         @if (session('status'))
             <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
+        @if ($order->scheduledPickup !== null)
+            @include('customer.orders.pickup', ['pickup' => $order->scheduledPickup])
+        @endif
         @error('expected_status')
             <p role="alert" class="rounded-lg border border-terrasse-danger/30 bg-terrasse-danger-surface p-4 text-sm text-terrasse-danger">{{ $message }}</p>
         @enderror

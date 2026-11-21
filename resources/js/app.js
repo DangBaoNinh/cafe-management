@@ -42,3 +42,25 @@ window.addEventListener('pageshow', (event) => {
         syncAppearance();
     }
 });
+
+const pickupCheckout = document.querySelector('[data-checkout-pickup]');
+
+if (pickupCheckout) {
+    const { fulfillment_type: fulfillment, pickup_mode: mode, pickup_date: date, pickup_clock: time } = pickupCheckout.elements;
+    const options = pickupCheckout.querySelector('[data-pickup-mode]');
+    const slot = pickupCheckout.querySelector('[data-pickup-slot]');
+
+    const updatePickupFields = () => {
+        const pickup = fulfillment.value === 'pickup';
+        const scheduled = pickup && mode.value === 'scheduled';
+
+        options.hidden = options.disabled = !pickup;
+        slot.hidden = slot.disabled = !scheduled;
+        date.required = time.required = scheduled;
+    };
+
+    fulfillment.addEventListener('change', updatePickupFields);
+    mode.addEventListener('change', updatePickupFields);
+    window.addEventListener('pageshow', updatePickupFields);
+    updatePickupFields();
+}

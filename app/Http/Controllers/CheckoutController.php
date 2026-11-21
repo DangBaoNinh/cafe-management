@@ -64,6 +64,7 @@ class CheckoutController extends Controller
         return view('customer.checkout.confirmation', [
             'order' => $order,
             'payment' => $order->payment()->firstOrFail(),
+            'pickup' => $order->scheduledPickup()->first(),
         ]);
     }
 

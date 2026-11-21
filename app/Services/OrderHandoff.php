@@ -28,6 +28,9 @@ class OrderHandoff
 
         DB::transaction(function () use ($actor, $number, $expected, $target, $fulfillment, $method, $collectedAmount): void {
             $order = Order::query()->where('order_number', $number)->lockForUpdate()->firstOrFail();
+            if ($order->scheduledPickup()->exists()) {
+                throw $this->invalid($number, 'expected_status', 'Đơn hẹn phải bàn giao từ màn hình tra mã phiếu nhận.', 409);
+            }
             if ($order->fulfillment_type !== $fulfillment) {
                 throw $this->invalid($number, 'fulfillment_type', 'Cách nhận đã thay đổi. Vui lòng tải lại trang.', 409);
             }

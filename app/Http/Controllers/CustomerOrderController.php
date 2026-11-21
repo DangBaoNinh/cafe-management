@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Http\Requests\CancelCustomerOrderRequest;
 use App\Models\User;
 use App\Services\CancelCustomerOrder;
+use App\Services\Checkout;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
@@ -42,7 +43,7 @@ class CustomerOrderController extends Controller
         ]);
     }
 
-    public function show(Request $request, string $number): View
+    public function show(Request $request, string $number, Checkout $checkout): View
     {
         $order = $this->customer($request)->orders()
             ->select([
@@ -53,6 +54,7 @@ class CustomerOrderController extends Controller
                 'items' => fn (HasMany $items) => $items->orderBy('id'),
                 'items.toppings' => fn (HasMany $toppings) => $toppings->orderBy('id'),
                 'payment:id,order_id,method,status',
+                'scheduledPickup.fees',
                 'statusHistories' => fn (HasMany $histories) => $histories
                     ->select(['id', 'order_id', 'to_status', 'created_at'])
                     ->orderBy('created_at')->orderBy('id'),
@@ -60,7 +62,7 @@ class CustomerOrderController extends Controller
             ->where('order_number', $number)
             ->firstOrFail();
 
-        return view('customer.orders.show', ['order' => $order]);
+        return view('customer.orders.show', ['order' => $order, 'bankAvailable' => $checkout->bankDetails() !== null]);
     }
 
     public function cancel(CancelCustomerOrderRequest $request, string $number, CancelCustomerOrder $cancelOrder): RedirectResponse

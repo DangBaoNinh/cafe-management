@@ -29,6 +29,9 @@ class OrderIntake
             if ($order->status !== OrderStatus::Pending) {
                 throw $this->conflict($number, 'Đơn đã đổi trạng thái. Vui lòng tải lại trang để xem trạng thái hiện tại.');
             }
+            if ($order->scheduledPickup?->hasMissedArrival()) {
+                throw $this->conflict($number, 'Đơn hẹn đã quá hạn nhận và đang chờ hủy do không đến.');
+            }
 
             $payment = $order->payment()->lockForUpdate()->first();
             $previousPaymentStatus = $payment?->status;
@@ -53,6 +56,7 @@ class OrderIntake
                     'to_status' => $reversedPaymentStatus->value,
                     'reason' => $reason,
                 ]);
+                PickupFees::reverse($order);
             }
         }, 5);
     }

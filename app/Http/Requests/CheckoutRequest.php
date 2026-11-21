@@ -23,6 +23,14 @@ class CheckoutRequest extends FormRequest
     {
         $coupon = $this->input('coupon_code');
         $key = $this->input('checkout_key');
+        $date = $this->input('pickup_date');
+        $clock = $this->input('pickup_clock');
+        if ($date !== null || $clock !== null) {
+            $this->merge([
+                'pickup_time' => is_string($date) && is_string($clock) ? $date.' '.$clock : '',
+                'pickup_mode' => 'scheduled',
+            ]);
+        }
 
         if (is_string($coupon)) {
             $coupon = Coupon::normalizeCode($coupon);
@@ -56,6 +64,7 @@ class CheckoutRequest extends FormRequest
                 'required', 'integer:strict', 'min:1',
             ],
             'coupon_code' => ['nullable', 'string', 'max:40', 'regex:/\A[A-Z0-9]+(?:[-_][A-Z0-9]+)*\z/'],
+            'pickup_time' => ['nullable', 'required_if:pickup_mode,scheduled', 'date_format:Y-m-d H:i'],
         ];
 
         if ($this->routeIs('checkout.store')) {
@@ -80,6 +89,7 @@ class CheckoutRequest extends FormRequest
             'phone' => 'số điện thoại',
             'address_id' => 'địa chỉ giao hàng',
             'coupon_code' => 'mã giảm giá',
+            'pickup_time' => 'giờ nhận hẹn',
             'checkout_key' => 'mã xác nhận đặt hàng',
             'accepted_total_vnd' => 'tổng tiền đã xác nhận',
             'quote_hash' => 'thông tin xác nhận',
@@ -98,6 +108,7 @@ class CheckoutRequest extends FormRequest
             $data['phone'],
             $data['address_id'] ?? null,
             $data['coupon_code'] ?? null,
+            $data['pickup_time'] ?? null,
         );
     }
 }

@@ -302,6 +302,14 @@
 
 - Đã chốt giờ hẹn cuối 22:30 và cách đối chiếu phụ phí trên màn hình tra mã cho UC26–UC27. Đặc tả đã sẵn sàng để triển khai.
 
+### UC26 đã kiểm thử, chờ nghiệm thu
+
+- Checkout nhận giờ 07:00–22:30 theo bước 5 phút và kiểm tra hạn đặt trước 60 phút khi chốt đơn. Khách xem phiếu trong đơn, đổi giờ và xem phụ phí. Nhân viên lọc lịch theo ngày hoặc giờ, nhập mã, ghi nhận khách đến và bàn giao qua quy trình UC19.
+- Phí tại quầy được chốt trong giao dịch bàn giao. Kênh ứng dụng dùng nội dung chuyển khoản riêng và nhân viên đối chiếu sao kê. Lịch chưa ghi nhận đến hết hiệu lực sau 30 phút. Tác vụ `pickups:expire` hủy đơn và cập nhật chuỗi không đến, dùng quy tắc chung cấp tài khoản cho UC26–UC27.
+- Đã chạy migration bổ sung trên MySQL local. Đã thử checkout và phiếu ở Brave 360 px. MySQL 8.4 riêng xác minh hoàn tác khi ghi phiếu lỗi và ba tình huống tranh chấp giữa ghi nhận đến/hủy quá hạn, bàn giao/hủy đơn, xác nhận thanh toán/chuyển kênh. Luồng liên UC27 được kiểm tra qua quy tắc chung với dữ liệu mô phỏng, vì màn hình UC27 đang chờ triển khai.
+- `composer ci:check` đạt Pint, PHPStan và 191 bài SQLite với 2.847 assertion. Bộ MySQL đạt 25 bài với 439 assertion. `npm run build` thành công.
+- Hướng dẫn vận hành scheduler và đối chiếu chuyển khoản nằm trong [README](../README.md#lịch-nhận-tại-quán).
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
