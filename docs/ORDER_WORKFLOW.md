@@ -55,4 +55,4 @@ Sai số tiền, thiếu tham chiếu cho khoản thu, nhập trùng tham chiế
 
 ## 4. Nhận tại quán theo lịch hẹn
 
-[UC26](use-cases/UC26.md) bổ sung giờ hẹn vào đơn nhận tại quán và phiếu điện tử để khách trình khi đến. Sau khi đơn đã sẵn sàng, staff/admin đối chiếu mã và hoàn tất theo UC19. Nếu đơn hủy hoặc bị từ chối, phiếu mất hiệu lực và khung giờ được trả chỗ. [UC27](use-cases/UC27.md) có lịch đặt bàn/phòng riêng. Việc check-in đặt chỗ không tạo đơn hay ghi nhận thanh toán.
+[UC26](use-cases/UC26.md) bổ sung giờ hẹn và phiếu điện tử vào đơn nhận tại quán. Staff/admin xác minh mã và ghi nhận lúc khách đến để tính phí trễ, sau đó bàn giao theo UC19 khi đơn sẵn sàng và đủ điều kiện thanh toán. Đơn hủy hoặc bị từ chối làm phiếu mất hiệu lực. Với đơn hẹn chưa ghi nhận khách đến sau 30 phút, ghi lý do hủy là không đến và xử lý khoản tiền của đơn theo BR15. [UC27](use-cases/UC27.md) có lịch đặt bàn/phòng riêng. Check-in không tạo đơn đồ uống. Phụ phí của cả hai UC theo BR26–BR27.
