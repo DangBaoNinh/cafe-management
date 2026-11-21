@@ -26,6 +26,8 @@
                             <a href="{{ route('orders.index') }}"
                                 @if (request()->routeIs('orders.*')) aria-current="page" @endif
                                 class="terrasse-store-link">Đơn của tôi</a>
+                            <a href="{{ route('reservations.create') }}" @if (request()->routeIs('reservations.*')) aria-current="page" @endif
+                                class="terrasse-store-link">Đặt chỗ</a>
                         @endcan
                         <a href="{{ route('dashboard') }}" @if (request()->routeIs('dashboard')) aria-current="page" @elseif ($settings) aria-current="location" @endif
                             class="terrasse-store-link">Tài khoản</a>

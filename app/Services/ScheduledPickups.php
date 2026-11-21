@@ -30,11 +30,8 @@ class ScheduledPickups
             BookingRules::authorizeBooking($customer);
             $this->require($pickup->isOpen($order) && $pickup->arrived_at === null && now()->lt($pickup->scheduled_at),
                 'Chỉ đổi lịch trước giờ hẹn và trước khi ghi nhận đến.');
-            $slot = BookingRules::slot($input);
             $this->require($pickup->revision === $revision, 'Lịch đã thay đổi. Vui lòng tải lại trang.');
-            $this->require(! $slot->eq($pickup->scheduled_at), 'Chọn giờ mới khác giờ đang hẹn.');
-            $this->require(abs($slot->getTimestamp() - $pickup->scheduled_at->getTimestamp()) <= 3600,
-                'Giờ mới chênh quá 60 phút. Vui lòng đặt lịch mới.');
+            $slot = BookingRules::replacementSlot($input, $pickup->scheduled_at);
 
             $oldSlot = $pickup->scheduled_at;
             $pickup->revision++;
@@ -62,7 +59,7 @@ class ScheduledPickups
 
             $arrival = now()->toImmutable();
             $this->require($arrival->lt($pickup->arrival_deadline), 'Đã quá hạn nhận đơn.');
-            $late = max(0, intdiv($arrival->getTimestamp() - $pickup->scheduled_at->getTimestamp(), 60));
+            $late = BookingRules::lateMinutes($pickup->scheduled_at, $arrival);
             if ($late > 5) {
                 $this->fees->add($pickup, 'late', ($late - 5) * 2000, $channel, ['late_minutes' => $late]);
             }
@@ -123,6 +120,11 @@ class ScheduledPickups
         } while ($batch->count() === 100);
 
         return $expired;
+    }
+
+    public function expireCandidate(int $id, CarbonImmutable $now): bool
+    {
+        return $this->expire(ScheduledPickup::query()->with('order:id,user_id')->findOrFail($id), $now);
     }
 
     private function expire(ScheduledPickup $candidate, CarbonImmutable $now): bool

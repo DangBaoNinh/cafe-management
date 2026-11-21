@@ -89,9 +89,15 @@ Bộ MySQL tự chạy migration tiến trên `coffee_shop_test`. Các bản ghi
 
 ### Lịch nhận tại quán
 
-Chạy `php artisan schedule:work` cùng ứng dụng khi thử trên Laragon. Trên máy triển khai, cấu hình trình lập lịch gọi `php artisan schedule:run` mỗi phút. Tác vụ `pickups:expire` hủy các đơn quá hạn nhận và áp dụng chính sách không đến.
+Chạy `php artisan schedule:work` cùng ứng dụng khi thử trên Laragon. Trên máy triển khai, cấu hình trình lập lịch gọi `php artisan schedule:run` mỗi phút. Tác vụ `bookings:expire` xử lý lịch nhận đồ uống và lịch đặt chỗ quá hạn theo thứ tự thời điểm vắng mặt.
 
 Kênh thu phụ phí qua ứng dụng dùng cấu hình chuyển khoản hiện có. Khách xem số tiền và nội dung chuyển khoản riêng của khoản phí trên phiếu. Nhân viên căn cứ vào sao kê để xác nhận tiền đã nhận hoặc ghi nhận kết quả cuối của giao dịch trước khi chuyển sang thu tại quầy.
+
+### Đặt bàn và phòng họp
+
+Khách mở **Đặt chỗ**, chọn giờ, loại chỗ và số người để xem sơ đồ hai tầng. Tại **Lịch đặt bàn và phòng**, nhân viên tra mã, check-in, đối chiếu phụ phí và ghi nhận khi khách rời đi. Sơ đồ vận hành hỗ trợ ghi khách trực tiếp và trả chỗ.
+
+Quản trị viên có thể bật hoặc ngừng phục vụ từng chỗ đang trống và thu hẹp giờ nhận đặt bàn, phòng trong khung 07:00–22:30. Điều chỉnh giờ áp dụng cho lịch tạo mới hoặc đổi giờ. Lịch đã xác nhận vẫn check-in theo giờ đã hẹn.
 
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md)
 - [Tiến độ và kết quả kiểm tra](docs/PROGRESS.md)

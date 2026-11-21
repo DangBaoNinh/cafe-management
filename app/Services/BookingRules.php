@@ -36,6 +36,24 @@ class BookingRules
         );
     }
 
+    public static function replacementSlot(string $input, CarbonImmutable $previous): CarbonImmutable
+    {
+        $slot = self::slot($input);
+        if ($slot->eq($previous)) {
+            throw ValidationException::withMessages(['pickup_time' => 'Chọn giờ mới khác giờ đang hẹn.']);
+        }
+        if (abs($slot->getTimestamp() - $previous->getTimestamp()) > 3600) {
+            throw ValidationException::withMessages(['pickup_time' => 'Giờ mới chênh quá 60 phút. Vui lòng đặt lịch mới.']);
+        }
+
+        return $slot;
+    }
+
+    public static function lateMinutes(CarbonImmutable $slot, CarbonImmutable $arrival): int
+    {
+        return max(0, intdiv($arrival->getTimestamp() - $slot->getTimestamp(), 60));
+    }
+
     public static function authorizeBooking(User $customer): void
     {
         if ($customer->booking_blocked_until?->isFuture()) {
