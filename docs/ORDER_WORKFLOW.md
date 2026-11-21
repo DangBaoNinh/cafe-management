@@ -52,3 +52,7 @@ flowchart TD
 | `refund_pending → refunded` | Admin kiểm tra tiền hoàn ngoài hệ thống và ghi tham chiếu hoàn. |
 
 Sai số tiền, thiếu tham chiếu cho khoản thu, nhập trùng tham chiếu chuyển khoản hay nhận tiền sau hủy cần đối chiếu thủ công. Yêu cầu lỗi giữ nguyên trạng thái, không ghi nhận một khoản thu mới. Doanh thu áp dụng BR17. Nhật ký nghiệp vụ và thông tin hiển thị cho khách tuân theo BR18.
+
+## 4. Nhận tại quán theo lịch hẹn
+
+[UC26](use-cases/UC26.md) bổ sung giờ hẹn vào đơn nhận tại quán và phiếu điện tử để khách trình khi đến. Sau khi đơn đã sẵn sàng, staff/admin đối chiếu mã và hoàn tất theo UC19. Nếu đơn hủy hoặc bị từ chối, phiếu mất hiệu lực và khung giờ được trả chỗ. [UC27](use-cases/UC27.md) có lịch đặt bàn/phòng riêng. Việc check-in đặt chỗ không tạo đơn hay ghi nhận thanh toán.

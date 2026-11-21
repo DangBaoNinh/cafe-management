@@ -26,4 +26,8 @@ Review [phân tích nghiệp vụ](BUSINESS_ANALYSIS.md), [quy tắc](BUSINESS_R
 
 ## Mở rộng sau MVP
 
-Xem UC24–UC25 khi có yêu cầu và nhà cung cấp phù hợp. Mỗi UC có nhánh riêng từ `develop`, kiểm thử, commit và báo cáo. Chờ nghiệm thu và yêu cầu merge trước khi cập nhật `ACCEPTED` sau tích hợp.
+- UC24–UC25 hỗ trợ mô phỏng tích hợp. Kết nối nhà cung cấp thật cần yêu cầu và thông tin cấu hình riêng.
+- [UC26](use-cases/UC26.md) mở rộng checkout và bàn giao tại quán. Chốt cấu hình khung nhận, chạy hồi quy nhận ngay/giao hàng và kiểm chứng tranh chỗ cuối trên MySQL thử nghiệm.
+- [UC27](use-cases/UC27.md) triển khai độc lập. Chốt cấu hình bàn/phòng, giờ mở và chính sách đặt chỗ. Kiểm chứng chồng lịch, hủy và check-in trên MySQL thử nghiệm.
+
+Mỗi UC có nhánh riêng từ `develop`, kiểm thử, commit và báo cáo. Chờ nghiệm thu và yêu cầu merge trước khi cập nhật `ACCEPTED` sau tích hợp.

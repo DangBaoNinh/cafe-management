@@ -296,6 +296,10 @@
 - Kiểm tra HTTP đặt lại mật khẩu thành công từ liên kết trong log. Đã đăng nhập lại bằng mật khẩu mới và xóa tài khoản kiểm thử. Các yêu cầu trực tiếp tới `.env` và `.git/config` bị Apache chặn.
 - Log Laravel ghi email đặt lại mật khẩu local. Không thấy mục lỗi trong lượt kiểm tra cuối.
 
+## Mở rộng phục vụ tại quán
+
+- Đã bổ sung đặc tả [UC26 — Đặt đồ uống hẹn giờ nhận tại quán](use-cases/UC26.md) và [UC27 — Đặt bàn hoặc phòng họp tại quán](use-cases/UC27.md). Tổng danh mục hiện có 27 UC. Hai UC mới ở trạng thái `TODO`, chờ xác nhận cấu hình vận hành và triển khai.
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

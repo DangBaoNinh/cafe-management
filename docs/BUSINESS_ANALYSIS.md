@@ -26,7 +26,14 @@ Base Project đã có trang chủ, layout khách và quản trị, cùng Laravel
 | Vòng đời đơn | Lịch sử, theo dõi, hủy, tiếp nhận, pha chế, bàn giao và quản trị đơn | UC15–UC19, UC21 |
 | Thanh toán và doanh thu | Đối chiếu chuyển khoản, xác nhận COD, ghi nhận hoàn thủ công và tổng hợp doanh thu | UC20, UC23 |
 
-MVP phục vụ **một cửa hàng**, dùng VND và thời gian nghiệp vụ theo `Asia/Ho_Chi_Minh`. Cửa hàng tự điều phối giao nhận. Hai UC mở rộng là cổng thanh toán tự động và tích hợp đối tác vận chuyển (UC24–UC25). Quản lý đa cửa hàng, kho nguyên liệu, POS và bàn là đề xuất ngoài phạm vi thiết kế hiện hành.
+MVP phục vụ **một cửa hàng**, dùng VND và thời gian nghiệp vụ theo `Asia/Ho_Chi_Minh`. Cửa hàng tự điều phối giao nhận. UC24–UC25 mô phỏng cổng thanh toán và đối tác vận chuyển. Quản lý đa cửa hàng, kho nguyên liệu và POS nằm ngoài phạm vi.
+
+| Mở rộng tại quán | Phạm vi |
+| --- | --- |
+| [UC26 — Đặt đồ uống hẹn giờ nhận tại quán](use-cases/UC26.md) | Khách chọn giờ đến lấy đồ uống và đưa phiếu điện tử để nhân viên kiểm tra trước bàn giao. Hẹn giờ là tùy chọn của nhận tại quán. |
+| [UC27 — Đặt bàn hoặc phòng họp tại quán](use-cases/UC27.md) | Giữ một bàn hoặc một phòng theo giờ và số người. Quán có hai tầng, mỗi tầng khoảng 10 bàn và một phòng họp lớn. |
+
+Hai UC có thể triển khai độc lập. Số bàn chính thức, sức chứa mỗi bàn/phòng, giờ mở cửa, giới hạn khung nhận và các chính sách đến muộn hoặc không đến cần được xác nhận trước triển khai. Q01 mô tả phạm vi MVP gốc, còn hẹn nhận theo khung giờ được đặc tả ở UC26.
 
 ## 4. Luồng chính và ngoại lệ
 
