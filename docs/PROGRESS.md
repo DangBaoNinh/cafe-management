@@ -214,7 +214,9 @@
 - Không cần migration. `composer ci:check` đạt Pint, PHPStan và 147 bài SQLite với 2.057 assertion, gồm hoàn tác tiền COD khi ghi lịch sử đơn thất bại. Bộ MySQL đạt 19 bài với 329 assertion. `npm run build` thành công.
 - Hai phiên MySQL kiểm chứng ba cặp yêu cầu đồng thời cho nhận tại quán, bàn giao cho người giao và hoàn tất giao hàng. Mỗi cặp chỉ ghi một lần và phiên đọc giữ trạng thái cũ cho đến khi giao dịch commit. Brave ở 360 px kiểm tra hai cách nhận, từ chối sai tiền COD, chặn yêu cầu thiếu mã CSRF và tiến trình phía khách.
 
-### UC21 đã kiểm chứng, chờ nghiệm thu
+### UC21 đã nghiệm thu
+
+- Người dùng nghiệm thu UC21 tại commit `dc0d96a`. Nhánh `feature/admin-order-management` đã tích hợp vào `develop` tại merge commit `d5367f0` sau khi chạy lại Pint, PHPStan, SQLite, MySQL và bản build.
 
 - Quản trị viên hoạt động vào **Quản lý đơn hàng** tại `/admin/orders`. Lọc theo mã hoặc đầu mã, ngày đặt theo giờ Việt Nam, trạng thái và phương thức thanh toán. Ngày kết thúc được tính trọn ngày và các bộ lọc được giữ khi phân trang.
 - Chi tiết hiển thị dữ liệu đã lưu khi đặt và lịch sử đơn, thanh toán với tác nhân, thời điểm và lý do nội bộ. Hủy ngoại lệ yêu cầu lý do tối đa 500 ký tự và chỉ áp dụng ở `pending`, `confirmed`, `preparing`, `ready`. Ghi trạng thái đơn, thanh toán và lịch sử cùng giao dịch. Đơn đã hủy giải phóng lượt mã. Khoản đã thu chuyển sang `refund_pending` để ghi nhận hoàn ở UC20.
@@ -236,4 +238,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC21 chờ nghiệm thu và tích hợp vào `develop` để gỡ phụ thuộc của UC22. UC23 đã đủ phụ thuộc.
+- UC22 và UC23 đã đủ phụ thuộc trên `develop`.
