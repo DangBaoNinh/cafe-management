@@ -298,7 +298,7 @@
 
 ## Mở rộng phục vụ tại quán
 
-- Đã bổ sung đặc tả [UC26 — Đặt đồ uống hẹn giờ nhận tại quán](use-cases/UC26.md) và [UC27 — Đặt bàn hoặc phòng họp tại quán](use-cases/UC27.md). Tổng danh mục hiện có 27 UC. Đã ghi các thông số vận hành được xác nhận về giờ quán, sức chứa, phụ phí và xử lý không đến. Hai UC ở trạng thái `TODO` vì đang chờ triển khai.
+- Đã bổ sung đặc tả [UC26 — Đặt đồ uống hẹn giờ nhận tại quán](use-cases/UC26.md) và [UC27 — Đặt bàn hoặc phòng họp tại quán](use-cases/UC27.md). Tổng danh mục hiện có 27 UC. Đã ghi các thông số vận hành được xác nhận về giờ quán, sức chứa, phụ phí và xử lý không đến. Đã cập nhật bước giờ 5 phút, hạn đổi trước giờ hẹn, phụ phí trên hóa đơn tại quầy và sơ đồ từng tầng với trạng thái sử dụng thực tế. Hai UC ở trạng thái `TODO` vì đang chờ triển khai.
 
 ## Việc còn lại
 
