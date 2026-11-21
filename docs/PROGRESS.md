@@ -281,6 +281,11 @@
 - Đã nghiệm thu nhánh `feature/storefront-chat` tại `7d46d88` và tích hợp vào `develop` tại `fc56ffc`. Khách có thể hỏi về thực đơn, nhận gợi ý, chọn size và thêm món vào giỏ từ khung chat.
 - Laravel trên Laragon đã trả lời hai lượt liên tiếp với Gemini thật và hiển thị thẻ món. SQLite đạt 180 bài với 2.633 assertion, MySQL đạt 24 bài với 417 assertion. Build, Pint và PHPStan đều đạt.
 
+## Ảnh đồ uống demo
+
+- Đã nghiệm thu 24 ảnh WebP và tích hợp nhánh `chore/demo-drink-photos` vào `develop` tại `c945c80`. Seeder bổ sung ảnh thiếu và giữ ảnh đã có.
+- SQLite thử nghiệm xác nhận chạy lại seeder giữ nguyên số lượng dữ liệu và giữ ảnh tùy chỉnh. Laragon trả HTTP 200 cho cả 24 ảnh. 180 bài SQLite, Pint và PHPStan đều đạt.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
