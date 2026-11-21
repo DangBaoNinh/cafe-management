@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#432329">
+    <title>Coffee Shop | Quản trị &amp; Vận hành</title>
+    <link rel="stylesheet" href="fonts/eb-garamond.css">
+    <link rel="stylesheet" href="operations.css">
+    <script src="operations.js" defer></script>
+</head>
+<body>
+    <header class="preview-bar">
+        <a href="index.html#terrasse">← <span>Mẫu khách hàng</span></a>
+        <nav aria-label="Chọn vai trò xem thử">
+            <a href="#admin" data-role="admin">Quản trị</a>
+            <a href="#staff" data-role="staff">Nhân viên</a>
+        </nav>
+    </header>
+
+    <div class="workspace">
+        <aside class="sidebar">
+            <a class="brand" id="brand-link" href="#admin">
+                <span class="brand-mark" aria-hidden="true">C</span>
+                <span>Coffee Shop<small id="brand-role">Quản trị</small></span>
+            </a>
+            <nav id="workspace-nav" aria-label="Điều hướng nội bộ"></nav>
+            <p class="sample-note">Dữ liệu minh họa</p>
+        </aside>
+
+        <main id="workspace-main">
+            <header class="page-header">
+                <div>
+                    <h1 id="page-title" tabindex="-1">Tổng quan quản trị</h1>
+                    <p id="page-description">Doanh thu và tình trạng đơn hàng của quán.</p>
+                </div>
+                <label class="period" id="period-control">
+                    <span class="visually-hidden">Khoảng báo cáo</span>
+                    <select id="period">
+                        <option value="7">7 ngày gần nhất</option>
+                        <option value="3">3 ngày gần nhất</option>
+                    </select>
+                </label>
+            </header>
+
+            <section id="overview" aria-label="Báo cáo cửa hàng">
+                <dl id="metrics" class="metrics"></dl>
+                <div class="report-grid">
+                    <section class="panel chart-panel" aria-labelledby="chart-title">
+                        <header class="panel-heading">
+                            <h2 id="chart-title">Doanh thu theo ngày</h2>
+                            <p id="chart-period"></p>
+                        </header>
+                        <div id="chart" class="chart"></div>
+                    </section>
+                    <section class="panel status-panel" aria-labelledby="status-title">
+                        <header class="panel-heading">
+                            <h2 id="status-title">Trạng thái đơn</h2>
+                            <p>Tính theo ngày đặt</p>
+                        </header>
+                        <dl id="status-report" class="status-report"></dl>
+                    </section>
+                </div>
+            </section>
+
+            <section id="orders" aria-labelledby="orders-heading" hidden>
+                <header class="list-toolbar">
+                    <h2 id="orders-heading">Đơn hàng mẫu</h2>
+                    <div class="list-controls">
+                        <label>
+                            <span class="visually-hidden">Tìm mã đơn</span>
+                            <input id="order-search" type="search" placeholder="Tìm mã đơn…" autocomplete="off">
+                        </label>
+                        <label>
+                            <span class="visually-hidden">Hình thức nhận</span>
+                            <select id="fulfillment">
+                                <option value="all">Mọi hình thức nhận</option>
+                                <option value="pickup">Nhận tại quán</option>
+                                <option value="delivery">Giao tận nơi</option>
+                            </select>
+                        </label>
+                    </div>
+                </header>
+                <p id="order-count" class="visually-hidden" role="status"></p>
+                <div id="order-list"></div>
+                <p id="empty-results" class="panel empty-results" hidden>Không tìm thấy đơn phù hợp.</p>
+            </section>
+        </main>
+    </div>
+
+    <dialog id="order-detail" aria-labelledby="detail-title">
+        <div class="detail-header">
+            <div>
+                <p>Chi tiết đơn</p>
+                <h2 id="detail-title"></h2>
+            </div>
+            <form method="dialog"><button class="close-button" aria-label="Đóng chi tiết đơn" autofocus>×</button></form>
+        </div>
+        <div id="detail-body"></div>
+    </dialog>
+</body>
+</html>
