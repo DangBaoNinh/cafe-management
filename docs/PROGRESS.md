@@ -223,7 +223,9 @@
 - Không cần migration. `composer ci:check` đạt Pint, PHPStan và 153 bài SQLite với 2.201 assertion. Bộ MySQL đạt 20 bài với 350 assertion. `npm run build` thành công.
 - Hai phiên MySQL kiểm chứng hủy và bàn giao ở cả hai thứ tự, cùng với hai yêu cầu hủy một đơn đã thu. Chỉ thao tác giữ khóa trước thành công. Brave ở 360 px kiểm tra lọc chéo, CSRF, lý do dài, phân quyền và giữ kín lý do hủy với khách.
 
-### UC22 đã kiểm chứng, chờ nghiệm thu
+### UC22 đã nghiệm thu
+
+- Người dùng nghiệm thu UC22 tại commit `86c6960`. Nhánh `feature/customer-management` đã tích hợp vào `develop` tại merge commit `2a8f7ed` sau khi chạy lại Pint, PHPStan, SQLite, MySQL và bản build.
 
 - Quản trị viên hoạt động vào **Tra cứu khách hàng** tại `/admin/customers`. Tìm một phần tên hoặc email, lọc tài khoản hoạt động hoặc đã khóa, giữ bộ lọc khi phân trang. Danh sách và hồ sơ chỉ lấy tài khoản vai trò khách hàng.
 - Hồ sơ hiển thị tên, email, trạng thái và tóm tắt đơn thuộc khách, gồm mã, giờ đặt, trạng thái và tổng tiền. Mã đơn mở chi tiết UC21. Liên kết chỉnh sửa tài khoản đi qua UC04 và yêu cầu xác nhận mật khẩu khi cần. UC22 chỉ đọc và không cần migration.
@@ -244,4 +246,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- UC22 chờ nghiệm thu và tích hợp vào `develop`. UC23 đã đủ phụ thuộc trên `develop`.
+- UC23 đã đủ phụ thuộc trên `develop`.
