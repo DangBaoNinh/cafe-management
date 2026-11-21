@@ -10,6 +10,15 @@ enum PaymentStatus: string
     case RefundPending = 'refund_pending';
     case Refunded = 'refunded';
 
+    public function afterOrderReversal(): ?self
+    {
+        return match ($this) {
+            self::Pending => self::Voided,
+            self::Paid => self::RefundPending,
+            default => null,
+        };
+    }
+
     public function label(): string
     {
         return match ($this) {

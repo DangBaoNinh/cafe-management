@@ -10,6 +10,9 @@
             @can('access-customer-orders')
                 <flux:button :href="route('orders.index')">Đơn của tôi</flux:button>
             @endcan
+            @can('operate-orders')
+                <flux:button :href="route('operations.orders.index')">Đơn chờ xác nhận</flux:button>
+            @endcan
         </div>
     </section>
 </x-layouts::app>

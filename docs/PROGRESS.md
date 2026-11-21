@@ -177,6 +177,13 @@
 - `composer ci:check` đạt Pint, PHPStan và 125 bài SQLite với 1.584 assertion, gồm kiểm tra rollback khi ghi lịch sử thanh toán thất bại. Bộ MySQL đạt 17 bài với 270 assertion, gồm kiểm tra dùng lại mã đã hết lượt sau hủy. `npm run build` thành công.
 - Hai phiên MySQL cô lập kiểm tra cả hai thứ tự giữa khách hủy và giao dịch mô phỏng nhân viên xác nhận. Trong mỗi lượt, phiên đến sau chờ khóa rồi bị từ chối. Brave ở 360 px kiểm tra xác nhận hủy, phản hồi 419 khi thiếu CSRF, hai kết quả thanh toán và bộ lọc **Đã kết thúc**.
 
+### UC17 đã kiểm chứng, chờ nghiệm thu
+
+- Nhân viên và quản trị viên đang hoạt động vào **Đơn chờ xác nhận** tại `/operations/orders`. Hàng đợi hiển thị đơn cũ nhất trước, 15 đơn mỗi trang. Chi tiết dùng thông tin đã lưu lúc đặt và hiển thị trạng thái thanh toán.
+- Chỉ quyết định được đơn `pending`. Xác nhận ghi lịch sử và giữ nguyên thanh toán, kể cả chuyển khoản chưa đối chiếu. Từ chối bắt buộc lý do tối đa 500 ký tự, giải phóng lượt mã và chuyển thanh toán sang `voided` hoặc `refund_pending`. Trạng thái và lịch sử ghi trong cùng giao dịch.
+- `composer ci:check` đạt Pint, PHPStan và 130 bài SQLite với 1.704 assertion. Bộ MySQL đạt 17 bài với 277 assertion. `npm run build` thành công. Không cần migration.
+- Hai phiên MySQL kiểm tra hai nhân viên cùng xác nhận, từ chối đồng thời với xác nhận và cả hai thứ tự giữa xác nhận và khách hủy. Mỗi lượt chỉ một thao tác thành công. Brave ở 360 px kiểm tra nhập lý do, CSRF, xác nhận, từ chối và cập nhật hàng đợi.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -192,4 +199,4 @@
 - Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
-- Xử lý đơn, đối chiếu thanh toán, quản lý khách hàng và doanh thu thuộc các giai đoạn tiếp theo.
+- UC17 chờ nghiệm thu. UC20 đối chiếu thanh toán là bước tiếp theo theo thứ tự phụ thuộc.
