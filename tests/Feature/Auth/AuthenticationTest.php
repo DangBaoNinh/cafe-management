@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,35 @@ class AuthenticationTest extends TestCase
         ])->assertSessionHasErrors(['email' => __('auth.failed')]);
 
         $this->assertGuest();
+    }
+
+    public function test_admin_login_defaults_to_the_admin_dashboard(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->post(route('login.store'), ['email' => $admin->email, 'password' => 'password'])
+            ->assertRedirectToRoute('admin.dashboard');
+        $this->assertAuthenticatedAs($admin);
+        $this->get(route('admin.dashboard'))->assertOk();
+    }
+
+    public function test_admin_login_returns_to_the_requested_page(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        $orders = route('admin.orders.index', ['status' => 'ready']);
+        $this->get($orders)->assertRedirectToRoute('login');
+
+        $this->post(route('login.store'), ['email' => $admin->email, 'password' => 'password'])
+            ->assertRedirect($orders);
+    }
+
+    public function test_admin_json_login_preserves_the_fortify_response(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->postJson(route('login.store'), ['email' => $admin->email, 'password' => 'password'])
+            ->assertOk()->assertExactJson(['two_factor' => false]);
+        $this->assertAuthenticatedAs($admin);
     }
 
     public function test_login_rate_limit_uses_the_same_bucket_for_email_case_variants(): void
