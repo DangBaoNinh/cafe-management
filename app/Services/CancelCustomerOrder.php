@@ -22,7 +22,7 @@ class CancelCustomerOrder
 
             $payment = $order->payment()->lockForUpdate()->first();
             $previousPaymentStatus = $payment?->status;
-            $nextPaymentStatus = $previousPaymentStatus?->afterOrderReversal();
+            $nextPaymentStatus = $payment?->status->afterOrderReversal($payment->amount_vnd);
             if ($payment === null || $previousPaymentStatus === null || $nextPaymentStatus === null) {
                 throw ValidationException::withMessages([
                     'expected_status' => 'Không thể hủy đơn với trạng thái thanh toán hiện tại. Vui lòng liên hệ cửa hàng.',

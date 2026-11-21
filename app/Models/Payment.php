@@ -6,6 +6,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -16,10 +17,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['method', 'status', 'amount_vnd', 'transfer_details'])]
 class Payment extends Model
 {
+    /** @return BelongsTo<Order, $this> */
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
+
     /** @return HasMany<PaymentStatusHistory, $this> */
     public function statusHistories(): HasMany
     {
         return $this->hasMany(PaymentStatusHistory::class);
+    }
+
+    public function matchesCollectedAmount(int $orderTotal, int $amount): bool
+    {
+        return $amount === $orderTotal && $amount === $this->amount_vnd;
     }
 
     /** @return array<string, string> */

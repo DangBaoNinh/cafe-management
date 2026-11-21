@@ -13,6 +13,7 @@
                 @endcan
                 <div class="flex flex-wrap gap-4 text-sm">
                     <a href="{{ route('operations.orders.index') }}" class="hover:underline">Đơn chờ xác nhận</a>
+                    <a href="{{ route('operations.payments.index') }}" class="hover:underline">Đối chiếu thanh toán</a>
                     @can('access-admin')
                         <a href="{{ route('admin.accounts.index') }}" class="hover:underline">Quản lý tài khoản</a>
                         <a href="{{ route('admin.categories.index') }}" class="hover:underline">Quản lý danh mục</a>

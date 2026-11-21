@@ -29,6 +29,7 @@
                 <dd class="font-semibold">{{ $order->payment?->status->label() ?? 'Chưa có thông tin' }}</dd>
                 @if ($order->payment !== null)
                     <dd class="text-sm">{{ $order->payment->method->label() }}</dd>
+                    <dd class="mt-1 text-sm"><flux:link :href="route('operations.payments.show', $order->order_number)">Chi tiết thanh toán</flux:link></dd>
                 @endif
             </div>
         </dl>

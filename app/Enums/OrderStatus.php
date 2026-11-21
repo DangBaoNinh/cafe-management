@@ -19,6 +19,12 @@ enum OrderStatus: string
         return [self::Completed->value, self::Cancelled->value, self::Rejected->value];
     }
 
+    /** @return list<string> */
+    public static function transferReconciliationValues(): array
+    {
+        return [self::Pending->value, self::Confirmed->value];
+    }
+
     public function label(): string
     {
         return match ($this) {

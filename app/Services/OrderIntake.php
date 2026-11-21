@@ -32,7 +32,7 @@ class OrderIntake
 
             $payment = $order->payment()->lockForUpdate()->first();
             $previousPaymentStatus = $payment?->status;
-            $reversedPaymentStatus = $previousPaymentStatus?->afterOrderReversal();
+            $reversedPaymentStatus = $payment?->status->afterOrderReversal($payment->amount_vnd);
             if ($payment === null || $previousPaymentStatus === null || $reversedPaymentStatus === null) {
                 throw $this->conflict($number, 'Vui lòng kiểm tra trạng thái thanh toán trước khi xử lý đơn.');
             }

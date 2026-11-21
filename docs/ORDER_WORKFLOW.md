@@ -46,9 +46,9 @@ flowchart TD
 
 | Chuyển | Điều kiện và kết quả |
 | --- | --- |
-| `pending → paid` | Chuyển khoản đối chiếu đúng tổng đơn và tham chiếu trước pha chế. COD xác nhận số tiền thu cùng thao tác hoàn tất. Ghi actor, thời điểm và tham chiếu khi có. |
-| `pending → voided` | Đơn bị từ chối hoặc hủy trước khi nhận tiền. |
+| `pending → paid` | Chuyển khoản đối chiếu đúng tổng đơn và mã giao dịch trước pha chế. Với đơn 0 ₫, nhân viên xác nhận đã đủ điều kiện thanh toán, không cần mã giao dịch. COD xác nhận số tiền thu cùng thao tác hoàn tất. Ghi actor, thời điểm và tham chiếu khi có. |
+| `pending → voided`, `paid → voided` | Đơn bị từ chối hoặc hủy khi chưa phát sinh khoản thu, kể cả đơn 0 ₫ đã được xác nhận thanh toán. |
 | `paid → refund_pending` | Đơn bị từ chối hoặc hủy sau khi đã nhận tiền. |
 | `refund_pending → refunded` | Admin kiểm tra tiền hoàn ngoài hệ thống và ghi tham chiếu hoàn. |
 
-Sai số tiền, thiếu tham chiếu, nhập trùng tham chiếu chuyển khoản hay nhận tiền sau hủy cần đối chiếu thủ công. Yêu cầu lỗi giữ nguyên trạng thái, không ghi nhận một khoản thu mới. Doanh thu áp dụng BR17. Nhật ký nghiệp vụ và thông tin hiển thị cho khách tuân theo BR18.
+Sai số tiền, thiếu tham chiếu cho khoản thu, nhập trùng tham chiếu chuyển khoản hay nhận tiền sau hủy cần đối chiếu thủ công. Yêu cầu lỗi giữ nguyên trạng thái, không ghi nhận một khoản thu mới. Doanh thu áp dụng BR17. Nhật ký nghiệp vụ và thông tin hiển thị cho khách tuân theo BR18.

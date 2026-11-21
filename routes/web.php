@@ -13,6 +13,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DeliveryFeeController;
+use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderIntakeController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,13 @@ Route::prefix('operations/orders')->name('operations.orders.')->middleware(['aut
     Route::get('/', [OrderIntakeController::class, 'index'])->name('index');
     Route::get('{number}', [OrderIntakeController::class, 'show'])->name('show');
     Route::post('{number}/decision', [OrderIntakeController::class, 'decide'])->name('decide');
+});
+
+Route::prefix('operations/payments')->name('operations.payments.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [ManualPaymentController::class, 'index'])->name('index');
+    Route::get('{number}', [ManualPaymentController::class, 'show'])->name('show');
+    Route::post('{number}/reconcile', [ManualPaymentController::class, 'reconcile'])->name('reconcile');
+    Route::post('{number}/refund', [ManualPaymentController::class, 'refund'])->middleware('can:access-admin')->name('refund');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
