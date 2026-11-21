@@ -21,6 +21,17 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 ])]
 class Order extends Model
 {
+    public function nextHandoffStatus(): ?OrderStatus
+    {
+        return match ($this->status) {
+            OrderStatus::Ready => $this->fulfillment_type === FulfillmentType::Delivery
+                ? OrderStatus::OutForDelivery : OrderStatus::Completed,
+            OrderStatus::OutForDelivery => $this->fulfillment_type === FulfillmentType::Delivery
+                ? OrderStatus::Completed : null,
+            default => null,
+        };
+    }
+
     /** @return HasMany<OrderItem, $this> */
     public function items(): HasMany
     {

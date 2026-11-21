@@ -13,6 +13,7 @@
             @can('operate-orders')
                 <flux:button :href="route('operations.orders.index')">Đơn chờ xác nhận</flux:button>
                 <flux:button :href="route('operations.preparation.index')">Pha chế</flux:button>
+                <flux:button :href="route('operations.handoff.index')">Bàn giao</flux:button>
                 <flux:button :href="route('operations.payments.index')">Đối chiếu thanh toán</flux:button>
             @endcan
         </div>
