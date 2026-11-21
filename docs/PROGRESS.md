@@ -312,7 +312,9 @@
 - `composer ci:check` đạt Pint, PHPStan và 191 bài SQLite với 2.847 assertion. Bộ MySQL đạt 25 bài với 439 assertion. `npm run build` thành công.
 - Hướng dẫn vận hành scheduler và đối chiếu chuyển khoản nằm trong [README](../README.md#lịch-nhận-tại-quán).
 
-### UC27 đã kiểm thử, chờ nghiệm thu
+### UC27 đã nghiệm thu
+
+- Người dùng nghiệm thu UC27 tại commit `bb64e42`. Đã tích hợp vào `develop` tại merge commit `96e1b7b` sau khi chạy lại Pint, PHPStan, 200 bài SQLite, 26 bài MySQL và bản build.
 
 - Đã triển khai chọn bàn hoặc phòng họp trên sơ đồ hai tầng, đặt chỗ theo sức chứa và giờ, tra lịch, check-in bằng mã, ghi khách đến trực tiếp và xác nhận trả chỗ. Admin quản lý trạng thái phục vụ và khung nhận lịch mới trong giới hạn BR25.
 - UC27 dùng chung quy tắc giờ, phụ phí và chuỗi vắng mặt với UC26. Scheduler `bookings:expire` xử lý hai loại lịch theo thứ tự thời điểm vắng mặt. Chỗ đã check-in vẫn được giữ cho đến khi nhân viên xác nhận khách rời đi.
