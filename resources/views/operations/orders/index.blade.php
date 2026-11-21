@@ -1,10 +1,10 @@
-<x-layouts::admin title="Đơn chờ xác nhận">
+<x-layouts::admin :title="$title">
     <section class="mx-auto max-w-3xl space-y-6">
-        <h1 class="text-2xl font-semibold sm:text-3xl">Đơn chờ xác nhận</h1>
+        <h1 class="text-2xl font-semibold sm:text-3xl">{{ $title }}</h1>
 
         @if ($orders->isEmpty())
             <p class="rounded-xl border border-coffee/15 bg-white p-5">
-                {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : 'Chưa có đơn chờ xác nhận.' }}
+                {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : $emptyMessage }}
             </p>
         @else
             <ul class="divide-y divide-coffee/15 rounded-xl border border-coffee/15 bg-white">
@@ -16,7 +16,7 @@
                             </h2>
                             <strong><x-customer.vnd :amount="$order->total_vnd" /></strong>
                         </div>
-                        <dl class="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
+                        <dl @class(['grid gap-x-4 gap-y-2 text-sm', 'sm:grid-cols-4' => $showOrderStatus, 'sm:grid-cols-3' => ! $showOrderStatus])>
                             <div>
                                 <dt class="font-medium">Giờ đặt</dt>
                                 <dd><x-customer.order-time :date="$order->created_at" /></dd>
@@ -25,6 +25,12 @@
                                 <dt class="font-medium">Cách nhận</dt>
                                 <dd>{{ $order->fulfillment_type->label() }}</dd>
                             </div>
+                            @if ($showOrderStatus)
+                                <div>
+                                    <dt class="font-medium">Trạng thái đơn</dt>
+                                    <dd>{{ $order->status->label() }}</dd>
+                                </div>
+                            @endif
                             <div>
                                 <dt class="font-medium">Thanh toán</dt>
                                 <dd>{{ $order->payment?->status->label() ?? 'Chưa có thông tin' }}</dd>

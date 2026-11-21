@@ -15,6 +15,7 @@ use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DeliveryFeeController;
 use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderIntakeController;
+use App\Http\Controllers\OrderPreparationController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'customer.home')->name('home');
@@ -47,7 +48,11 @@ Route::prefix('operations/orders')->name('operations.orders.')->middleware(['aut
     Route::get('/', [OrderIntakeController::class, 'index'])->name('index');
     Route::get('{number}', [OrderIntakeController::class, 'show'])->name('show');
     Route::post('{number}/decision', [OrderIntakeController::class, 'decide'])->name('decide');
+    Route::post('{number}/preparation', [OrderPreparationController::class, 'update'])->name('prepare');
 });
+
+Route::get('operations/preparation', [OrderPreparationController::class, 'index'])
+    ->middleware(['auth', 'can:operate-orders'])->name('operations.preparation.index');
 
 Route::prefix('operations/payments')->name('operations.payments.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('/', [ManualPaymentController::class, 'index'])->name('index');
