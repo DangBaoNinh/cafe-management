@@ -34,3 +34,14 @@ Mỗi quy tắc có mã ổn định để đặc tả UC tham chiếu. Các quy
 | Xác nhận chuyển khoản và COD | — | Theo quy trình | Theo quy trình |
 | Vai trò, danh mục, phí, ưu đãi, tra cứu khách và doanh thu | — | — | Được cấp |
 | Hủy ngoại lệ và xác nhận hoàn | — | — | Theo BR13 và BR15 |
+
+## Quy tắc mở rộng UC26 và UC27
+
+Các quy tắc dưới đây là thiết kế đề xuất cho hai UC mới.
+
+| Mã | Quy tắc |
+| --- | --- |
+| BR21 | Hẹn giờ chỉ áp dụng khi nhận tại quán, phí giao bằng 0 theo BR08. Kiểm tra khung, thời hạn đặt và sức chứa trên backend. Cấp chỗ trong transaction checkout. Hủy hoặc từ chối trả chỗ và làm phiếu mất hiệu lực. |
+| BR22 | Phiếu điện tử có mã tra cứu duy nhất, khó đoán. Chỉ chủ đơn xem phiếu, chỉ staff/admin đang hoạt động tra cứu và bàn giao. Kiểm tra đơn sẵn sàng, thanh toán và hiệu lực mã. Ghi bàn giao và dùng phiếu trong cùng transaction, áp dụng BR14 và UC19. |
+| BR23 | Một đặt chỗ giữ một bàn hoặc một phòng đủ sức chứa, đang hoạt động, trong giờ mở cửa. Hai lịch giữ chỗ trên cùng tài nguyên không được giao nhau theo khoảng `[bắt đầu, kết thúc)`. Khóa tài nguyên và kiểm tra lại khi ghi. |
+| BR24 | Khách chỉ xem hoặc hủy đặt chỗ của mình. Staff/admin tra lịch, hủy có lý do, check-in, ghi không đến hoặc hoàn tất theo UC27. Chỉ admin cấu hình danh mục chỗ. Hủy giải phóng khoảng đã giữ. Ghi lịch sử trạng thái và tác nhân trong transaction. |

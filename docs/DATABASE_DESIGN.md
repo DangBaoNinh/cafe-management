@@ -87,3 +87,17 @@ erDiagram
 - Dùng `unsignedBigInteger` cho số tiền VND, đặt hậu tố `_vnd` cho cột chỉ chứa tiền và tính bằng số nguyên. Dữ liệu có thể biểu diễn cả tiền và tỷ lệ, như `coupons.discount_value`, phải được đọc theo kiểu giảm giá.
 - Laravel chạy ở UTC và kết nối MySQL đặt phiên ở `+00:00`. Đổi giờ sang `Asia/Ho_Chi_Minh` ở biên hiển thị và đổi hai mốc ngày địa phương sang UTC trước khi truy vấn. MySQL tự đổi múi giờ của cột `TIMESTAMP` khi đọc/ghi. Với `DATETIME`, ứng dụng phải chuyển đầu vào sang UTC trước khi ghi. [MySQL 8.4 Reference Manual](https://dev.mysql.com/doc/refman/8.4/en/time-zone-support.html)
 - Khi tích hợp TECH01, Laravel lấy giờ UTC từ cấu hình ứng dụng. Có thể bỏ `APP_TIMEZONE` cũ khỏi `.env`. Làm mới cache cấu hình và khởi động lại tiến trình Laravel chạy lâu nếu đang sử dụng. Schema Laragon đã đối chiếu dùng InnoDB, `utf8mb4` và từng có múi giờ phiên trùng giờ ứng dụng (+07:00), nên chuyển phiên sang UTC giữ nguyên thời điểm đã lưu. Với môi trường có lịch sử múi giờ khác, đối chiếu thời điểm đã biết trên bản sao trước khi áp dụng.
+
+## 6. Dữ liệu đề xuất cho UC26 và UC27
+
+Thiết kế dưới đây bổ sung vào mô hình MVP khi triển khai [UC26](use-cases/UC26.md) và [UC27](use-cases/UC27.md). Lưu các mốc theo UTC, hiển thị theo giờ Việt Nam.
+
+| Dữ liệu | Trường và ràng buộc chính |
+| --- | --- |
+| Khung nhận tại quán | Giờ bắt đầu/kết thúc, giới hạn số đơn, trạng thái mở. Khóa hàng khung giờ khi cấp chỗ hoặc trả chỗ. |
+| Phiếu nhận | FK đơn unique, FK khung giờ, mốc giờ hẹn, mã tra cứu unique, thời điểm dùng hoặc vô hiệu. Giữ phí và thanh toán trong đơn gốc. Chỉ giữ sức chứa cho đơn đã cấp chỗ và chưa hủy/từ chối. |
+| Bàn và phòng | Mã chỗ unique, tầng 1 hoặc 2, loại bàn/phòng họp, sức chứa và trạng thái phục vụ. Giữ chỗ đã có lịch sử để tra cứu. |
+| Đặt chỗ | FK khách và FK chỗ, mã đặt unique, tên và điện thoại liên hệ, số khách, `starts_at`, `ends_at`, trạng thái và khóa gửi lại duy nhất theo khách. Index theo chỗ, trạng thái và giờ bắt đầu. |
+| Lịch sử đặt chỗ | FK đặt chỗ, người thao tác, thời điểm, trạng thái trước/sau và lý do khi cần. |
+
+UC26 cấp chỗ trong cùng transaction tạo đơn. Khi thay đổi hiệu lực phiếu, khóa và đối chiếu đơn cùng dữ liệu khung theo thứ tự nhất quán. Khung giờ đã có phiếu giữ nguyên mốc hẹn của khách. Hai giao dịch UC27 giữ cùng chỗ phải khóa hàng chỗ trước rồi kiểm tra giao nhau trên các lịch `confirmed` hoặc `checked_in` bằng điều kiện `existing.starts_at < requested.end` và `existing.ends_at > requested.start`. Dùng phép đọc thấy dữ liệu đã commit mới nhất sau khi lấy khóa. Kiểm chứng tranh chấp đồng thời trên MySQL thử nghiệm.
