@@ -14,6 +14,7 @@
             ['operations.orders.index', 'operations.orders.*', 'Đơn chờ xác nhận'],
             ['operations.preparation.index', 'operations.preparation.*', 'Pha chế'],
             ['operations.handoff.index', 'operations.handoff.*', 'Bàn giao'],
+            ['operations.pickups.index', 'operations.pickups.*', 'Lịch nhận tại quán'],
             ['operations.payments.index', 'operations.payments.*', 'Đối chiếu thanh toán'],
         ],
         'Cửa hàng' => $canAdminister ? [

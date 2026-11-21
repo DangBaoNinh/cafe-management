@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -15,19 +16,20 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * @property int $id
+ * @property positive-int $id
  * @property string $name
  * @property string $email
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property UserRole $role
  * @property bool $is_active
+ * @property CarbonImmutable|null $booking_blocked_until
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'booking_no_shows', 'booking_blocked_until'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -36,6 +38,7 @@ class User extends Authenticatable
     protected $attributes = [
         'role' => UserRole::Customer->value,
         'is_active' => true,
+        'booking_no_shows' => 0,
     ];
 
     /**
@@ -50,6 +53,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => UserRole::class,
             'is_active' => 'boolean',
+            'booking_no_shows' => 'integer',
+            'booking_blocked_until' => 'immutable_datetime',
         ];
     }
 

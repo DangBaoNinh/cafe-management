@@ -15,6 +15,7 @@ final readonly class CheckoutDetails
         public string $phone,
         public ?int $addressId,
         public ?string $couponCode,
+        public ?string $pickupTime = null,
     ) {}
 
     /** @return array<string, int|string|null> */
@@ -28,6 +29,6 @@ final readonly class CheckoutDetails
             'phone' => $this->phone,
             'address_id' => $this->addressId,
             'coupon_code' => $this->couponCode,
-        ];
+        ] + ($this->pickupTime === null ? [] : ['pickup_time' => $this->pickupTime]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\FulfillmentType;
 use App\Enums\OrderStatus;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 /**
  * @property FulfillmentType $fulfillment_type
  * @property OrderStatus $status
+ * @property CarbonImmutable|null $completed_at
  * @property array<string, string|null>|null $address_snapshot
  */
 #[Fillable([
@@ -42,6 +44,12 @@ class Order extends Model
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
+    }
+
+    /** @return HasOne<ScheduledPickup, $this> */
+    public function scheduledPickup(): HasOne
+    {
+        return $this->hasOne(ScheduledPickup::class);
     }
 
     /** @return HasOne<DemoShipment, $this> */

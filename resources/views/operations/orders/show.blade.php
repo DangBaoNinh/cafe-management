@@ -39,6 +39,13 @@
 
         <x-customer.order-snapshot :order="$order" />
 
+        @if ($pickup = $order->scheduledPickup)
+            <p class="text-sm">
+                Hẹn nhận lúc <x-customer.order-time :date="$pickup->scheduled_at" />
+                · <flux:link :href="route('operations.pickups.show', $pickup->code)">Tra cứu phiếu nhận</flux:link>
+            </p>
+        @endif
+
         @if ($order->status === \App\Enums\OrderStatus::Pending)
             <section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 <h2 class="text-lg font-semibold">Quyết định tiếp nhận</h2>
@@ -63,7 +70,7 @@
             </section>
         @elseif (in_array($order->status, [\App\Enums\OrderStatus::Confirmed, \App\Enums\OrderStatus::Preparing], true))
             @include('operations.orders.preparation-actions')
-        @elseif ($order->demoShipment === null && ($handoffTarget = $order->nextHandoffStatus()) !== null)
+        @elseif ($pickup === null && $order->demoShipment === null && ($handoffTarget = $order->nextHandoffStatus()) !== null)
             @include('operations.orders.handoff-actions', ['target' => $handoffTarget])
         @endif
 

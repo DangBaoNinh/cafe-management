@@ -7,6 +7,9 @@
 
         <div class="space-y-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <p class="font-semibold">{{ $details->fulfillment->label() }} · {{ $details->method->label() }}</p>
+            @if ($details->pickupTime !== null)
+                <p>Giờ hẹn nhận tại quán · {{ $details->pickupTime }} (giờ Việt Nam)</p>
+            @endif
             <p class="wrap-anywhere">{{ $order['recipient_name'] }} · {{ $order['phone'] }}</p>
             @if ($address = $order['address_snapshot'])
                 <p class="wrap-anywhere">{{ implode(', ', array_filter([

@@ -7,6 +7,8 @@
     $fulfillment = old('fulfillment_type', 'pickup');
     $method = old('method', 'cod');
     $addressId = old('address_id');
+    $pickupTime = old('pickup_time');
+    $pickupMode = old('pickup_mode', is_string($pickupTime) && $pickupTime !== '' ? 'scheduled' : 'now');
     $inlineErrorFields = ['recipient_name', 'phone', 'fulfillment_type', 'method', 'coupon_code'];
     if ($addresses->isNotEmpty()) {
         $inlineErrorFields[] = 'address_id';
@@ -27,7 +29,8 @@
             </ul>
         @endif
 
-        <form method="POST" action="{{ route('checkout.review') }}" class="space-y-5 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-6">
+        <form method="POST" action="{{ route('checkout.review') }}" class="space-y-5 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-6"
+            data-checkout-pickup>
             @csrf
             <input type="hidden" name="cart_version" value="{{ $cartVersion }}">
 
@@ -43,6 +46,17 @@
                     <flux:select.option :value="$type->value" :selected="$fulfillment === $type->value">{{ $type->label() }}</flux:select.option>
                 @endforeach
             </flux:select>
+
+            <fieldset class="space-y-3" data-pickup-mode>
+                <flux:select name="pickup_mode" label="Thời điểm nhận tại quán">
+                    <flux:select.option value="now" :selected="$pickupMode === 'now'">Nhận ngay</flux:select.option>
+                    <flux:select.option value="scheduled" :selected="$pickupMode === 'scheduled'">Hẹn giờ</flux:select.option>
+                </flux:select>
+                <fieldset data-pickup-slot>
+                    <x-customer.pickup-slot :date="is_string($pickupTime) ? substr($pickupTime, 0, 10) : null"
+                        :time="is_string($pickupTime) ? substr($pickupTime, 11) : null" :required="false" />
+                </fieldset>
+            </fieldset>
 
             @if ($addresses->isEmpty())
                 <p class="text-sm">Để chọn giao tận nơi, hãy <flux:link :href="route('addresses.index')">thêm địa chỉ giao hàng</flux:link>.</p>

@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\Topping;
 use App\Models\User;
 use App\Models\UserAddress;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -34,6 +35,8 @@ class Checkout
     /** @return Quote */
     public function preview(User $user, CheckoutDetails $details): array
     {
+        $this->pickupSlot($user, $details);
+
         return DB::transaction(fn (): array => $this->price(
             $user,
             $user->cart()->first(),
@@ -65,17 +68,43 @@ class Checkout
                 return $existing;
             }
 
+            $slot = $this->pickupSlot($customer, $details);
             $quote = $this->price($customer, $cart, $details, $coupon);
             if ($quote['order']['total_vnd'] !== $acceptedTotal || ! hash_equals($quote['hash'], $quoteHash)) {
                 throw $this->invalid('accepted_total_vnd', 'Thông tin hoặc giá đã thay đổi. Vui lòng xem lại tổng tiền trước khi đặt hàng.', 409);
             }
 
             $order = $this->saveOrder($customer, $details, $quote, $key, $requestHash);
+            if ($slot !== null) {
+                $order->scheduledPickup()->create([
+                    'code' => strtoupper(bin2hex(random_bytes(8))),
+                    'scheduled_at' => $slot,
+                    'arrival_deadline' => $slot->addMinutes(30),
+                ]);
+            }
             $cart->items()->delete();
             $cart->increment('version');
 
             return $order;
         }, 5);
+    }
+
+    private function pickupSlot(User $user, CheckoutDetails $details): ?CarbonImmutable
+    {
+        if ($details->pickupTime === null) {
+            return null;
+        }
+        if ($details->fulfillment !== FulfillmentType::Pickup) {
+            throw $this->invalid('pickup_time', 'Hẹn giờ chỉ áp dụng khi nhận tại quán.');
+        }
+
+        try {
+            BookingRules::authorizeBooking($user);
+
+            return BookingRules::slot($details->pickupTime);
+        } catch (ValidationException $exception) {
+            throw $exception->redirectTo(route('checkout.create'));
+        }
     }
 
     /** @return BankDetails|null */

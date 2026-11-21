@@ -22,6 +22,7 @@ use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Controllers\ScheduledPickupController;
 use App\Http\Controllers\StorefrontChatController;
 use App\Http\Middleware\EnsureDemoDeliveryEnabled;
 use App\Http\Middleware\EnsureDemoPaymentEnabled;
@@ -55,6 +56,7 @@ Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-custom
     Route::get('/', [CustomerOrderController::class, 'index'])->name('index');
     Route::get('{number}', [CustomerOrderController::class, 'show'])->name('show');
     Route::post('{number}/cancel', [CustomerOrderController::class, 'cancel'])->name('cancel');
+    Route::post('{number}/reschedule-pickup', [ScheduledPickupController::class, 'reschedule'])->name('reschedule-pickup');
     Route::prefix('{number}/demo-payment')->name('demo-payment.')->middleware(EnsureDemoPaymentEnabled::class)->group(function () {
         Route::post('/', [DemoPaymentController::class, 'start'])->name('start');
         Route::get('{reference}', [DemoPaymentController::class, 'show'])->whereUuid('reference')->name('show');
@@ -85,6 +87,17 @@ Route::get('operations/preparation', [OrderPreparationController::class, 'index'
 
 Route::get('operations/handoff', [OrderHandoffController::class, 'index'])
     ->middleware(['auth', 'can:operate-orders'])->name('operations.handoff.index');
+
+Route::prefix('operations/pickups')->name('operations.pickups.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [ScheduledPickupController::class, 'index'])->name('index');
+    Route::post('lookup', [ScheduledPickupController::class, 'lookup'])->name('lookup');
+    Route::get('{code}', [ScheduledPickupController::class, 'show'])->name('show');
+    Route::post('{code}/arrival', [ScheduledPickupController::class, 'arrive'])->name('arrive');
+    Route::post('{code}/handoff', [ScheduledPickupController::class, 'handoff'])->name('handoff');
+    Route::post('{code}/fees/{fee}/resolve', [ScheduledPickupController::class, 'resolve'])->whereNumber('fee')->name('resolve');
+    Route::post('{code}/fees/{fee}/counter', [ScheduledPickupController::class, 'moveToCounter'])->whereNumber('fee')->name('counter');
+    Route::post('{code}/fees/{fee}/refund', [ScheduledPickupController::class, 'refund'])->whereNumber('fee')->middleware('can:access-admin')->name('refund');
+});
 
 Route::prefix('operations/payments')->name('operations.payments.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('/', [ManualPaymentController::class, 'index'])->name('index');
