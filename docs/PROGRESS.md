@@ -264,6 +264,13 @@
 - Đã chốt phong cách Terrasse và triển khai trên nhánh `feature/storefront-templates` cho trang chủ, thực đơn và layout đặt món của khách hàng, cùng layout quản trị và vận hành. Tổng quan quản trị dùng số liệu báo cáo thật. Hàng đợi vận hành hiển thị thẻ đơn từ dữ liệu hiện có.
 - `npm run build` thành công. SQLite đạt 173 bài kiểm thử với 2.554 assertion. Báo cáo doanh thu trên MySQL thử nghiệm đạt 1 bài với 13 assertion. Đã xác nhận trên Edge tại 320, 390 và 1440 px, gồm chuyển một đơn thử từ chờ xác nhận sang hàng đợi pha chế.
 
+## Tích hợp bản trình diễn
+
+- Đã nghiệm thu giao diện Terrasse, seeder thực đơn mẫu và bản sửa chuyển hướng đăng nhập. Quản trị viên đăng nhập trực tiếp vào trang tổng quan quản trị. Nếu đã mở một trang quản trị trước khi đăng nhập, ứng dụng quay lại trang đó. Nhân viên và khách tiếp tục vào trang tài khoản theo mặc định.
+- `DemoMenuSeeder` thêm 24 món mẫu thuộc 6 danh mục, với 48 size và 8 topping trên cơ sở dữ liệu trống. Đã kiểm tra chạy hai lần trên SQLite mà số bản ghi không tăng. Brave ở 360 px xác nhận chuyển hướng đúng cho ba vai trò, CSS Terrasse và truy cập thực đơn mẫu.
+- Bản tích hợp đạt Pint, PHPStan, 176 bài SQLite với 2.569 assertion, 24 bài MySQL với 417 assertion và `npm run build`.
+- Đã xử lý xung đột với nhánh tài liệu Git Flow cũ và giữ hướng dẫn dự án hiện hành.
+
 ## Kết quả kiểm tra nền tảng ban đầu
 
 - Laravel 13.43.0 chạy trên PHP 8.3.37 của Laragon. Composer xác nhận các yêu cầu nền tảng và file cấu hình hợp lệ.
@@ -276,6 +283,5 @@
 
 ## Việc còn lại
 
-- Nhánh `chore/gitflow-setup` chờ review.
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.
