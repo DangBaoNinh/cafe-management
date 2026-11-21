@@ -89,6 +89,88 @@
 .terrasse-account-link:focus-visible { outline: 2px solid var(--color-accent); }
 .terrasse-account-icon { display: grid; flex: 0 0 2.5rem; aspect-ratio: 1; place-items: center; border-radius: 50%; background: #f0e2d7; color: var(--color-accent); }
 
+.terrasse-settings {
+    --terrasse-setting-highlight: #f2e3d8;
+    --terrasse-setting-field: #fffdf8;
+}
+
+.dark .terrasse-settings {
+    --color-cream: #26191b;
+    --color-accent: #f0bb92;
+    --color-accent-foreground: #351b21;
+    --color-accent-content: #f0bb92;
+    --terrasse-ink: #fff0de;
+    --terrasse-muted: #dfc4b5;
+    --terrasse-line: #735055;
+    --terrasse-paper: #322226;
+    --terrasse-setting-highlight: #503036;
+    --terrasse-setting-field: #281a1e;
+
+    color-scheme: dark;
+}
+
+.dark .terrasse-settings :where(input, textarea, select, [data-flux-control]) { color-scheme: dark; }
+.terrasse-settings-header {
+    padding-block: clamp(1.4rem, 4vw, 2.65rem);
+    background-position: right 52%;
+}
+.terrasse-settings-header a { color: var(--terrasse-gold); }
+.terrasse-settings-header a:hover { text-decoration: underline; text-underline-offset: .25em; }
+.terrasse-settings-header a:focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-settings-nav a { border-inline-start: 2px solid transparent; }
+.terrasse-settings-nav a:hover, .terrasse-settings-nav a[aria-current] {
+    background: var(--terrasse-setting-highlight);
+    color: var(--color-accent-content);
+}
+.terrasse-settings-nav a[aria-current] { border-inline-start-color: currentColor; font-weight: 600; }
+.terrasse-settings-panel { padding: clamp(1rem, 3vw, 2rem); }
+.terrasse-settings-panel-header { border-bottom: 1px solid var(--terrasse-line); padding-bottom: 1.15rem; }
+.terrasse-settings-panel :is(input:not([type="radio"], [type="checkbox"]), select):where([data-flux-control]) {
+    border-color: var(--terrasse-line);
+    background-color: var(--terrasse-setting-field);
+}
+.terrasse-settings-panel :is(input, select)[aria-invalid="true"] { border-color: var(--color-red-500); }
+.terrasse-settings-jump { color: var(--color-accent-content); }
+.terrasse-address-card { border: 1px solid var(--terrasse-line); background: var(--terrasse-setting-field); }
+.terrasse-address-empty { border: 1px dashed var(--terrasse-line); }
+.terrasse-address-form { scroll-margin-top: 1rem; }
+
+.terrasse-theme-option {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--terrasse-line);
+    border-radius: .5rem;
+}
+.terrasse-theme-option:hover, .terrasse-theme-option:has(:checked) { border-color: var(--color-accent); }
+.terrasse-theme-option:has(:checked) { background: var(--terrasse-setting-highlight); }
+.terrasse-theme-option:has(:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.terrasse-theme-option input { accent-color: var(--color-accent); }
+.terrasse-theme-preview {
+    display: grid;
+    align-items: end;
+    min-height: 5.25rem;
+    padding: .75rem;
+    background: linear-gradient(#762d39 0 24%, transparent 24%), #f6efe3;
+}
+.terrasse-theme-preview[data-theme="dark"] { background-color: #26191b; }
+.terrasse-theme-preview[data-theme="system"] {
+    background: linear-gradient(#762d39 0 24%, transparent 24%), linear-gradient(120deg, #f6efe3 50%, #26191b 50%);
+}
+.terrasse-theme-preview span {
+    display: block;
+    width: 72%;
+    height: 2.25rem;
+    border: 1px solid #b88b7f;
+    border-radius: .25rem;
+    background:
+        linear-gradient(#ac786b, #ac786b) .5rem .55rem / 42% 2px no-repeat,
+        linear-gradient(#ac786b, #ac786b) .5rem .95rem / 28% 2px no-repeat,
+        #fffaf2;
+}
+.terrasse-theme-preview[data-theme="dark"] span { background-color: #39272c; }
+.terrasse-theme-preview[data-theme="system"] span { background-color: #ead0ba; }
+
 .terrasse-workspace { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: 100vh; }
 .terrasse-sidebar { background: var(--color-coffee); color: #fcebd9; }
 .terrasse-sidebar .terrasse-brand-mark { color: var(--terrasse-gold); }

@@ -1,11 +1,11 @@
-@props(['title' => null, 'fullBleed' => false])
+@props(['title' => null, 'fullBleed' => false, 'settings' => false])
 
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="terrasse flex min-h-screen flex-col font-sans antialiased">
+    <body @class(['terrasse flex min-h-screen flex-col font-sans antialiased', 'terrasse-settings' => $settings])>
         <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-white focus:p-3">Đến nội dung chính</a>
         <header id="store-header" class="terrasse-store-header" tabindex="-1">
             <nav aria-label="Điều hướng chính" class="terrasse-frame flex flex-wrap items-center justify-between gap-4 py-4">
@@ -27,7 +27,7 @@
                                 @if (request()->routeIs('orders.*')) aria-current="page" @endif
                                 class="terrasse-store-link">Đơn của tôi</a>
                         @endcan
-                        <a href="{{ route('dashboard') }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif
+                        <a href="{{ route('dashboard') }}" @if (request()->routeIs('dashboard')) aria-current="page" @elseif ($settings) aria-current="location" @endif
                             class="terrasse-store-link">Tài khoản</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -45,5 +45,15 @@
             {{ $slot }}
         </main>
         <x-terrasse.store-footer />
+
+        @if ($settings)
+            @persist('toast')
+                <flux:toast.group>
+                    <flux:toast />
+                </flux:toast.group>
+            @endpersist
+
+            @fluxScripts
+        @endif
     </body>
 </html>

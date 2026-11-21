@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Cài đặt hồ sơ')] class extends Component {
+new #[Layout('layouts::settings')] #[Title('Cài đặt hồ sơ')] class extends Component {
     use ProfileValidationRules;
 
     public string $name = '';
@@ -66,28 +67,15 @@ new #[Title('Cài đặt hồ sơ')] class extends Component {
 
 }; ?>
 
-<section class="w-full">
-    @include('partials.settings-heading')
-
-    <flux:heading level="2" class="sr-only">{{ __('Profile settings') }}</flux:heading>
-
+<div class="min-w-0">
     <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
-        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+        <form wire:submit="updateProfileInformation" class="max-w-lg space-y-5">
+            <flux:input wire:model="name" :label="__('Name')" type="text" required autocomplete="name" />
+            <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
 
-            <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
-
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
-                        {{ __('Save') }}
-                    </flux:button>
-                </div>
-
-            </div>
+            <flux:button variant="primary" type="submit" data-test="update-profile-button">
+                Lưu hồ sơ
+            </flux:button>
         </form>
     </x-pages::settings.layout>
-</section>
+</div>

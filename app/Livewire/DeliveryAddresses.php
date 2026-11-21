@@ -9,10 +9,12 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Layout('layouts::settings')]
 #[Title('Địa chỉ giao hàng')]
 class DeliveryAddresses extends Component
 {
