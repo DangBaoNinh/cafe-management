@@ -25,6 +25,18 @@ class RecipeInventoryTest extends TestCase
 
     private const START = ['expected_status' => 'confirmed', 'target_status' => 'preparing'];
 
+    public function test_staff_sees_a_vietnamese_forbidden_page_when_opening_an_ingredient(): void
+    {
+        $this->app->setLocale('vi');
+        $ingredient = $this->ingredient('Sữa tươi', 'ml');
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+
+        $this->actingAs($staff)->get(route('admin.inventory.show', $ingredient))
+            ->assertForbidden()
+            ->assertSeeText('Bạn không có quyền truy cập.')
+            ->assertDontSeeText('This action is unauthorized.');
+    }
+
     public function test_admin_can_initialize_and_reconcile_stock_with_an_auditable_ledger(): void
     {
         $admin = User::factory()->create(['role' => UserRole::Admin]);
