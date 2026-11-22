@@ -13,11 +13,13 @@ class FilterOrdersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => ['nullable', 'string', 'max:32', 'regex:/\A[A-Za-z0-9-]+\z/'],
+            'number' => ['nullable', 'string', 'max:36', 'regex:/\A[A-Za-z0-9-]+\z/'],
             'from' => ['nullable', 'date_format:Y-m-d'],
             'to' => ['nullable', 'date_format:Y-m-d', Rule::when($this->filled('from'), 'after_or_equal:from')],
-            'status' => ['nullable', Rule::enum(OrderStatus::class)],
-            'method' => ['nullable', Rule::enum(PaymentMethod::class)],
+            'status' => ['nullable', Rule::in([...array_column(OrderStatus::cases(), 'value'), 'pending_payment'])],
+            'method' => ['nullable', Rule::in([...array_column(PaymentMethod::cases(), 'value'), 'cash', 'counter'])],
+            'source' => ['nullable', Rule::in(['online', 'counter', 'legacy'])],
+            'display_status' => ['nullable', Rule::in(['paid', 'cancelled', 'pending'])],
         ];
     }
 
@@ -43,6 +45,6 @@ class FilterOrdersRequest extends FormRequest
 
     protected function getRedirectUrl(): string
     {
-        return route('admin.orders.index');
+        return route($this->routeIs('admin.invoices.*') ? 'admin.invoices.index' : 'admin.orders.index');
     }
 }

@@ -1,9 +1,10 @@
+@php($adminInvoice = $adminInvoice ?? false)
 <article class="invoice-sheet receipt-page">
     <div data-no-print>@include('table-orders.feedback')</div>
     <div class="receipt-toolbar" data-no-print>
-        <flux:link :href="$customer ? route('table-orders.show', $invoice->tableSession->seat->code) : route('operations.table-sessions.index')">{{ $customer ? 'Về bàn' : 'Quay về nhận order' }}</flux:link>
+        @if(!$adminInvoice)<flux:link :href="$customer ? route('table-orders.show', $invoice->tableSession->seat->code) : route('operations.table-sessions.index')">{{ $customer ? 'Về bàn' : 'Quay về nhận order' }}</flux:link>@endif
         <flux:button type="button" data-print-invoice>In {{ $invoice->status === 'paid' ? 'hóa đơn' : 'tạm tính' }}</flux:button>
-        @if(!$customer && $invoice->status === 'draft')<flux:button :href="route('operations.table-sessions.pos', [$invoice->tableSession, 'round' => $invoice->table_round_id])">Sửa order</flux:button>@endif
+        @if(!$adminInvoice && !$customer && $invoice->status === 'draft')<flux:button :href="route('operations.table-sessions.pos', [$invoice->tableSession, 'round' => $invoice->table_round_id])">Sửa order</flux:button>@endif
     </div>
     <section class="receipt-paper" aria-label="{{ $invoice->status === 'paid' ? 'Hóa đơn thanh toán' : 'Hóa đơn tạm tính' }}">
         <x-receipt.header :title="match($invoice->status) { 'paid' => 'Hóa đơn thanh toán', 'voided' => 'Hóa đơn đã hủy', default => 'Hóa đơn tạm tính' }" :number="$invoice->number" />
@@ -41,7 +42,7 @@
             <p><strong>Cảm ơn Quý khách!</strong></p><p>Hẹn gặp lại tại Toàn Café &amp; Jardin.</p>
         </footer>
     </section>
-    @if(!$customer && $invoice->status === 'draft')
+    @if(!$adminInvoice && !$customer && $invoice->status === 'draft')
         <section class="receipt-actions" data-no-print>
             <p>Kiểm tra tạm tính và xác nhận đã thu đủ tiền {{ $invoice->method->label() }}.</p>
             <form method="POST" action="{{ route('operations.invoices.prepaid.pay', $invoice) }}">@csrf<input type="hidden" name="revision" value="{{ $invoice->revision }}"><flux:button type="submit" variant="primary">Hoàn tất thanh toán</flux:button></form>
@@ -57,6 +58,6 @@
             <flux:link :href="route('table-orders.invoice.show', [$invoice->tableSession->seat->code, $invoice])">Cập nhật thanh toán</flux:link>
         </section>
     @endif
-    @if(!$customer && $invoice->status === 'paid')<div class="receipt-actions" data-no-print><flux:button variant="primary" :href="route('operations.table-sessions.index')">Quay về nhận order</flux:button></div>@endif
-    @if($invoice->status === 'paid')<p role="status" data-no-print>Đã hoàn tất thanh toán và xuất hóa đơn. Trạng thái bàn: {{ $invoice->tableSession->seat->availabilityLabel() }}.</p>@endif
+    @if(!$adminInvoice && !$customer && $invoice->status === 'paid')<div class="receipt-actions" data-no-print><flux:button variant="primary" :href="route('operations.table-sessions.index')">Quay về nhận order</flux:button></div>@endif
+    @if(!$adminInvoice && $invoice->status === 'paid')<p role="status" data-no-print>Đã hoàn tất thanh toán và xuất hóa đơn. Trạng thái bàn: {{ $invoice->tableSession->seat->availabilityLabel() }}.</p>@endif
 </article>

@@ -78,14 +78,17 @@ class TableRounds
         }, 5);
     }
 
-    public function advance(User $actor, TableSession $target, string $roundId, TableRoundStatus $expected, TableRoundStatus $next, ?string $reason): void
+    public function advance(User $actor, TableSession $target, string $roundId, TableRoundStatus $expected, TableRoundStatus $next, ?string $reason, ?int $invoiceRevision = null): void
     {
         Gate::forUser($actor)->authorize('operate-orders');
 
-        DB::transaction(function () use ($actor, $target, $roundId, $expected, $next, $reason): void {
+        DB::transaction(function () use ($actor, $target, $roundId, $expected, $next, $reason, $invoiceRevision): void {
             $trackStock = $next === TableRoundStatus::Preparing && $this->inventory->lockForOperation();
             $session = TableSession::query()->lockForUpdate()->findOrFail($target->id);
             $round = $session->rounds()->findOrFail($roundId);
+            if ($invoiceRevision !== null) {
+                $this->require($round->invoice?->revision === $invoiceRevision, 'Phiếu đã thay đổi. Vui lòng tải lại trước khi hủy.');
+            }
             $prepaid = $session->billing_mode === 'prepaid';
             $this->require($prepaid || (in_array($session->status, [TableSessionStatus::Open, TableSessionStatus::Closing], true) && $session->billed_at === null),
                 'Hóa đơn đã chốt hoặc phiên đã kết thúc.');

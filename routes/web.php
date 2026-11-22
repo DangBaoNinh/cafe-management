@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CounterOrderController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -201,6 +202,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
             Route::delete('{ingredient}', [InventoryRecipeController::class, 'destroy'])->whereNumber('ingredient')->name('destroy');
         });
     });
+    Route::post('counter-orders/{invoice}/status/preview', [CounterOrderController::class, 'preview'])->name('counter-orders.preview');
+    Route::post('counter-orders/{invoice}/status', [CounterOrderController::class, 'update'])->name('counter-orders.update');
+    Route::get('invoices', [OrderController::class, 'index'])->name('invoices.index');
+    Route::get('invoices/{number}', [OrderController::class, 'show'])->name('invoices.show');
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{number}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{number}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');

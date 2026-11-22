@@ -1,8 +1,9 @@
 <nav aria-label="Điều hướng nội bộ" class="french-internal-nav space-y-5">
     @foreach ($sections as $label => $links)
         @continue($links === [])
-        <div>
-            <p class="sidebar-label">{{ $label }}</p>
+        @php($sectionActive = collect($links)->contains(fn ($link) => request()->routeIs($link[1])))
+        <details class="nav-section" name="workspace-navigation" @if($sectionActive) open @endif>
+            <summary class="sidebar-label">{{ $label }} <span class="nav-chevron" aria-hidden="true">⌄</span></summary>
             <ul class="space-y-1 text-sm">
                 @foreach ($links as [$route, $pattern, $text])
                     <li>
@@ -12,7 +13,7 @@
                     </li>
                 @endforeach
             </ul>
-        </div>
+        </details>
     @endforeach
 
     <div class="border-t border-terrasse-ink/15 pt-3 text-sm">
