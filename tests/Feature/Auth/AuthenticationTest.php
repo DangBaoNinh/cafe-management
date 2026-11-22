@@ -17,6 +17,17 @@ class AuthenticationTest extends TestCase
         $this->get(route('login'))->assertOk();
     }
 
+    public function test_storefront_has_one_mobile_account_action_per_auth_state(): void
+    {
+        $guest = $this->get(route('home'))->assertOk()->getContent();
+        $this->assertSame(1, substr_count($guest, 'class="french-mobile-register"'));
+        $this->assertStringNotContainsString('class="french-mobile-logout"', $guest);
+
+        $customer = $this->actingAs(User::factory()->create())->get(route('home'))->assertOk()->getContent();
+        $this->assertSame(1, substr_count($customer, 'class="french-mobile-logout"'));
+        $this->assertStringNotContainsString('class="french-mobile-register"', $customer);
+    }
+
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
         $user = User::factory()->create();
