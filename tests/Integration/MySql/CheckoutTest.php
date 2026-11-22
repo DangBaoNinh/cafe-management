@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\User;
 use App\Services\ShoppingCart;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -15,6 +16,10 @@ class CheckoutTest extends MySqlTestCase
     public function test_checkout_locks_the_coupon_before_reading_redemptions_and_rejects_the_second_order(): void
     {
         DB::setDefaultConnection($this->primary->getName());
+        $this->travelTo(CarbonImmutable::parse('2026-11-23 10:00', 'Asia/Ho_Chi_Minh')->utc());
+        config(['checkout.bank_transfer' => [
+            'bank_name' => 'Ngân hàng thử', 'account_number' => '00123456', 'account_holder' => 'Quán thử',
+        ]]);
         $this->primary->beginTransaction();
 
         try {
@@ -30,6 +35,9 @@ class CheckoutTest extends MySqlTestCase
             $first = User::factory()->create();
             $second = User::factory()->create();
             foreach ([$first, $second] as $customer) {
+                $customer->forceFill(['linked_bank' => [
+                    'bank_name' => 'Ngân hàng thử', 'account_number' => '0123456789', 'account_holder' => 'KHACH THU',
+                ]])->save();
                 app(ShoppingCart::class)->add($customer, $product->id, ['size_id' => $size->id], 1);
             }
 
@@ -52,6 +60,8 @@ class CheckoutTest extends MySqlTestCase
                 ->assertUnprocessable()->assertJsonValidationErrors('coupon_code');
             $order = $first->orders()->sole();
             $this->assertSame(30000, $order->total_vnd);
+            $this->assertSame('bank_transfer', $order->payment()->sole()->method->value);
+            $this->assertSame('10:15', $order->scheduledPickup()->sole()->scheduled_at->setTimezone('Asia/Ho_Chi_Minh')->format('H:i'));
             $this->assertSame(0, $first->cart()->sole()->items()->count());
             $this->assertSame(1, $second->cart()->sole()->items()->count());
             $this->assertFalse($second->orders()->exists());
@@ -94,7 +104,8 @@ class CheckoutTest extends MySqlTestCase
 
             app(ShoppingCart::class)->add($second, $product->id, ['size_id' => $size->id], 1);
             $review = [
-                'cart_version' => $second->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'cod',
+                'cart_version' => $second->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'bank_transfer',
+                'pickup_time' => '2026-11-23 10:15',
                 'recipient_name' => 'Khách thử', 'phone' => '0901234567', 'coupon_code' => $coupon->code,
             ];
             $this->actingAs($second)->postJson(route('checkout.review'), $review)
@@ -118,7 +129,8 @@ class CheckoutTest extends MySqlTestCase
     private function submission(User $user, Coupon $coupon): array
     {
         $details = [
-            'cart_version' => $user->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'cod',
+            'cart_version' => $user->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'bank_transfer',
+            'pickup_time' => '2026-11-23 10:15',
             'recipient_name' => 'Khách thử', 'phone' => '0901234567', 'coupon_code' => $coupon->code,
         ];
         $response = $this->actingAs($user)->post(route('checkout.review'), $details)->assertOk();

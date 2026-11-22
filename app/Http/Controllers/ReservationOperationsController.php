@@ -43,7 +43,7 @@ class ReservationOperationsController extends Controller
     public function seats(): View
     {
         return view('operations.reservations.seats', [
-            'seats' => ReservationSeat::query()->with(['activeReservation:id,code,active_seat_id,status', 'activeTableSession'])
+            'seats' => ReservationSeat::query()->with(['activeReservation:id,reservation_seat_id,code,active_seat_id,status', 'activeTableSession'])
                 ->orderBy('floor')->orderBy('position')->get()->toBase()->groupBy('floor'),
             'hours' => ReservationHours::query()->sole(),
         ]);
@@ -68,9 +68,18 @@ class ReservationOperationsController extends Controller
         ]);
     }
 
+    public function reschedule(Request $request, string $code, TableReservations $bookings): RedirectResponse
+    {
+        $data = $request->validate(['pickup_date' => ['required', 'date_format:Y-m-d'],
+            'pickup_clock' => ['required', 'date_format:H:i'], 'revision' => ['required', 'integer', 'min:0'], 'confirm' => ['accepted']]);
+        $bookings->rescheduleByAdmin($this->actor($request), $code, $data['pickup_date'].' '.$data['pickup_clock'], (int) $data['revision']);
+
+        return $this->result($code, 'Đã điều chỉnh lịch đặt; giữ nguyên tiền cọc để trừ vào hóa đơn.');
+    }
+
     public function checkIn(Request $request, string $code, TableReservations $bookings): RedirectResponse
     {
-        $bookings->checkIn($this->actor($request), $code);
+        $bookings->checkIn($this->actor($request), $code, true);
 
         return $this->result($code, 'Đã ghi nhận khách đến và chốt phụ phí.');
     }

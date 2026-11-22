@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\FulfillmentType;
 use App\Enums\TableRoundStatus;
 use App\Http\Requests\FilterInvoicesRequest;
 use App\Models\Order;
@@ -20,7 +21,7 @@ class OperationsInvoiceController extends Controller
         $from = isset($data['from']) ? CarbonImmutable::parse($data['from'], 'Asia/Ho_Chi_Minh')->startOfDay() : ($history ? $today->subDays(6) : null);
         $to = isset($data['to']) ? CarbonImmutable::parse($data['to'], 'Asia/Ho_Chi_Minh')->startOfDay() : ($history ? $today : null);
         $source = $data['source'] ?? 'all';
-        $bills = $invoices->listing($history, $from, $to, $source);
+        $bills = $invoices->listing($history, $from, $to, $source, ! $request->user()->can('access-admin'));
 
         return response()->view('operations.invoices.index', compact('history', 'from', 'to', 'source', 'bills'))
             ->header('Cache-Control', 'private, no-store');
@@ -30,6 +31,7 @@ class OperationsInvoiceController extends Controller
     {
         $order = Order::query()->with(['items.toppings', 'payment', 'scheduledPickup.fees'])->where('order_number', $number)->firstOrFail();
         abort_if($order->payment === null, 404);
+        abort_unless(auth()->user()->can('access-admin') || $order->fulfillment_type === FulfillmentType::Pickup, 403);
 
         return response()->view('operations.invoices.order', compact('order'))->header('Cache-Control', 'private, no-store');
     }

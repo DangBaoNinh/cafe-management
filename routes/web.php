@@ -19,17 +19,22 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\CustomerRefundController;
+use App\Http\Controllers\CustomerSupportController;
 use App\Http\Controllers\DeliveryFeeController;
 use App\Http\Controllers\DemoDeliveryController;
 use App\Http\Controllers\DemoPaymentController;
+use App\Http\Controllers\LinkedBankController;
 use App\Http\Controllers\ManualPaymentController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OperationsInvoiceController;
+use App\Http\Controllers\OperationsSupportController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
-use App\Http\Controllers\OfferController;
 use App\Http\Controllers\PublicSeatingController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReservationDepositController;
 use App\Http\Controllers\ReservationOperationsController;
 use App\Http\Controllers\ScheduledPickupController;
 use App\Http\Controllers\StorefrontChatController;
@@ -45,7 +50,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CatalogController::class, 'home'])->name('home');
 Route::view('cau-chuyen', 'customer.story')->name('story');
-Route::view('khong-gian', 'customer.spaces')->name('spaces');
+Route::get('khong-gian', [ReservationController::class, 'create'])->name('spaces');
 Route::get('khong-gian/snapshot', PublicSeatingController::class)->middleware('throttle:60,1')->name('spaces.snapshot');
 Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
 Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
@@ -94,6 +99,14 @@ Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-custom
     });
 });
 
+Route::prefix('lien-he')->name('support.')->middleware(['auth', 'can:access-customer-orders'])->group(function () {
+    Route::get('/', [CustomerSupportController::class, 'index'])->name('index');
+    Route::get('moi', [CustomerSupportController::class, 'create'])->name('create');
+    Route::post('/', [CustomerSupportController::class, 'store'])->name('store');
+    Route::get('{conversation}', [CustomerSupportController::class, 'show'])->whereNumber('conversation')->name('show');
+    Route::post('{conversation}/phan-hoi', [CustomerSupportController::class, 'reply'])->whereNumber('conversation')->name('reply');
+});
+
 Route::post('payments/demo/callback', [DemoPaymentController::class, 'callback'])
     ->middleware(EnsureDemoPaymentEnabled::class)->withoutMiddleware(PreventRequestForgery::class)->name('payments.demo.callback');
 
@@ -101,6 +114,7 @@ Route::prefix('reservations')->name('reservations.')->middleware(['auth', 'can:a
     Route::get('/', [ReservationController::class, 'index'])->name('index');
     Route::get('create', [ReservationController::class, 'create'])->name('create');
     Route::post('/', [ReservationController::class, 'store'])->name('store');
+    Route::post('{code}/deposit/demo', [ReservationDepositController::class, 'pay'])->middleware('throttle:20,1')->name('deposit.pay');
     Route::get('{code}', [ReservationController::class, 'show'])->name('show');
     Route::post('{code}/reschedule', [ReservationController::class, 'reschedule'])->name('reschedule');
     Route::post('{code}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
@@ -127,6 +141,13 @@ Route::get('operations/preparation', [OrderPreparationController::class, 'index'
 Route::get('operations/handoff', [OrderHandoffController::class, 'index'])
     ->middleware(['auth', 'can:operate-orders'])->name('operations.handoff.index');
 
+Route::prefix('operations/ho-tro')->name('operations.support.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [OperationsSupportController::class, 'index'])->name('index');
+    Route::get('{conversation}', [OperationsSupportController::class, 'show'])->whereNumber('conversation')->name('show');
+    Route::post('{conversation}/phan-hoi', [OperationsSupportController::class, 'reply'])->whereNumber('conversation')->name('reply');
+    Route::post('{conversation}/dong', [OperationsSupportController::class, 'close'])->whereNumber('conversation')->name('close');
+});
+
 Route::prefix('operations/pickups')->name('operations.pickups.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('/', [ScheduledPickupController::class, 'index'])->name('index');
     Route::post('lookup', [ScheduledPickupController::class, 'lookup'])->name('lookup');
@@ -146,6 +167,8 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
     Route::post('{number}/demo-reconcile', [DemoPaymentController::class, 'reconcile'])
         ->middleware([EnsureDemoPaymentEnabled::class, 'can:access-admin'])->name('demo-reconcile');
 });
+
+Route::get('operations/deposits/{deposit}', [ReservationDepositController::class, 'show'])->middleware(['auth', 'can:access-admin'])->name('operations.deposits.show');
 
 Route::prefix('operations/invoices')->name('operations.invoices.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('prepaid/{tableInvoice}', [TableInvoiceController::class, 'show'])->whereUuid('tableInvoice')->name('prepaid.show');
@@ -181,7 +204,7 @@ Route::prefix('operations/reservations')->name('operations.reservations.')->midd
     Route::get('{code}', [ReservationOperationsController::class, 'show'])->name('show');
     Route::post('{code}/check-in', [ReservationOperationsController::class, 'checkIn'])->name('check-in');
     Route::post('{code}/release', [ReservationOperationsController::class, 'release'])->name('release');
-    Route::post('{code}/cancel', [ReservationOperationsController::class, 'cancel'])->name('cancel');
+    Route::post('{code}/cancel', [ReservationOperationsController::class, 'cancel'])->middleware('can:access-admin')->name('cancel');
     Route::post('{code}/collect', [ReservationOperationsController::class, 'collect'])->name('collect');
     Route::post('{code}/fees/{fee}/resolve', [ReservationOperationsController::class, 'resolve'])->whereNumber('fee')->name('resolve');
     Route::post('{code}/fees/{fee}/counter', [ReservationOperationsController::class, 'moveToCounter'])->whereNumber('fee')->name('counter');
@@ -232,3 +255,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
 });
 
 require __DIR__.'/settings.php';
+
+Route::post('/settings/linked-bank', [LinkedBankController::class, 'update'])->middleware(['auth', 'can:access-customer-orders'])->name('profile.bank.update');
+
+Route::middleware(['auth', 'can:access-admin'])->prefix('operations/refund-requests')->name('operations.refunds.')->group(function (): void {
+    Route::get('/', [CustomerRefundController::class, 'index'])->name('index');
+    Route::post('/{refund}/complete', [CustomerRefundController::class, 'complete'])->name('complete');
+});
+
+Route::post('/operations/reservations/{code}/reschedule', [ReservationOperationsController::class, 'reschedule'])->middleware(['auth', 'can:access-admin'])->name('operations.reservations.reschedule');
+
+Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->name('admin.')->group(function (): void {
+    Route::get('reservations', [ReservationOperationsController::class, 'index'])->name('reservations.index');
+    Route::get('deposits', [App\Http\Controllers\Admin\ReservationDepositController::class, 'index'])->name('deposits.index');
+    Route::post('deposits/{deposit}/forfeit', [App\Http\Controllers\Admin\ReservationDepositController::class, 'forfeit'])->name('deposits.forfeit');
+});

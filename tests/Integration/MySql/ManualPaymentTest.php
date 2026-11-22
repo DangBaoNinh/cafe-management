@@ -12,10 +12,15 @@ class ManualPaymentTest extends MySqlTestCase
     public function test_transfer_references_are_unique_and_a_cancelled_collection_can_be_recorded_as_refunded(): void
     {
         DB::setDefaultConnection($this->primary->getName());
+        // This case verifies the manual refund path, rather than automatic demo refunds.
+        config(['checkout.customer_refund_demo' => false]);
         $this->primary->beginTransaction();
 
         try {
             $customer = User::factory()->create();
+            $customer->forceFill(['linked_bank' => [
+                'bank_name' => 'Ngân hàng thử', 'account_number' => '0123456789', 'account_holder' => 'KHACH THU',
+            ]])->save();
             $staff = User::factory()->create(['role' => UserRole::Staff]);
             $admin = User::factory()->create(['role' => UserRole::Admin]);
             $orders = [];

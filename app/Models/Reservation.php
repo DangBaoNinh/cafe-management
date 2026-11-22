@@ -33,6 +33,12 @@ class Reservation extends Model
         return $this->belongsTo(ReservationSeat::class, 'reservation_seat_id');
     }
 
+    /** @return HasOne<ReservationDeposit, $this> */
+    public function deposit(): HasOne
+    {
+        return $this->hasOne(ReservationDeposit::class);
+    }
+
     /** @return HasMany<ReservationEvent, $this> */
     public function events(): HasMany
     {
@@ -54,6 +60,11 @@ class Reservation extends Model
     public function canChange(): bool
     {
         return $this->status === ReservationStatus::Confirmed && now()->lt($this->scheduled_at);
+    }
+
+    public function canCustomerCancel(): bool
+    {
+        return $this->status === ReservationStatus::Confirmed && now()->lte($this->created_at->copy()->addMinutes(30));
     }
 
     public function canSettleFees(): bool

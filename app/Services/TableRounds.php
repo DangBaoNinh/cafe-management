@@ -6,6 +6,7 @@ use App\Enums\CounterOrderStatus;
 use App\Enums\TableRoundStatus;
 use App\Enums\TableSessionStatus;
 use App\Models\Product;
+use App\Models\ReservationDeposit;
 use App\Models\TableRound;
 use App\Models\TableSession;
 use App\Models\Topping;
@@ -106,6 +107,9 @@ class TableRounds
             }
             if ($prepaid && $next->needsReason() && $round->invoice !== null) {
                 $invoice = $round->invoice;
+                ReservationDeposit::query()->where('table_invoice_id', $invoice->id)->where('status', 'paid')->update(['table_invoice_id' => null]);
+                $invoice->deposit_credit_vnd = 0;
+                $invoice->deposit_refund_vnd = 0;
                 $invoice->status = 'voided';
                 $invoice->order_status = CounterOrderStatus::Cancelled;
                 $invoice->save();

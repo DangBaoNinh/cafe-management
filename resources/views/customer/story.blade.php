@@ -43,7 +43,7 @@
 <em>Phần còn lại, cứ thong thả.</em>
 </h2>
 <div class="hero-actions">
-<a class="btn" href="{{ route('reservations.create') }}">Hẹn một ngày ghé quán</a>
+<a class="btn" href="{{ route('spaces').'#booking-form' }}">Hẹn một ngày ghé quán</a>
 <a class="btn secondary" href="{{ route('menu.index') }}">Chọn một món yêu thích</a>
 </div>
 </section>

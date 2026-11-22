@@ -14,10 +14,10 @@ class TableInvoiceController extends Controller
 {
     public function pay(Request $request, TableInvoice $tableInvoice, TableInvoices $invoices): RedirectResponse
     {
-        $input = $request->validate(['revision' => ['required', 'integer', 'min:1']]);
+        $input = $request->validate(['revision' => ['required', 'integer', 'min:1'], 'deposit_refund_confirmed' => ['nullable', 'boolean']]);
         /** @var User $actor */
         $actor = $request->user();
-        $invoices->completeSaved($actor, $tableInvoice, (int) $input['revision']);
+        $invoices->completeSaved($actor, $tableInvoice, (int) $input['revision'], $request->boolean('deposit_refund_confirmed'));
 
         return to_route('operations.invoices.prepaid.show', $tableInvoice, 303)->with('status', 'Đã hoàn tất thanh toán và xuất hóa đơn.');
     }

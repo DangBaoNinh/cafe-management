@@ -22,6 +22,7 @@
                     <label class="block" for="counter-reason">{{ $invoice->status === 'paid' ? 'Lý do thay đổi (bắt buộc)' : 'Lý do hủy (bắt buộc khi hủy)' }}</label>
                     <textarea @required($invoice->status === 'paid') id="counter-reason" name="reason" maxlength="500" class="w-full rounded border p-2">{{ old('reason') }}</textarea>
                     @if($invoice->status === 'paid')<p>Hóa đơn đã thu được giữ nguyên. Hoàn tiền là thao tác riêng. Thay đổi này chỉ cập nhật trạng thái đơn, không thu thêm tiền hoặc hoàn tiền.</p>@endif
+                    @if($invoice->status === 'draft' && $invoice->deposit_refund_vnd > 0)<label class="block"><input type="checkbox" name="deposit_refund_confirmed" value="1">Đã hoàn tiền mặt <x-customer.vnd :amount="$invoice->deposit_refund_vnd" /> cọc dư (bắt buộc khi hoàn tất).</label>@endif
                     <p class="text-sm">Bạn sẽ kiểm tra lại thay đổi ở bước xác minh trước khi hệ thống cập nhật.</p>
                     <flux:button type="submit" variant="primary">Tiếp tục xác minh</flux:button>
                 </form>

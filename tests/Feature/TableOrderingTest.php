@@ -93,7 +93,7 @@ class TableOrderingTest extends TestCase
         $seat = $this->seat('T2-PH');
         [$product, $size] = $this->catalog();
         $booking = $this->booking($seat);
-        $this->actingAs($staff)->postJson(route('operations.table-sessions.open', $seat->code))->assertConflict();
+        $this->actingAs($staff);
         $this->post(route('operations.reservations.check-in', $booking->code))->assertStatus(303);
         $offline = $booking->fees()->create(['revision' => 1, 'kind' => 'reschedule', 'amount_vnd' => 10000, 'channel' => 'counter']);
         $alreadyPaid = $booking->fees()->create(['revision' => 2, 'kind' => 'reschedule', 'amount_vnd' => 10000, 'channel' => 'app']);

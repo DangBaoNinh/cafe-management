@@ -22,7 +22,7 @@ class TableInvoices
 
     /** @param list<Selection> $selections */
     public function save(TableSession $target, array $selections, string $key, ?int $roundId, int $revision,
-        CollectionMethod $method, int $acceptedTotal, bool $changesConfirmed, bool $pay, ?User $actor): TableInvoice
+        CollectionMethod $method, int $acceptedTotal, bool $changesConfirmed, bool $pay, ?User $actor, bool $depositRefundConfirmed = false): TableInvoice
     {
         if ($actor !== null) {
             Gate::forUser($actor)->authorize('operate-orders');
@@ -31,7 +31,7 @@ class TableInvoices
         $selections = TableRounds::canonicalSelections($selections);
         $hash = hash('sha256', json_encode([$selections, $method->value, $acceptedTotal], JSON_THROW_ON_ERROR));
 
-        return DB::transaction(function () use ($target, $selections, $key, $roundId, $revision, $method, $acceptedTotal, $changesConfirmed, $pay, $actor, $hash): TableInvoice {
+        return DB::transaction(function () use ($target, $selections, $key, $roundId, $revision, $method, $acceptedTotal, $changesConfirmed, $pay, $actor, $hash, $depositRefundConfirmed): TableInvoice {
             $this->inventory->lockForOperation();
             $session = TableSession::query()->lockForUpdate()->findOrFail($target->id);
             $this->require($session->billing_mode === 'prepaid', 'Phiên cũ tiếp tục dùng hóa đơn đã chốt theo luồng cũ.');
@@ -110,6 +110,7 @@ class TableInvoices
                 $invoice->payment_reported_at = null;
             }
             $invoice->save();
+            app(ReservationDeposits::class)->claim($invoice);
             if ($newFees->isNotEmpty()) {
                 $reservation->fees()->whereKey($newFees->pluck('id')->all())->update(['table_invoice_id' => $invoice->id]);
             }
@@ -119,7 +120,7 @@ class TableInvoices
                     'after' => json_encode(['selections' => $selections, 'method' => $method->value, 'total_vnd' => $total], JSON_THROW_ON_ERROR), 'created_at' => now()]);
             }
             if ($pay && $actor !== null) {
-                $this->settle($invoice, $round, $actor);
+                $this->settle($invoice, $round, $actor, $depositRefundConfirmed);
             }
 
             return $invoice;
@@ -137,11 +138,11 @@ class TableInvoices
         ])->all()));
     }
 
-    public function completeSaved(User $actor, TableInvoice $target, int $revision): TableInvoice
+    public function completeSaved(User $actor, TableInvoice $target, int $revision, bool $depositRefundConfirmed = false): TableInvoice
     {
         Gate::forUser($actor)->authorize('operate-orders');
 
-        return DB::transaction(function () use ($actor, $target, $revision): TableInvoice {
+        return DB::transaction(function () use ($actor, $target, $revision, $depositRefundConfirmed): TableInvoice {
             $this->inventory->lockForOperation();
             TableSession::query()->lockForUpdate()->findOrFail($target->table_session_id);
             $round = TableRound::query()->lockForUpdate()->findOrFail($target->table_round_id);
@@ -152,13 +153,13 @@ class TableInvoices
             $this->require($invoice->status === 'draft' && $round->status === TableRoundStatus::Pending, 'Phiếu đã hủy hoặc order đã đổi trạng thái.');
             $this->require($invoice->revision === $revision, 'Phiếu đã được sửa trên màn hình khác. Vui lòng tải lại tạm tính trước khi thanh toán.');
             $this->require((int) $invoice->fees()->where('status', 'pending')->sum('amount_vnd') === $invoice->fees_vnd, 'Phụ phí của phiếu đã thay đổi. Vui lòng kiểm tra lại trước khi thu tiền.');
-            $this->settle($invoice, $round, $actor);
+            $this->settle($invoice, $round, $actor, $depositRefundConfirmed);
 
             return $invoice;
         }, 5);
     }
 
-    private function settle(TableInvoice $invoice, TableRound $round, User $actor): void
+    private function settle(TableInvoice $invoice, TableRound $round, User $actor, bool $depositRefundConfirmed): void
     {
         if ($this->inventory->enabled()) {
             $round->load('tableSession');
@@ -170,6 +171,7 @@ class TableInvoices
                     : route('operations.invoices.prepaid.show', $invoice));
             }
         }
+        app(ReservationDeposits::class)->settle($invoice, $actor, $depositRefundConfirmed);
         $invoice->status = 'paid';
         $invoice->order_status = CounterOrderStatus::Completed;
         $invoice->paid_by = $actor->id;

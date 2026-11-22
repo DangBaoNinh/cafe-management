@@ -26,7 +26,7 @@ class DemoPaymentTest extends TestCase
         $this->actingAs($customer)->post($start)->assertStatus(303);
         $session = $payment->demoSessions()->sole();
         $gateway = route('orders.demo-payment.show', [$order->order_number, $session->reference]);
-        $this->get($gateway)->assertOk()->assertSee('Thanh toán thành công')->assertSee('42.000');
+        $this->get($gateway)->assertOk()->assertSee('Tôi đã hoàn tất chuyển khoản')->assertSee($session->reference)->assertSee('42.000');
         $this->get($detail)->assertOk()->assertSee('Chờ thanh toán');
         $this->post($start)->assertRedirect($gateway);
         $this->assertDatabaseCount('demo_payment_sessions', 1);
@@ -98,7 +98,7 @@ class DemoPaymentTest extends TestCase
         $this->get(route('operations.payments.index'))->assertOk()->assertDontSee($paymentLink);
     }
 
-    public function test_success_delivered_after_cancellation_requires_refund_and_does_not_reopen_order(): void
+    public function test_success_delivered_after_customer_cancellation_is_refunded_automatically_and_does_not_reopen_order(): void
     {
         $owner = User::factory()->create();
         $order = $this->order($owner);
@@ -108,9 +108,10 @@ class DemoPaymentTest extends TestCase
         $this->assertSame(PaymentStatus::Voided, $order->payment()->sole()->status);
         $this->postCallback($this->event($session))->assertNoContent();
         $this->assertSame('cancelled', $order->refresh()->status->value);
-        $this->assertSame(PaymentStatus::RefundPending, $order->payment()->sole()->status);
+        $this->assertSame(PaymentStatus::Refunded, $order->payment()->sole()->status);
         $this->postCallback($this->event($session))->assertNoContent();
-        $this->assertDatabaseCount('payment_status_histories', 2);
+        $this->assertDatabaseCount('payment_status_histories', 3)
+            ->assertDatabaseHas('customer_refund_requests', ['order_id' => $order->id, 'status' => 'completed', 'is_demo' => true]);
     }
 
     public function test_only_the_owner_can_use_a_session_and_demo_routes_are_disabled_in_production(): void
@@ -150,6 +151,7 @@ class DemoPaymentTest extends TestCase
 
     private function order(User $owner): Order
     {
+        $owner->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
         $order = $owner->orders()->create([
             'order_number' => 'CF-'.Str::upper(Str::random(16)), 'checkout_key' => Str::uuid()->toString(),
             'request_hash' => hash('sha256', 'demo'), 'recipient_name' => 'Khách thử', 'phone' => '0901234567',

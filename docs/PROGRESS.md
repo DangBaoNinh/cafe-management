@@ -374,5 +374,12 @@
 
 ## Việc còn lại
 
+### Trải nghiệm khách hàng và liên hệ cửa hàng — đang chờ nghiệm thu
+
+- Nhánh `feature/customer-experience-support` bổ sung số điện thoại vào hồ sơ khách để làm giá trị gợi ý cho checkout và giữ chỗ, nhưng vẫn giữ snapshot người nhận trên đơn/lịch theo BR03 và BR18.
+- Customer đăng nhập trực tiếp được đưa về trang chủ; admin và staff giữ luồng chuyển hướng workspace hiện có. Màn đặt chỗ hiển thị lại sơ đồ 3D/2D tương tác ngay trong hành trình tạo lịch; lõi UC26/UC27 không đổi.
+- Bổ sung UC31: khách tạo/xem/phản hồi cuộc trao đổi của mình, staff/admin phản hồi hoặc đóng; có kiểm tra ownership, quyền vận hành, giới hạn nội dung và lịch sử tin nhắn. Đã chạy 50 bài kiểm thử trọng tâm với 769 assertion và `npm run build`. Ngày 22/11/2026, migration UC31 đã chạy trên MySQL local; chưa được nghiệm thu/tích hợp vào `develop`.
+- Không triển khai tích điểm vì chưa có chính sách tích/đổi điểm, hết hạn và hoàn điểm khi hủy đơn được chốt.
+
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.
 - Việc gửi email thật cần thông tin SMTP. Môi trường local mặc định dùng mailer `log` và đã thử gửi SMTP qua Mailpit.

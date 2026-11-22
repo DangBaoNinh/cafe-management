@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\DB;
 class OperationsInvoices
 {
     /** @return LengthAwarePaginator<int, \stdClass> */
-    public function listing(bool $history, ?CarbonImmutable $from, ?CarbonImmutable $to, string $source): LengthAwarePaginator
+    public function listing(bool $history, ?CarbonImmutable $from, ?CarbonImmutable $to, string $source, bool $staffOnly = false): LengthAwarePaginator
     {
         $orderDate = $history ? 'payments.paid_at' : 'orders.created_at';
         $orders = DB::table('payments')->join('orders', 'orders.id', '=', 'payments.order_id')
+            ->when($staffOnly, fn ($q) => $q->where('orders.fulfillment_type', 'pickup'))
             ->selectRaw("'order' AS source, orders.id, orders.order_number AS reference, orders.recipient_name AS label,
                 orders.total_vnd AS amount_vnd, payments.status AS payment_status, payments.method, payments.collection_method, $orderDate AS event_at, orders.order_number AS display_number")
             ->when($history, fn ($query) => $query->whereNotNull('payments.paid_at'),

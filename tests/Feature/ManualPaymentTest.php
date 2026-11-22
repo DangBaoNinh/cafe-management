@@ -215,6 +215,7 @@ class ManualPaymentTest extends TestCase
         string $method = 'bank_transfer',
         int $amount = 40000,
     ): Order {
+        $owner->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
         $order = $owner->orders()->create([
             'order_number' => 'CF-'.Str::ulid(), 'checkout_key' => Str::uuid()->toString(),
             'request_hash' => hash('sha256', 'checkout'), 'recipient_name' => 'Khách nhận', 'phone' => '0901234567',

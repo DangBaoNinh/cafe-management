@@ -6,8 +6,10 @@
     $sections = [
         'Quản trị' => $canAdminister ? [
             ['admin.dashboard', 'admin.dashboard', 'Tổng quan quản trị'],
-            ['admin.orders.index', 'admin.orders.*', 'Quản lý đơn hàng'],
             ['admin.invoices.index', 'admin.invoices.*', 'Quản lý hóa đơn'],
+            ['admin.reservations.index', 'admin.reservations.*', 'Quản lý phiếu đặt bàn'],
+            ['admin.deposits.index', 'admin.deposits.*', 'Quản lý tiền cọc'],
+            ['operations.refunds.index', 'operations.refunds.*', 'Quản lý hoàn tiền'],
             ['admin.customers.index', 'admin.customers.*', 'Tra cứu khách hàng'],
             ['admin.accounts.index', 'admin.accounts.*', 'Quản lý tài khoản'],
         ] : [],
@@ -16,10 +18,10 @@
             ['operations.orders.index', 'operations.orders.*', 'Đơn chờ xác nhận'],
             ['operations.preparation.index', 'operations.preparation.*', 'Pha chế'],
             ['operations.handoff.index', 'operations.handoff.*', 'Bàn giao'],
-            ['operations.pickups.index', 'operations.pickups.*', 'Lịch nhận tại quán'],
             ['operations.reservations.index', 'operations.reservations.*', 'Lịch đặt bàn và phòng'],
             ['operations.invoices.index', 'operations.invoices.index', 'Hóa đơn thanh toán'],
             ['operations.invoices.history', 'operations.invoices.history', 'Lịch sử hóa đơn'],
+            ['operations.support.index', 'operations.support.*', 'Tin nhắn khách hàng'],
         ],
         'Cửa hàng' => $canAdminister ? [
             ['admin.categories.index', 'admin.categories.*', 'Quản lý danh mục'],

@@ -16,7 +16,7 @@
             <p class="jardin-hero-description">Ngoài kia cứ vội.<br>Ở đây có cà phê thơm, hoa nở<br>và một góc dành riêng cho bạn.</p>
             <div class="jardin-hero-actions">
                 <a class="jardin-button jardin-button-light" href="{{ route('menu.index') }}" aria-label="Xem thực đơn">Khám phá thực đơn</a>
-                <a class="jardin-quiet-link" href="{{ route('reservations.create') }}">Hẹn nhau ở Toàn</a>
+                <a class="jardin-quiet-link" href="{{ route('spaces').'#booking-form' }}">Hẹn nhau ở Toàn</a>
             </div>
         </div>
         <div class="jardin-hero-postmark" aria-hidden="true">
@@ -206,7 +206,7 @@
         <h2>Hẹn một ngày đẹp trời.<br><em>Hay cứ hôm nay đi.</em>
         </h2>
         <p>Một mình cũng vui. Có bạn càng thương.<br>Toàn dành một góc cho mọi cuộc hẹn.</p>
-        <a class="jardin-button" href="{{ route('reservations.create') }}">Giữ một chỗ hẹn</a>
+        <a class="jardin-button" href="{{ route('spaces').'#booking-form' }}">Giữ một chỗ hẹn</a>
         <span class="jardin-invitation-sign">À bientôt !</span>
     </section>
 

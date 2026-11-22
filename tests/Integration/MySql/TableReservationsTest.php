@@ -9,6 +9,7 @@ use App\Models\ReservationSeat;
 use App\Models\User;
 use App\Services\BookingExpirations;
 use App\Services\BookingRules;
+use App\Services\ReservationCalendar;
 use App\Services\TableReservations;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -53,8 +54,21 @@ class TableReservationsTest extends MySqlTestCase
             $service->release($staff, $booking->code);
             $next = $service->place($second, [...$input, 'pickup_time' => '2026-11-22 07:00', 'booking_key' => Str::uuid()->toString()]);
             $this->assertSame(ReservationStatus::Completed, $booking->refresh()->status);
+            $this->assertSame(0, Reservation::query()->where('active_seat_id', $seat->id)->count());
+            $this->assertNull($next->active_seat_id);
+            $this->assertSame('free', $seat->fresh()->availability());
+            $this->assertFalse(ReservationCalendar::available($seat->fresh(), $next->scheduled_at));
+            try {
+                $service->place($first, [...$input, 'pickup_time' => '2026-11-22 08:00', 'booking_key' => Str::uuid()->toString()]);
+                $this->fail('A future reservation must reject another booking on the same date without occupying today.');
+            } catch (ValidationException $e) {
+                $this->assertArrayHasKey('reservation', $e->errors());
+            }
+            $this->travelTo(CarbonImmutable::parse('2026-11-22 07:00', BookingRules::TIMEZONE)->utc());
+            $this->assertSame('held', $seat->fresh()->availability());
+            $service->checkIn($staff, $next->code);
             $this->assertSame(1, Reservation::query()->where('active_seat_id', $seat->id)->count());
-            $this->assertSame($seat->id, $next->active_seat_id);
+            $this->assertSame($seat->id, $next->refresh()->active_seat_id);
         } finally {
             $this->primary->rollBack();
         }

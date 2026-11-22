@@ -19,6 +19,7 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
+            'phone' => $this->phoneRules(),
         ];
     }
 
@@ -48,5 +49,11 @@ trait ProfileValidationRules
                 ? Rule::unique(User::class)
                 : Rule::unique(User::class)->ignore($userId),
         ];
+    }
+
+    /** @return array<int, string> */
+    protected function phoneRules(): array
+    {
+        return ['nullable', 'string', 'regex:/\\A(?:0|\\+84)[1-9][0-9]{8,9}\\z/'];
     }
 }

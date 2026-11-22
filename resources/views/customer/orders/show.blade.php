@@ -6,7 +6,8 @@
     <section class="mx-auto max-w-3xl space-y-6">
         <header class="space-y-2">
             <flux:link :href="route('orders.index')">Về Đơn của tôi</flux:link>
-            <h1 class="text-3xl font-semibold tracking-tight wrap-anywhere sm:text-4xl">Đơn {{ $order->order_number }}</h1>
+            <p class="text-sm">Chỉ hủy trong 30 phút từ lúc đặt. Cần <a href="{{ route('profile.edit') }}" class="underline">liên kết ngân hàng trong Hồ sơ</a> để yêu cầu hoàn tiền.</p>
+        <h1 class="font-mono text-3xl font-semibold tabular-nums tracking-normal wrap-anywhere sm:text-4xl">Đơn {{ $order->order_number }}</h1>
             <p class="text-sm">Đặt lúc <x-customer.order-time :date="$order->created_at" /></p>
         </header>
 
@@ -55,7 +56,7 @@
 
         <x-customer.start-demo-payment :order="$order" :payment="$payment" />
 
-        @if ($order->status === \App\Enums\OrderStatus::Pending)
+        @if (in_array($order->status, [\App\Enums\OrderStatus::Pending, \App\Enums\OrderStatus::Confirmed], true))
             <details class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4" @if ($errors->hasAny(['reason', 'confirm'])) open @endif>
                 <summary class="cursor-pointer font-semibold">Hủy đơn hàng</summary>
                 <form method="POST" action="{{ route('orders.cancel', $order->order_number) }}" class="mt-4 space-y-4">
@@ -67,7 +68,7 @@
                         <flux:textarea id="cancel-reason" name="reason" maxlength="500" rows="2">{{ is_string(old('reason')) ? old('reason') : '' }}</flux:textarea>
                         <flux:error name="reason" />
                     </div>
-                    <flux:button type="submit" name="confirm" value="1" variant="danger">Xác nhận hủy đơn</flux:button>
+                    <flux:button type="submit" name="confirm" value="1" variant="danger" :disabled="now()->gt($order->created_at->copy()->addMinutes(30))" data-cancel-until="{{ $order->created_at->copy()->addMinutes(30)->getTimestamp() * 1000 }}">Xác nhận hủy đơn</flux:button>
                     <flux:error name="confirm" />
                 </form>
             </details>
@@ -76,6 +77,7 @@
         @if($payment?->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details)
             <x-payment-qr :amount="$order->total_vnd" :memo="$order->order_number" :bank="$payment->transfer_details" />
         @endif
+        @if($order->status === \App\Enums\OrderStatus::Preparing)<flux:button disabled>Hủy đơn hàng</flux:button><p>Đơn đang pha chế, không thể hủy.</p>@endif
         <x-customer.order-snapshot :order="$order" />
 
         @if ($order->statusHistories->isNotEmpty())

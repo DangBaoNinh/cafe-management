@@ -268,9 +268,12 @@ export function mountSeatingScene(root, onSelect) {
     });
     if (moved) renderOnce();
   }
+  let viewportWidth = 0, viewportHeight = 0;
   function resize() {
-    const { width, height } = root.getBoundingClientRect();
-    if (!width || !height) return;
+    const width = root.clientWidth, height = root.clientHeight;
+    if (!width || !height || (width === viewportWidth && height === viewportHeight)) return;
+    viewportWidth = width;
+    viewportHeight = height;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);

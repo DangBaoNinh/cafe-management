@@ -2,7 +2,7 @@
     <section class="mx-auto max-w-2xl space-y-5">
         <h1 class="text-3xl font-semibold tracking-tight">Đã đặt hàng</h1>
         <div class="space-y-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
-            <p class="font-semibold wrap-anywhere">Mã đơn {{ $order->order_number }}</p>
+            <p class="font-mono font-semibold tabular-nums tracking-normal wrap-anywhere">Mã đơn {{ $order->order_number }}</p>
             <p>{{ $order->fulfillment_type->label() }} · {{ $payment->method->label() }}</p>
             @if ($pickup !== null)
                 <p>Giờ hẹn · <x-customer.order-time :date="$pickup->scheduled_at" /></p>

@@ -20,13 +20,21 @@ class RevenueReport
             ->where('orders.status', 'completed')->where('payments.status', 'paid')
             ->selectRaw("orders.completed_at AS event_at, orders.subtotal_vnd AS subtotal, orders.discount_vnd AS discount,
                 orders.delivery_fee_vnd AS delivery, 0 AS fees, orders.total_vnd AS total,
-                COALESCE(payments.collection_method, CASE WHEN payments.method = 'cod' THEN 'unclassified' ELSE payments.method END) AS channel");
+                COALESCE(payments.collection_method, CASE WHEN payments.method = 'cod' THEN 'unclassified' ELSE payments.method END) AS channel, 1 AS invoice_count, 1 AS channel_count");
         $counter = DB::table('table_invoices')->where('status', 'paid')->where('order_status', 'completed')
-            ->selectRaw('paid_at AS event_at, subtotal_vnd AS subtotal, 0 AS discount, 0 AS delivery, fees_vnd AS fees, total_vnd AS total, method AS channel');
+            ->selectRaw("paid_at AS event_at, subtotal_vnd AS subtotal, 0 AS discount, 0 AS delivery, fees_vnd AS fees,
+                total_vnd - deposit_credit_vnd AS total, method AS channel, 1 AS invoice_count,
+                CASE WHEN total_vnd > deposit_credit_vnd OR deposit_credit_vnd = 0 OR method = 'bank_transfer' THEN 1 ELSE 0 END AS channel_count");
+        $credits = DB::table('table_invoices')->where('status', 'paid')->where('order_status', 'completed')->where('deposit_credit_vnd', '>', 0)
+            ->selectRaw("paid_at AS event_at, 0 AS subtotal, 0 AS discount, 0 AS delivery, 0 AS fees, deposit_credit_vnd AS total,
+                'bank_transfer' AS channel, 0 AS invoice_count, CASE WHEN method = 'bank_transfer' THEN 0 ELSE 1 END AS channel_count");
         $legacy = DB::table('table_sessions')->where('billing_mode', 'legacy')->whereNotNull('paid_at')
-            ->selectRaw("paid_at AS event_at, subtotal_vnd AS subtotal, 0 AS discount, 0 AS delivery, fees_vnd AS fees, total_vnd AS total, 'unclassified' AS channel");
+            ->selectRaw("paid_at AS event_at, subtotal_vnd AS subtotal, 0 AS discount, 0 AS delivery, fees_vnd AS fees, total_vnd AS total, 'unclassified' AS channel, 1 AS invoice_count, 1 AS channel_count");
+        $forfeited = DB::table('reservation_deposits')->where('status', 'forfeited')
+            ->selectRaw("settled_at AS event_at, amount_vnd AS subtotal, 0 AS discount, 0 AS delivery, 0 AS fees, amount_vnd AS total,
+                'bank_transfer' AS channel, 1 AS invoice_count, 1 AS channel_count");
 
-        return DB::query()->fromSub($online->unionAll($counter)->unionAll($legacy), 'receipts');
+        return DB::query()->fromSub($online->unionAll($counter)->unionAll($credits)->unionAll($legacy)->unionAll($forfeited), 'receipts');
     }
 
     /** @return array<string, mixed> */
@@ -37,7 +45,7 @@ class RevenueReport
         $daySql = DB::getDriverName() === 'sqlite' ? 'DATE(event_at, ?)' : "DATE(CONVERT_TZ(event_at, '+00:00', ?))";
         $rows = $this->receipts()->where('event_at', '>=', $start)->where('event_at', '<', $end)
             ->selectRaw("$daySql AS local_day", [$from->format('P')])
-            ->selectRaw('channel, COUNT(*) AS orders, SUM(subtotal) AS subtotal, SUM(discount) AS discount, SUM(delivery) AS delivery, SUM(fees) AS fees, SUM(total) AS total')
+            ->selectRaw('channel, SUM(invoice_count) AS orders, SUM(channel_count) AS channel_orders, SUM(subtotal) AS subtotal, SUM(discount) AS discount, SUM(delivery) AS delivery, SUM(fees) AS fees, SUM(total) AS total')
             ->groupBy('local_day', 'channel')->get();
         $totals = self::ZERO_TOTALS;
         $daily = $dailyFees = $dailyChannels = [];
@@ -59,7 +67,7 @@ class RevenueReport
             }
             $dailyFees[$date] += (int) $row->fees;
             $channel = array_key_exists($row->channel, $channels) ? $row->channel : 'unclassified';
-            $channels[$channel]['orders'] += (int) $row->orders;
+            $channels[$channel]['orders'] += (int) $row->channel_orders;
             $channels[$channel]['total'] += (int) $row->total;
             $dailyChannel = in_array($channel, ['cash', 'bank_transfer'], true) ? $channel : 'other';
             $dailyChannels[$date][$dailyChannel] = ($dailyChannels[$date][$dailyChannel] ?? 0) + (int) $row->total;

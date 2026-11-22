@@ -16,6 +16,7 @@ class SaveTableInvoiceRequest extends TableRoundRequest
             'intent' => ['required', Rule::in(['draft', 'pay'])],
             'accepted_total_vnd' => ['required', 'integer', 'min:0'],
             'changes_confirmed' => ['nullable', 'boolean'],
+            'deposit_refund_confirmed' => ['nullable', 'boolean'],
             'payment_confirmed' => ['accepted_if:intent,pay'],
         ];
     }

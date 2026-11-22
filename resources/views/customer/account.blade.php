@@ -32,6 +32,10 @@
                 @endcan
 
                 @can('access-customer-orders')
+                    <x-terrasse.account-link :href="route('reservations.index')" title="Lịch sử đặt bàn"
+                        description="Theo dõi lịch hẹn và xem chi tiết các lần đặt bàn, phòng họp.">
+                        <x-slot:icon><flux:icon.calendar-days class="size-5" /></x-slot:icon>
+                    </x-terrasse.account-link>
                     <x-terrasse.account-link :href="route('orders.index')" title="Đơn của tôi"
                         description="Xem lịch sử và theo dõi trạng thái đơn.">
                         <x-slot:icon><flux:icon.shopping-bag class="size-5" /></x-slot:icon>

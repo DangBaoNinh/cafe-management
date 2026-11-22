@@ -18,7 +18,7 @@ class FilterOrdersRequest extends FormRequest
             'to' => ['nullable', 'date_format:Y-m-d', Rule::when($this->filled('from'), 'after_or_equal:from')],
             'status' => ['nullable', Rule::in([...array_column(OrderStatus::cases(), 'value'), 'pending_payment'])],
             'method' => ['nullable', Rule::in([...array_column(PaymentMethod::cases(), 'value'), 'cash', 'counter'])],
-            'source' => ['nullable', Rule::in(['online', 'counter', 'legacy'])],
+            'source' => ['nullable', Rule::in(['online', 'counter', 'legacy', 'deposit'])],
             'display_status' => ['nullable', Rule::in(['paid', 'cancelled', 'pending'])],
         ];
     }

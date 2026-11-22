@@ -1,11 +1,11 @@
 @php
     $fields = [
         'recipient_name' => old('recipient_name', $addresses->first()?->recipient_name ?? $customer->name),
-        'phone' => old('phone', $addresses->first()?->phone),
+        'phone' => old('phone', $addresses->first()?->phone ?? $customer->phone),
         'coupon_code' => old('coupon_code'),
     ];
     $fulfillment = old('fulfillment_type', 'pickup');
-    $method = old('method', 'cod');
+    $method = old('method', 'bank_transfer');
     $addressId = old('address_id');
     $pickupTime = old('pickup_time');
     $pickupMode = old('pickup_mode', is_string($pickupTime) && $pickupTime !== '' ? 'scheduled' : 'now');
@@ -49,8 +49,8 @@
 
             <fieldset class="space-y-3" data-pickup-mode>
                 <flux:select name="pickup_mode" label="Thời điểm nhận tại quán">
-                    <flux:select.option value="now" :selected="$pickupMode === 'now'">Nhận ngay</flux:select.option>
-                    <flux:select.option value="scheduled" :selected="$pickupMode === 'scheduled'">Hẹn giờ</flux:select.option>
+
+                    <flux:select.option value="scheduled" :selected="$pickupMode === 'scheduled'">Nhận ít nhất 15 phút sau khi đặt</flux:select.option>
                 </flux:select>
                 <fieldset data-pickup-slot>
                     <x-customer.pickup-slot :date="is_string($pickupTime) ? substr($pickupTime, 0, 10) : null"
@@ -77,10 +77,11 @@
                     <flux:select.option value="bank_transfer" :selected="$method === 'bank_transfer'">{{ \App\Enums\PaymentMethod::BankTransfer->label() }}</flux:select.option>
                 @endif
                 @if (\App\Services\DemoPaymentGateway::enabled())
-                    <flux:select.option value="demo_gateway" :selected="$method === 'demo_gateway'">{{ \App\Enums\PaymentMethod::DemoGateway->label() }}</flux:select.option>
+                    <flux:select.option value="demo_gateway" :selected="$method === 'demo_gateway'">Ngân hàng liên kết (demo)</flux:select.option>
                 @endif
             </flux:select>
 
+            <p>Nhận tại quán chỉ dùng QR chuyển khoản hoặc tài khoản liên kết. <a class="underline" href="{{ route('profile.edit') }}">Liên kết ngân hàng trong Hồ sơ</a>.</p>
             <section class="coupon-checkout-field" aria-labelledby="coupon-checkout-heading">
                 <div class="flex flex-wrap items-start justify-between gap-3"><div><p class="coupon-summary__eyebrow">Ưu đãi</p><h2 id="coupon-checkout-heading" class="text-lg font-semibold">Bạn có mã giảm giá?</h2></div><span class="coupon-checkout-field__seal" aria-hidden="true">%</span></div>
                 <flux:input name="coupon_code" label="Nhập mã ưu đãi" maxlength="40" description="Mỗi đơn dùng một mã. Hệ thống sẽ kiểm tra điều kiện và tổng giảm ở bước tiếp theo." :value="is_string($fields['coupon_code']) ? $fields['coupon_code'] : ''" />

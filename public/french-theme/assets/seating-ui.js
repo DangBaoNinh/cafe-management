@@ -78,6 +78,7 @@ export async function mountPublicSeating(root) {
       const url = new URL(reservationUrl);
       if (available && !demo) {
         url.searchParams.set('seat_id', table.id);
+        url.searchParams.set('booking_date', root.querySelector('[data-seat-date]').value);
         const partySize = Number(capacity.value);
         if (partySize > 1 && partySize <= table.capacity) url.searchParams.set('party_size', partySize);
       }
@@ -118,7 +119,7 @@ export async function mountPublicSeating(root) {
         .filter((t) => t.capacity >= minCapacity)
         .map(
           (table) =>
-            `<button class="seat-row ${selected === table.id ? 'selected' : ''}" data-public-table="${escape(table.id)}" aria-pressed="${selected === table.id}"><span class="seat-row-code">${escape(table.code)}</span><span>${table.capacity} chỗ</span><span class="badge ${stale ? 'unknown' : table.status}">${stale ? 'Chưa xác minh' : statusLabels[table.status]}</span></button>`,
+            `<button class="seat-row ${selected === table.id ? 'selected' : ''}" data-public-table="${escape(table.id)}" aria-pressed="${selected === table.id}"><span class="seat-row-code">${escape(table.code)}${table.scheduled_at ? `<small style="display:block;font-size:11px">${escape(formatAppointment(new Date(table.scheduled_at)))}</small>` : ''}</span><span>${table.capacity} chỗ</span><span class="badge ${stale ? 'unknown' : table.status}">${stale ? 'Chưa xác minh' : statusLabels[table.status]}</span></button>`,
         )
         .join('') || '<p class="empty">Khu vực này chưa có bàn phù hợp số người bạn chọn.</p>';
     const pageCount = Math.max(1, Math.ceil(shown.length / 6));
@@ -151,8 +152,10 @@ export async function mountPublicSeating(root) {
     root.classList.add('seating-stale');
     draw();
   }
+  listen(root.querySelector('[data-seat-date]'), 'change', () => { selected = ''; document.querySelectorAll('input[name=pickup_date]').forEach(input => input.value = root.querySelector('[data-seat-date]').value); markStale('Đang tải lịch theo ngày…'); load(); });
   async function load() {
     if (busy || disposed) return;
+    const requestedDay = root.querySelector('[data-seat-date]')?.value;
     busy = true;
     refresh.disabled = true;
     try {
@@ -162,6 +165,8 @@ export async function mountPublicSeating(root) {
         data = getDemoSeating();
       } else {
         const url = new URL(options.endpoint, location.href);
+        const bookingDay = root.querySelector('[data-seat-date]')?.value;
+        if (bookingDay) url.searchParams.set('date', bookingDay);
         if (!options.endpoint || url.origin !== location.origin)
           throw new Error('Configure a same-origin endpoint');
         request = new AbortController();
@@ -197,7 +202,10 @@ export async function mountPublicSeating(root) {
     } finally {
       busy = false;
       request = null;
-      if (!disposed) refresh.disabled = false;
+      if (!disposed) {
+        refresh.disabled = false;
+        if (requestedDay !== root.querySelector('[data-seat-date]')?.value) load();
+      }
     }
   }
   listen(root, 'click', (event) => {

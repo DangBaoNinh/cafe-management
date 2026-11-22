@@ -35,7 +35,7 @@ class AuthenticationTest extends TestCase
         $this->post(route('login.store'), [
             'email' => ' '.strtoupper($user->email).' ',
             'password' => 'password',
-        ])->assertSessionHasNoErrors()->assertRedirect(route('dashboard', absolute: false));
+        ])->assertSessionHasNoErrors()->assertRedirect(route('home', absolute: false));
 
         $this->assertAuthenticatedAs($user);
     }
@@ -134,7 +134,7 @@ class AuthenticationTest extends TestCase
 
         $this->travel(61)->seconds();
 
-        $this->post(route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+        $this->post(route('login.store'), $credentials)->assertRedirect(route('home'));
         $this->assertAuthenticatedAs($user);
     }
 

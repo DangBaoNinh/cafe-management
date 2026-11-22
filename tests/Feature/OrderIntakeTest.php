@@ -100,7 +100,7 @@ class OrderIntakeTest extends TestCase
         $this->get($show)->assertSee('Đơn đã đổi trạng thái.');
         $this->actingAs($customer)->postJson(route('orders.cancel', $order->order_number), [
             'expected_status' => 'pending', 'confirm' => '1',
-        ])->assertConflict();
+        ])->assertUnprocessable();
 
         $this->assertSame(OrderStatus::Confirmed, $order->refresh()->status);
         $payment = $order->payment()->sole();

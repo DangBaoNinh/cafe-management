@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ReservationStatus;
 use App\Models\PickupFee;
 use App\Models\ReservationHours;
 use App\Models\ReservationSeat;
 use App\Models\User;
 use App\Services\BookingRules;
 use App\Services\Checkout;
+use App\Services\ReservationCalendar;
 use App\Services\TableReservations;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,18 +22,44 @@ class ReservationController extends Controller
 {
     public function index(Request $request): View
     {
+        $filters = $request->validate([
+            'scope' => ['nullable', Rule::in(['all', 'open', 'history'])],
+            'status' => ['nullable', Rule::enum(ReservationStatus::class)],
+            'from' => ['nullable', 'date_format:Y-m-d'],
+            'to' => ['nullable', 'date_format:Y-m-d', ...($request->filled('from') ? ['after_or_equal:from'] : [])],
+        ]);
+        $scope = $filters['scope'] ?? 'all';
+        $finished = [ReservationStatus::Completed, ReservationStatus::Cancelled, ReservationStatus::NoShow];
+        $query = $this->customer($request)->reservations();
+        if ($scope === 'history') {
+            $query->whereIn('status', $finished);
+        } elseif ($scope === 'open') {
+            $query->whereNotIn('status', $finished);
+        }
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+        if (! empty($filters['from'])) {
+            $query->where('scheduled_at', '>=', CarbonImmutable::parse($filters['from'], BookingRules::TIMEZONE)->startOfDay()->utc());
+        }
+        if (! empty($filters['to'])) {
+            $query->where('scheduled_at', '<', CarbonImmutable::parse($filters['to'], BookingRules::TIMEZONE)->startOfDay()->addDay()->utc());
+        }
+
         return view('customer.reservations.index', [
-            'reservations' => $this->customer($request)->reservations()->with('seat')->latest('id')->paginate(12),
+            'reservations' => $query->with(['seat', 'deposit'])->latest('id')->paginate(12)->withQueryString(),
+            'filters' => $filters, 'scope' => $scope,
         ]);
     }
 
     public function create(Request $request, Checkout $checkout): View
     {
-        $customer = $this->customer($request);
+        $customer = $request->user();
+        $request->validate(['booking_date' => ['nullable', 'date_format:Y-m-d']]);
         $hours = ReservationHours::query()->sole();
-        $filters = ['pickup_date' => now(BookingRules::TIMEZONE)->toDateString(), 'pickup_clock' => null,
+        $filters = ['pickup_date' => $request->query('booking_date', now(BookingRules::TIMEZONE)->toDateString()), 'pickup_clock' => null,
             'kind' => 'table', 'party_size' => 2, 'floor' => null];
-        $seats = ReservationSeat::query()->with('activeReservation:id,active_seat_id,status')
+        $seats = ReservationSeat::query()->with('activeReservation:id,reservation_seat_id,active_seat_id,status')
             ->orderBy('floor')->orderBy('position')->get();
         $seatId = filter_var($request->query('seat_id'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $preferredSeat = $seatId === false ? null : $seats->find($seatId);
@@ -51,7 +80,16 @@ class ReservationController extends Controller
             $filters['party_size'] = $partySize === false ? min(2, $preferredSeat->capacity) : $partySize;
         }
 
-        return view('customer.reservations.create', [
+        $day = CarbonImmutable::parse($filters['pickup_date'], BookingRules::TIMEZONE);
+        foreach ($seats as $seat) {
+            $booking = ReservationCalendar::bookings($seat->id, $day)->first();
+            $seat->setRelation('activeReservation', $booking);
+            if (! $day->isToday()) {
+                $seat->walk_in_at = null;
+            }
+        }
+
+        return view('customer.spaces', [
             'seats' => $seats->toBase()->groupBy('floor'), 'filters' => $filters, 'searched' => $searched,
             'preferredSeat' => $preferredSeat, 'customer' => $customer,
             'bankAvailable' => $checkout->bankDetails() !== null, 'bookingKey' => Str::uuid()->toString(), 'slots' => $hours->slots(),
@@ -65,15 +103,16 @@ class ReservationController extends Controller
             'seat_id' => (int) $data['seat_id'], 'kind' => $data['kind'], 'party_size' => (int) $data['party_size'],
             'pickup_time' => $data['pickup_date'].' '.$data['pickup_clock'],
             'contact_name' => $data['contact_name'], 'phone' => $data['phone'], 'channel' => $data['channel'],
-            'booking_key' => strtolower($data['booking_key']),
+            'booking_key' => strtolower($data['booking_key']), 'deposit_required' => true,
         ]);
 
-        return to_route('reservations.show', $booking->code, 303)->with('status', 'Đã giữ chỗ tại quán.');
+        return to_route('reservations.show', $booking->code, 303)->with('status', $booking->status === ReservationStatus::PendingDeposit ? 'Đã tạo yêu cầu đặt chỗ. Vui lòng chuyển khoản cọc theo số tiền trên phiếu để xác nhận bàn.' : 'Đã đặt chỗ tại quán.');
     }
 
     public function show(Request $request, string $code): View
     {
-        $reservation = $this->customer($request)->reservations()->with('seat', 'fees')->where('code', $code)->firstOrFail();
+        $reservation = $this->customer($request)->reservations()->with(['seat', 'fees', 'deposit.invoice',
+            'events' => fn ($query) => $query->orderBy('occurred_at')->orderBy('id')])->where('code', $code)->firstOrFail();
 
         return view('customer.reservations.show', ['reservation' => $reservation, 'slots' => ReservationHours::query()->sole()->slots()]);
     }
@@ -94,7 +133,7 @@ class ReservationController extends Controller
         $request->validate(['confirm' => ['accepted']], ['confirm.accepted' => 'Bạn cần xác nhận hủy lịch.']);
         $bookings->cancel($this->customer($request), $code);
 
-        return to_route('reservations.show', $code, 303)->with('status', 'Đã hủy lịch và trả chỗ.');
+        return to_route('reservations.show', $code, 303)->with('status', 'Đã xử lý yêu cầu. Khoản đã thu được tự hoàn demo về ngân hàng liên kết khi hủy hợp lệ.');
     }
 
     /** @return array<string, list<mixed>> */

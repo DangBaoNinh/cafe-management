@@ -26,7 +26,10 @@ class TableSessions
             $seat = ReservationSeat::query()->lockForUpdate()->findOrFail($target->id);
             $this->require($seat->is_active && ! $seat->activeTableSession()->exists(), 'Chỗ này đã có phiên gọi món hoặc đang ngừng phục vụ.');
             $reservation = $seat->activeReservation()->lockForUpdate()->first();
-            $this->require($reservation === null || $reservation->status === ReservationStatus::CheckedIn, 'Hãy check-in lượt đặt trước khi mở phiên.');
+            // Only the explicit reservation check-in may attach a deposit to an order.
+            if ($reservation?->status !== ReservationStatus::CheckedIn) {
+                $reservation = null;
+            }
             if ($reservation === null && $seat->walk_in_at === null) {
                 $this->reservations->walkIn($actor, $seat->id, true);
             }

@@ -13,7 +13,7 @@ enum PaymentMethod: string
         return match ($this) {
             self::Cod => 'Thanh toán khi nhận',
             self::BankTransfer => 'Chuyển khoản ngân hàng',
-            self::DemoGateway => 'Cổng thanh toán mô phỏng',
+            self::DemoGateway => 'Chuyển khoản mô phỏng',
         };
     }
 }

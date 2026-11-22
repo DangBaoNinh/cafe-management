@@ -21,7 +21,7 @@
                     <flux:select.option :value="$role->value" :selected="$account->role === $role">{{ $role->label() }}</flux:select.option>
                 @endforeach
             </flux:select>
-            <flux:select name="is_active" label="Trạng thái" required>
+            <flux:select name="is_active" label="Trạng thái — khóa / mở khóa tài khoản" required>
                 <flux:select.option value="1" :selected="$account->is_active">Đang hoạt động</flux:select.option>
                 <flux:select.option value="0" :selected="! $account->is_active">Đã khóa</flux:select.option>
             </flux:select>

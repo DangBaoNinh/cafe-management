@@ -29,6 +29,7 @@
                                 <p class="font-semibold">{{ $seat->code }}</p>
                             @endif
                             <p>{{ $seat->capacity }} người · {{ $seat->availabilityLabel() }}</p>
+                            @if($seat->activeReservation)<p>Đã đặt: {{ $seat->activeReservation->scheduled_at?->setTimezone('Asia/Ho_Chi_Minh')->format('H:i d/m/Y') }}</p>@endif
                             @if ($operational)
                                 @include('operations.reservations.seat-actions')
                             @endif
