@@ -355,6 +355,11 @@
 - Chromium headless với SQLite riêng kiểm tra trang chủ/thực đơn tại 320, 390 và 1.440 px; đăng nhập, tùy chỉnh món và thêm giỏ bằng Livewire, checkout, đặt chỗ, quản trị/sơ đồ vận hành, sidebar và Escape, chuyển trang cài đặt bằng Livewire và chế độ tối. Các màn hình đã đo không tràn ngang toàn trang; không có lỗi JavaScript trong các kịch bản đã chạy. Mô hình quán có một canvas, đổi góc nhìn thực sự thay đổi hình; snapshot lỗi không giữ số chỗ khả dụng cũ.
 - Chưa kiểm chứng WebGL trên GPU/thiết bị thật; trình duyệt kiểm tra dùng renderer tương thích. Chưa chạy bộ tích hợp MySQL do chưa có cấu hình database thử riêng trong checkout hiện tại. Gói chưa chứa MP4 13 giây nên banner dùng poster đã gửi. Không chạy migration hoặc ghi dữ liệu thử vào MySQL cửa hàng. [Đối chiếu và hướng dẫn tích hợp](ui-preview/FRENCH_THEME_INTEGRATION.md).
 
+### Video banner trang chủ — đã tích hợp, chờ nghiệm thu
+
+- Đã tích hợp video PixVerse người dùng gửi vào banner Toàn. Giữ nguyên file, dài khoảng 8,04 giây và kích thước 1024 × 688; tự phát tắt tiếng, lặp, có nút phát/tạm dừng và poster khi tải lỗi. Tôn trọng reduced motion/tiết kiệm dữ liệu, tạm dừng khi banner ra ngoài viewport hoặc tab bị ẩn, giải phóng media theo lifecycle Livewire.
+- Edge headless xác minh giải mã và phát video thật, điều khiển, phát lặp, offscreen pause, reduced motion với phát chủ động và fallback khi media trả 404. Mobile 390 px không tràn ngang, không phát sinh lỗi JavaScript. Build, cú pháp JS và 6 bài hồi quy catalog/trang chủ với 89 assertion đạt. Không thay database hoặc logic nghiệp vụ.
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

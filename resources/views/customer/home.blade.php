@@ -2,7 +2,7 @@
 
     <section class="jardin-hero" data-film-hero aria-label="Chào mừng đến Toàn">
         <img class="jardin-hero-photo" src="{{ asset('french-theme/assets/film/entry-keyframe.png') }}" alt="Khách bước qua cánh cửa xanh vào khu vườn cà phê đầy nắng và hoa giấy" width="1672" height="941" fetchpriority="high">
-        <video class="jardin-film-video" data-hero-film hidden muted loop playsinline preload="none" poster="{{ asset('french-theme/assets/film/entry-keyframe.png') }}" aria-label="Phim ngắn Toàn Café: từ cánh cửa khu vườn đến tách cà phê">
+        <video class="jardin-film-video" data-hero-film data-src="{{ asset('french-theme/assets/film/toan-banner.mp4') }}" hidden muted loop playsinline preload="none" poster="{{ asset('french-theme/assets/film/entry-keyframe.png') }}" aria-label="Phim ngắn Toàn Café: từ cánh cửa khu vườn đến tách cà phê">
         </video>
         <div class="jardin-hero-shade">
         </div>
@@ -25,7 +25,7 @@
         </div>
         <div class="jardin-hero-bottom">
             <div class="jardin-film-control">
-                <button type="button" data-film-toggle hidden aria-pressed="false">Phát phim</button>
+                <button type="button" data-film-toggle hidden aria-pressed="false">Phát video</button>
                 <button type="button" data-foliage-toggle aria-pressed="true">Dừng cây lá đung đưa</button>
                 <a href="{{ route('story') }}">Chuyện ở khu vườn</a>
             </div>

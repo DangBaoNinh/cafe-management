@@ -99,6 +99,12 @@ async function initializeFrenchTheme() {
         }
     }));
 
+    if (document.querySelector('[data-hero-film]')) {
+        try {
+            const { mountHeroFilm } = await import(/* @vite-ignore */ new URL('assets/hero-film.js', base).href);
+            if (current === generation) retain(mountHeroFilm());
+        } catch { /* The poster remains available when the video module cannot load. */ }
+    }
     if (document.querySelector('[data-foliage-toggle]')) {
         try {
             const { mountGardenWindow } = await import(/* @vite-ignore */ new URL('assets/garden-window.js', base).href);

@@ -49,4 +49,8 @@ Lượt xác minh tích hợp đạt 215 bài với 3.465 assertion trên SQLite
 
 Kiểm tra giao diện tại trang chủ, `/menu`, `/cau-chuyen`, `/khong-gian`, `/cart`, `/checkout`, `/reservations/create`, `/admin` và `/operations/reservations/seats`. Dùng tài khoản đúng vai trò. Kiểm tra menu mobile, Escape, bàn phím, thay size, thêm giỏ, thông báo lỗi và chế độ sáng/tối.
 
-Gói chưa có MP4 13 giây: banner hiện dùng ảnh poster đã cung cấp. Scene 3D là minh họa kiến trúc/sơ đồ, không phải mô hình đo đạc mặt bằng. Font Cormorant Garamond và DM Sans tải từ Google Fonts, có font local/hệ thống dự phòng. Không thay schema hoặc chạy migration trên MySQL của ứng dụng trong task giao diện này.
+Banner đã nối video PixVerse người dùng cung cấp qua `public/french-theme/assets/film/toan-banner.mp4`. Video gốc dài khoảng 8,04 giây, kích thước 1024 × 688, dung lượng khoảng 3,64 MB; được giữ nguyên nội dung. Video tự phát tắt tiếng, lặp, hiển thị inline và có nút phát/tạm dừng. Khi bật reduced motion hoặc tiết kiệm dữ liệu, chờ người dùng nhấn phát. Video tạm dừng khi ra khỏi viewport hoặc tab bị ẩn; lỗi tải giữ ảnh poster. Module được dispose theo lifecycle Livewire. Đường dẫn media nằm trong `data-src` của video, metadata tham khảo nằm trong `film.json`.
+
+Edge headless đã giải mã và phát video thật, kiểm tra lặp, nút phát/tạm dừng, tạm dừng khi cuộn ra ngoài banner, chế độ giảm chuyển động và lỗi media. Banner ở 390 px không tràn ngang. Kiểm thử hồi quy trang chủ/catalog đạt 6 bài với 89 assertion; build và cú pháp JS đạt.
+
+Scene 3D là minh họa kiến trúc/sơ đồ, không phải mô hình đo đạc mặt bằng. Font Cormorant Garamond và DM Sans tải từ Google Fonts, có font local/hệ thống dự phòng. Không thay schema hoặc chạy migration trên MySQL của ứng dụng trong task giao diện này.
