@@ -31,6 +31,7 @@ use App\Http\Controllers\OperationsSupportController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\PublicSeatingController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationDepositController;
@@ -53,6 +54,7 @@ Route::get('khong-gian', [ReservationController::class, 'create'])->name('spaces
 Route::get('khong-gian/snapshot', PublicSeatingController::class)->middleware('throttle:60,1')->name('spaces.snapshot');
 Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
 Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
+Route::get('uu-dai', OfferController::class)->name('offers.index');
 Route::post('tro-chuyen', StorefrontChatController::class)
     ->middleware('throttle:storefront-chat')->name('storefront-chat.reply');
 

@@ -14,6 +14,13 @@ class CouponManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-21 00:00:00 UTC'));
+    }
+
     public function test_admin_creates_edits_and_disables_a_coupon(): void
     {
         $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
@@ -114,6 +121,29 @@ class CouponManagementTest extends TestCase
             $this->patch(route('admin.coupons.update', $coupon), $this->payload())->assertForbidden();
         }
         $this->assertDatabaseCount('coupons', 1);
+    }
+
+    public function test_coupon_start_may_be_in_the_past_but_expiry_cannot(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
+        $this->travelTo(CarbonImmutable::parse('2026-11-22 01:00:00', Coupon::LOCAL_TIMEZONE));
+
+        $this->postJson(route('admin.coupons.store'), $this->payload([
+            'starts_at' => '2026-11-21T00:59',
+            'ends_at' => '2026-11-22T02:30',
+        ]))->assertRedirect();
+        $coupon = Coupon::query()->sole();
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-22 02:00:00', Coupon::LOCAL_TIMEZONE));
+        $this->patch(route('admin.coupons.update', $coupon), $this->payload([
+            'is_active' => '0',
+        ]))->assertRedirectToRoute('admin.coupons.index');
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-22 03:00:00', Coupon::LOCAL_TIMEZONE));
+        $this->patchJson(route('admin.coupons.update', $coupon), $this->payload([
+            'starts_at' => '2026-11-22T02:00',
+            'ends_at' => '2026-11-22T02:30',
+        ]))->assertUnprocessable()->assertJsonValidationErrors('ends_at');
     }
 
     public function test_discount_respects_the_time_window_threshold_limits_rounding_and_cap(): void

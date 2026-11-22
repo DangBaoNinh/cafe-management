@@ -82,8 +82,10 @@
             </flux:select>
 
             <p>Nhận tại quán chỉ dùng QR chuyển khoản hoặc tài khoản liên kết. <a class="underline" href="{{ route('profile.edit') }}">Liên kết ngân hàng trong Hồ sơ</a>.</p>
-            <flux:input name="coupon_code" label="Mã giảm giá (nếu có)" maxlength="40"
-                :value="is_string($fields['coupon_code']) ? $fields['coupon_code'] : ''" />
+            <section class="coupon-checkout-field" aria-labelledby="coupon-checkout-heading">
+                <div class="flex flex-wrap items-start justify-between gap-3"><div><p class="coupon-summary__eyebrow">Ưu đãi</p><h2 id="coupon-checkout-heading" class="text-lg font-semibold">Bạn có mã giảm giá?</h2></div><span class="coupon-checkout-field__seal" aria-hidden="true">%</span></div>
+                <flux:input name="coupon_code" label="Nhập mã ưu đãi" maxlength="40" description="Mỗi đơn dùng một mã. Hệ thống sẽ kiểm tra điều kiện và tổng giảm ở bước tiếp theo." :value="is_string($fields['coupon_code']) ? $fields['coupon_code'] : ''" />
+            </section>
             <flux:button type="submit" variant="primary">Xem tổng tiền</flux:button>
         </form>
     </section>

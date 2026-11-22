@@ -4,8 +4,10 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\CouponDiscountType;
 use App\Models\Coupon;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class SaveCouponRequest extends FormRequest
 {
@@ -52,6 +54,29 @@ class SaveCouponRequest extends FormRequest
             'per_user_limit' => ['bail', 'nullable', 'integer:strict', 'min:1'],
             'is_active' => ['required', 'boolean'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $coupon = $this->route('coupon');
+            $now = CarbonImmutable::now(Coupon::LOCAL_TIMEZONE)->startOfMinute();
+
+            foreach (['ends_at'] as $field) {
+                if ($validator->errors()->has($field) || ! is_string($this->input($field))) {
+                    continue;
+                }
+
+                $submitted = CarbonImmutable::createFromFormat(
+                    Coupon::FORM_DATE_FORMAT,
+                    $this->string($field)->toString(),
+                    Coupon::LOCAL_TIMEZONE,
+                );
+                if ($submitted->lt($now)) {
+                    $validator->errors()->add($field, 'Không được chọn thời gian trong quá khứ.');
+                }
+            }
+        });
     }
 
     /** @return array<string, string> */
