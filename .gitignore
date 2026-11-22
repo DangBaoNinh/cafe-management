@@ -39,3 +39,6 @@ yarn-error.log
 /boost.json
 /opencode.json
 /opencode.jsonc
+
+# Extracted UI reference; integrated assets live in public/french-theme.
+/docs/ui-preview/french-theme-source/

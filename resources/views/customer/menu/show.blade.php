@@ -3,7 +3,7 @@
         <flux:link :href="route('menu.index', $filters)">Về thực đơn</flux:link>
 
         <div class="grid items-start gap-8 md:grid-cols-2 md:gap-10">
-            <x-customer.product-image :$product detail class="aspect-[4/3] rounded-xl border border-terrasse-ink/15" />
+            <x-customer.product-image :$product detail class="aspect-square rounded-t-[8rem] rounded-b-xl border border-terrasse-ink/15" />
 
             <div class="min-w-0 space-y-5">
                 <header class="space-y-3">

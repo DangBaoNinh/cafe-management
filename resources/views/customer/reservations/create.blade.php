@@ -1,7 +1,7 @@
 <x-layouts::customer title="Đặt chỗ tại quán">
     <section class="mx-auto max-w-5xl space-y-5">
         <flux:link :href="route('reservations.index')">Lịch đặt của tôi</flux:link>
-        <h1 class="terrasse-display text-3xl font-semibold sm:text-4xl">Đặt chỗ tại quán</h1>
+        <header class="french-booking-hero"><div><p class="eyebrow">Une place pour vous</p><h1>Đặt chỗ tại quán</h1><p class="terrasse-muted mt-4">Một chiếc bàn nhỏ, một cuộc hẹn thật đẹp. Chọn ngày, giờ và góc ngồi phù hợp với bạn.</p></div><img src="{{ asset('french-theme/assets/interior.webp') }}" alt="Không gian bên khung cửa xanh của Toàn" width="1122" height="1402"></header>
         @include('reservations.feedback')
         <form method="GET" action="{{ route('reservations.create') }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-5">
             <x-customer.pickup-slot :date="$filters['pickup_date']" :time="$filters['pickup_clock']" :$slots day-label="Ngày đến" time-label="Giờ đến (giờ Việt Nam)" />

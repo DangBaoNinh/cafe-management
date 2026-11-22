@@ -1,0 +1,27 @@
+{
+  "status": "awaiting_user_video",
+  "duration": 13,
+  "src": null,
+  "poster": "./entry-keyframe.png",
+  "ratio": "16:9",
+  "storyboard": [
+    {
+      "start": 0,
+      "end": 5,
+      "shot": "Khách bước qua cánh cửa xanh, camera dolly theo vào khu vườn ngập nắng và hoa giấy.",
+      "reference": "./entry-keyframe.png"
+    },
+    {
+      "start": 5,
+      "end": 8,
+      "shot": "Camera lướt qua giàn hoa và những góc bàn xanh mát, cảm giác mở ra một khoảng trời riêng.",
+      "reference": "../garden.webp"
+    },
+    {
+      "start": 8,
+      "end": 13,
+      "shot": "Barista rót sữa, hoàn thiện latte art; cận tách cà phê, hơi ấm và ánh sáng dịu.",
+      "reference": "./barista-keyframe.png"
+    }
+  ]
+}
