@@ -59,7 +59,7 @@ class SecurityTest extends TestCase
             ->assertSessionHasErrors(['email' => __('auth.failed')]);
         $this->assertGuest();
         $this->post(route('login.store'), ['email' => $user->email, 'password' => 'new-password'])
-            ->assertRedirect(route('dashboard'));
+            ->assertRedirect(route('home'));
         $this->assertAuthenticatedAs($user);
     }
 

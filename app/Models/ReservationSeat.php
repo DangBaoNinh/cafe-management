@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ReservationStatus;
+use App\Services\BookingRules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -22,7 +23,12 @@ class ReservationSeat extends Model
     /** @return HasOne<Reservation, $this> */
     public function activeReservation(): HasOne
     {
-        return $this->hasOne(Reservation::class, 'active_seat_id');
+        return $this->hasOne(Reservation::class, 'reservation_seat_id')->where(function ($q): void {
+            $start = now(BookingRules::TIMEZONE)->startOfDay()->utc();
+            $q->where('status', ReservationStatus::CheckedIn)->orWhere(function ($q) use ($start): void {
+                $q->where('status', ReservationStatus::Confirmed)->where('scheduled_at', '>=', $start)->where('scheduled_at', '<', $start->copy()->addDay());
+            });
+        });
     }
 
     /** @return HasOne<TableSession, $this> */
@@ -45,7 +51,7 @@ class ReservationSeat extends Model
     {
         return match ($this->availability()) {
             'occupied' => 'Đang sử dụng',
-            'held' => 'Đã giữ',
+            'held' => 'Đã đặt',
             'inactive' => 'Ngừng phục vụ',
             default => 'Trống',
         };

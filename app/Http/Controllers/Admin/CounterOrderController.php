@@ -23,12 +23,16 @@ class CounterOrderController extends Controller
             'target' => ['required', Rule::in(['completed', 'cancelled'])],
             'revision' => ['required', 'integer', 'min:1'],
             'reason' => [Rule::requiredIf($invoice->status === 'paid'), 'required_if:target,cancelled', 'nullable', 'string', 'max:500'],
+            'deposit_refund_confirmed' => ['nullable', 'boolean'],
         ]);
         if (! in_array($invoice->status, ['draft', 'paid'], true) || $invoice->revision !== (int) $data['revision']
             || ($invoice->status === 'paid' && $invoice->order_status->value === $data['target'])) {
             throw ValidationException::withMessages(['revision' => 'Phiếu đã đổi trạng thái hoặc nội dung. Vui lòng tải lại đơn hàng.'])->status(409);
         }
-        $token = $confirmation->issue($request->user(), $invoice, $data['target'], (int) $data['revision'], $data['reason'] ?? null);
+        if ($invoice->status === 'draft' && $data['target'] === 'completed' && $invoice->deposit_refund_vnd > 0 && ! $request->boolean('deposit_refund_confirmed')) {
+            throw ValidationException::withMessages(['deposit_refund_confirmed' => 'Xác nhận đã hoàn tiền mặt phần cọc dư.']);
+        }
+        $token = $confirmation->issue($request->user(), $invoice, $data['target'], (int) $data['revision'], $data['reason'] ?? null, $request->boolean('deposit_refund_confirmed'));
 
         return view('admin.orders.confirm-status', ['invoice' => $invoice, 'target' => $data['target'], 'reason' => $data['reason'] ?? null, 'token' => $token, 'returnToInvoices' => $request->boolean('return_to_invoices')]);
     }
@@ -51,7 +55,7 @@ class CounterOrderController extends Controller
         if ($data['payment_status'] === 'paid') {
             app(PaidCounterOrderStatus::class)->change($request->user(), $invoice, $data['target'], $data['revision'], $data['reason']);
         } elseif ($data['target'] === 'completed') {
-            $invoices->completeSaved($request->user(), $invoice, (int) $data['revision']);
+            $invoices->completeSaved($request->user(), $invoice, (int) $data['revision'], $data['deposit_refund_confirmed']);
         } else {
             $rounds->advance($request->user(), $invoice->tableSession, (string) $invoice->table_round_id,
                 TableRoundStatus::Pending, TableRoundStatus::Cancelled, $data['reason'], (int) $data['revision']);

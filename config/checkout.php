@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'customer_refund_demo' => (bool) env('CUSTOMER_REFUND_DEMO_ENABLED', true),
+    'reservation_deposit_demo' => (bool) env('RESERVATION_DEPOSIT_DEMO_ENABLED', false),
     'bank_transfer' => [
         // Recipient supplied by the shop in docs/ui-preview/image.png (public payment information).
         'bank_name' => env('CHECKOUT_BANK_NAME') ?: 'VietinBank',

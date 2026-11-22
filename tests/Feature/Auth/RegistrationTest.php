@@ -53,7 +53,7 @@ class RegistrationTest extends TestCase
 
     public function test_registration_rejects_a_duplicate_email_with_different_case(): void
     {
-        $user = User::factory()->create(['email' => 'test@example.com']);
+        $user = User::factory()->create(['email' => 'test@example.com'])->refresh();
 
         $this->from(route('register'))->post(route('register.store'), [
             'name' => 'Another customer',

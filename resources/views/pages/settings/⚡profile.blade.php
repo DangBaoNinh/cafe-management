@@ -81,5 +81,18 @@ new #[Layout('layouts::settings')] #[Title('Cài đặt hồ sơ')] class extend
                 Lưu hồ sơ
             </flux:button>
         </form>
+        @can('access-customer-orders')
+        <form method="POST" action="{{ route('profile.bank.update') }}" class="mt-8 max-w-lg space-y-4 rounded-xl border p-5">
+            @csrf
+            <h2 class="text-xl font-bold">Liên kết tài khoản ngân hàng</h2>
+            <p>Liên kết demo dùng thanh toán online và nhận hoàn tiền. Không nhập mật khẩu ngân hàng hoặc OTP.</p>
+            @if(session('status'))<p role="status">{{ session('status') }}</p>@endif
+            <flux:input name="bank_name" label="Ngân hàng" :value="old('bank_name', auth()->user()->linked_bank['bank_name'] ?? '')" required maxlength="100" />
+            <flux:input name="account_number" label="Số tài khoản" :value="old('account_number', auth()->user()->linked_bank['account_number'] ?? '')" required inputmode="numeric" maxlength="30" />
+            <flux:input name="account_holder" label="Tên chủ tài khoản" :value="old('account_holder', auth()->user()->linked_bank['account_holder'] ?? '')" required maxlength="120" />
+            <label><input type="checkbox" name="confirm" value="1" required> Tôi xác nhận đây là tài khoản của mình.</label>
+            <flux:button type="submit" variant="primary">Liên kết / cập nhật tài khoản demo</flux:button>
+        </form>
+        @endcan
     </x-pages::settings.layout>
 </div>

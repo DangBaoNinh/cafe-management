@@ -132,7 +132,7 @@ class AccountManagementTest extends TestCase
         $rememberToken = $customer->remember_token;
 
         $this->post(route('login.store'), ['email' => $customer->email, 'password' => 'password'])
-            ->assertRedirect(route('dashboard'));
+            ->assertRedirect(route('home'));
         $this->get(route('profile.edit'))->assertOk();
         $sessionId = session()->getId();
 

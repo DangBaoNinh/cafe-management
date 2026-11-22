@@ -94,7 +94,17 @@ class Checkout
 
     private function pickupSlot(User $user, CheckoutDetails $details): ?CarbonImmutable
     {
-        if ($details->pickupTime === null) {
+        if ($details->fulfillment === FulfillmentType::Pickup) {
+            if ($details->method === PaymentMethod::Cod) {
+                throw $this->invalid('method', 'Nhận tại quán chỉ thanh toán bằng QR chuyển khoản hoặc ngân hàng liên kết demo.');
+            }
+            if ($details->method === PaymentMethod::DemoGateway) {
+                CustomerRefunds::requireBank($user);
+            }
+            if ($details->pickupTime === null) {
+                throw $this->invalid('pickup_time', 'Chọn giờ nhận ít nhất 15 phút sau khi đặt.');
+            }
+        } elseif ($details->pickupTime === null) {
             return null;
         }
         if ($details->fulfillment !== FulfillmentType::Pickup) {
@@ -104,7 +114,7 @@ class Checkout
         try {
             BookingRules::authorizeBooking($user);
 
-            return BookingRules::slot($details->pickupTime);
+            return BookingRules::slot($details->pickupTime, 15);
         } catch (ValidationException $exception) {
             throw $exception->redirectTo(route('checkout.create'));
         }

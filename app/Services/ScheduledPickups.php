@@ -32,7 +32,7 @@ class ScheduledPickups
             $this->require($pickup->isOpen($order) && $pickup->arrived_at === null && now()->lt($pickup->scheduled_at),
                 'Chỉ đổi lịch trước giờ hẹn và trước khi ghi nhận đến.');
             $this->require($pickup->revision === $revision, 'Lịch đã thay đổi. Vui lòng tải lại trang.');
-            $slot = BookingRules::replacementSlot($input, $pickup->scheduled_at);
+            $slot = BookingRules::replacementSlot($input, $pickup->scheduled_at, 15);
 
             $oldSlot = $pickup->scheduled_at;
             $pickup->revision++;

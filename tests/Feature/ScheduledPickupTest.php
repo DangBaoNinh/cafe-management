@@ -35,7 +35,7 @@ class ScheduledPickupTest extends TestCase
         $this->postJson(route('checkout.review'), [...$details, 'fulfillment_type' => 'delivery', 'address_id' => 1, 'pickup_time' => '2026-11-21 07:00'])
             ->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
         $input = $this->review([...$details, 'pickup_mode' => 'scheduled', 'pickup_date' => '2026-11-21', 'pickup_clock' => '07:00']);
-        $this->travel(1)->minutes();
+        $this->travel(46)->minutes();
         $this->postJson(route('checkout.store'), $input)->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
         $this->assertSame(1, $customer->cart()->sole()->items()->count());
         $this->assertDatabaseCount('orders', 0);
@@ -196,8 +196,8 @@ class ScheduledPickupTest extends TestCase
         $details = $this->basket($customer);
         $this->actingAs($customer)->postJson(route('checkout.review'), [...$details, 'pickup_time' => '2026-11-22 07:00'])
             ->assertJsonValidationErrors('pickup_time');
-        $this->post(route('checkout.store'), $this->review($details))->assertStatus(303);
-        $this->assertSame(1, $customer->orders()->whereDoesntHave('scheduledPickup')->count());
+        $this->postJson(route('checkout.review'), $details)->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
+        $this->assertSame(0, $customer->orders()->whereDoesntHave('scheduledPickup')->count());
         $this->travel(7)->days();
         $this->post(route('checkout.review'), [...$this->basket($customer), 'pickup_time' => '2026-11-29 07:00'])->assertOk();
     }
@@ -324,13 +324,14 @@ class ScheduledPickupTest extends TestCase
 
     private function basket(User $customer): array
     {
+        config(['checkout.bank_transfer' => ['bank_name' => 'VCB', 'account_number' => '1234567', 'account_holder' => 'QUAN']]);
         $category = Category::create(['name' => 'Cà phê', 'slug' => fake()->uuid()]);
         $product = $category->products()->create(['name' => 'Cà phê sữa', 'slug' => fake()->uuid()]);
         $size = $product->sizes()->create(['label' => 'Vừa', 'code' => 'm', 'price_vnd' => 40000]);
         app(ShoppingCart::class)->add($customer, $product->id, ['size_id' => $size->id], 1);
 
         return [
-            'cart_version' => $customer->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'cod',
+            'cart_version' => $customer->cart()->sole()->version, 'fulfillment_type' => 'pickup', 'method' => 'bank_transfer',
             'recipient_name' => 'Khách nhận', 'phone' => '0901234567',
         ];
     }
@@ -350,6 +351,7 @@ class ScheduledPickupTest extends TestCase
     private function scheduled(string $time, string $status = 'pending', ?User $customer = null, string $paymentStatus = 'pending'): array
     {
         $customer ??= User::factory()->create();
+        $customer->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
         $key = fake()->uuid();
         $order = $customer->orders()->create([
             'order_number' => 'CF-'.Str::ulid(), 'checkout_key' => $key, 'request_hash' => hash('sha256', $key),

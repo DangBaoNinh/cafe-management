@@ -135,6 +135,7 @@ class DemoPaymentGateway
             'to_status' => $payment->status->value,
             'reason' => $admin === null ? 'Callback cổng thanh toán mô phỏng.' : 'Đối chiếu cổng thanh toán mô phỏng.',
         ]);
+        CustomerRefunds::refundLateDemoReceipt($order);
     }
 
     private function deliver(DemoPaymentSession $session, ?User $admin = null): void

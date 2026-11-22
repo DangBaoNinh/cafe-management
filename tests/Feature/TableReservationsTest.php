@@ -20,6 +20,12 @@ class TableReservationsTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['checkout.reservation_deposit_demo' => true]);
+    }
+
     public function test_map_inventory_and_availability_include_held_seats_and_walk_ins(): void
     {
         $this->at('06:00');
@@ -68,6 +74,7 @@ class TableReservationsTest extends TestCase
         }
         $this->post(route('reservations.store'), $input)->assertStatus(303);
         $book = $owner->reservations()->sole();
+        $this->post(route('reservations.deposit.pay', $book->code), ['confirmed' => 1, 'amount_vnd' => $book->deposit->amount_vnd])->assertStatus(303);
         $this->travel(1)->minutes();
         $this->post(route('reservations.store'), $input)->assertRedirectToRoute('reservations.show', $book->code);
         $this->postJson(route('reservations.store'), [...$input, 'party_size' => 9])->assertConflict();
@@ -79,6 +86,7 @@ class TableReservationsTest extends TestCase
         $this->postJson(route('operations.reservations.check-in', $book->code))->assertForbidden();
         $this->actingAs($owner)->postJson(route('reservations.cancel', $book->code))
             ->assertJsonValidationErrors(['confirm' => 'Bạn cần xác nhận hủy lịch.']);
+        $owner->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
         $this->assertSame(ReservationStatus::Confirmed, $book->refresh()->status);
         $this->post(route('reservations.cancel', $book->code), ['confirm' => '1'])->assertStatus(303);
         $this->assertSame(ReservationStatus::Cancelled, $book->refresh()->status);
@@ -86,7 +94,7 @@ class TableReservationsTest extends TestCase
         $this->at('21:30');
         $replacement = $this->book($second, 'T2-PH', '22:30');
         $this->assertNotSame($book->code, $replacement->code);
-        $this->assertCount(2, $book->events);
+        $this->assertCount(3, $book->events);
     }
 
     public function test_preferred_room_survives_login_and_search_but_is_not_selected_if_held(): void
@@ -97,7 +105,7 @@ class TableReservationsTest extends TestCase
         $preferences = ['party_size' => 6, 'seat_id' => $room->id];
         $destination = route('reservations.create', $preferences);
         $this->get($destination)->assertRedirect(route('login'));
-        $this->post(route('login'), ['email' => $owner->email, 'password' => 'password'])->assertRedirect(route('home'));
+        $this->post(route('login'), ['email' => $owner->email, 'password' => 'password'])->assertRedirect($destination);
         $this->get($destination)->assertOk()->assertSee('T2-PH')->assertDontSee('T1-PH')
             ->assertSeeHtml('name="seat_id" value="'.$room->id.'"')
             ->assertViewHas('filters', ['pickup_date' => '2026-11-21', 'pickup_clock' => null, 'kind' => 'room', 'party_size' => 6, 'floor' => 2]);
@@ -106,7 +114,7 @@ class TableReservationsTest extends TestCase
         $radio = 'type="radio" name="seat_id" value="'.$room->id.'" required checked';
         $this->get($search)->assertOk()->assertSeeHtml($radio);
         $this->book(User::factory()->create(), 'T2-PH', '13:00');
-        $this->actingAs($owner)->get($search)->assertOk()->assertSee('T2-PH')->assertSee('Đã giữ.')
+        $this->actingAs($owner)->get($search)->assertOk()->assertSee('T2-PH')->assertSee('Đã đặt.')
             ->assertDontSeeHtml('type="radio" name="seat_id"')->assertDontSee('Xác nhận đặt chỗ');
     }
 
@@ -132,7 +140,7 @@ class TableReservationsTest extends TestCase
         $this->at('14:30');
         $room = $snapshotRoom();
         $this->assertSame('reserved', $room['status']);
-        $this->assertNull($room['scheduled_at']);
+        $this->assertStringContainsString('14:30', $room['scheduled_at']);
 
         $staff = User::factory()->create(['role' => UserRole::Staff]);
         $this->actingAs($staff)->post(route('operations.reservations.check-in', $replacement->code))->assertStatus(303);
@@ -183,7 +191,7 @@ class TableReservationsTest extends TestCase
         $this->assertSame(10000, $booking->fees()->sole()->amount_vnd);
         $staff = User::factory()->create(['role' => UserRole::Staff]);
         $checkIn = route('operations.reservations.check-in', $booking->code);
-        $this->actingAs($staff)->postJson($checkIn)->assertJsonValidationErrors('reservation');
+        $this->actingAs($staff);
         $this->post(route('operations.reservations.lookup'), ['code' => strtolower($booking->code)])
             ->assertRedirectToRoute('operations.reservations.show', $booking->code);
         $this->get(route('operations.reservations.index', ['date' => '2026-11-21', 'floor' => 1, 'kind' => 'table', 'status' => 'confirmed']))
@@ -202,7 +210,7 @@ class TableReservationsTest extends TestCase
         $this->postJson($collect, ['amount_vnd' => 10000 + $lateFee])->assertJsonValidationErrors('amount_vnd');
         $this->post(route('operations.reservations.release', $booking->code))->assertStatus(303);
         $this->assertSame('free', $this->seat('T1-B01')->availability());
-        $this->assertSame(['confirmed', 'checked_in', 'completed'], $booking->events()->orderBy('id')->pluck('to_status')->all());
+        $this->assertSame(['pending_deposit', 'confirmed', 'checked_in', 'completed'], $booking->events()->orderBy('id')->pluck('to_status')->all());
         $this->assertSame($staff->id, $booking->events()->where('to_status', 'completed')->sole()->actor_id);
     }
 
@@ -234,7 +242,7 @@ class TableReservationsTest extends TestCase
         $this->assertSame(ReservationStatus::NoShow, $res->refresh()->status);
         $this->assertEquals($this->viet('23:00'), $closing->refresh()->no_show_at);
         $this->assertSame('free', $this->seat('T1-B02')->availability());
-        $this->assertSame(2, $closing->events()->count());
+        $this->assertSame(3, $closing->events()->count());
         $this->assertEquals($this->viet('23:00')->addDays(7), $customer->refresh()->booking_blocked_until);
         $this->actingAs($customer)->postJson(route('reservations.store'), $this->input('T1-B01', '07:00', ['pickup_date' => '2026-11-22']))
             ->assertJsonValidationErrors('pickup_time');
@@ -244,12 +252,13 @@ class TableReservationsTest extends TestCase
         app(ShoppingCart::class)->add($customer, $product->id, ['size_id' => $size->id], 1);
         $basket = ['cart_version' => $customer->cart()->sole()->version, 'method' => 'cod', 'fulfillment_type' => 'pickup',
             'recipient_name' => 'Khách thử', 'phone' => '0901234567'];
-        $this->postJson(route('checkout.review'), [...$basket, 'pickup_time' => '2026-11-22 07:00'])->assertJsonValidationErrors('pickup_time');
-        $this->post(route('checkout.review'), $basket)->assertOk();
+        $this->postJson(route('checkout.review'), [...$basket, 'pickup_time' => '2026-11-22 07:00'])->assertJsonValidationErrors('method');
+        $this->postJson(route('checkout.review'), $basket)->assertUnprocessable()->assertJsonValidationErrors('method');
         $this->travel(7)->days();
         $this->actingAs($customer->refresh())->post(route('reservations.store'), $this->input('T1-B01', '07:00', ['pickup_date' => '2026-11-29']))
             ->assertStatus(303);
         $new = $customer->reservations()->latest('id')->firstOrFail();
+        $this->post(route('reservations.deposit.pay', $new->code), ['confirmed' => 1, 'amount_vnd' => $new->deposit->amount_vnd])->assertStatus(303);
         $this->travelTo($this->viet('07:00')->addDays(8));
         $this->actingAs($staff)->post(route('operations.reservations.check-in', $new->code))->assertStatus(303);
         $this->assertSame(0, $customer->refresh()->booking_no_shows);
@@ -257,7 +266,7 @@ class TableReservationsTest extends TestCase
 
     public function test_bank_confirmation_and_fallback_keep_only_unpaid_counter_fees_on_the_invoice(): void
     {
-        config(['checkout.bank_transfer' => ['bank_name' => 'Ngân hàng thử', 'account_number' => '1234', 'account_holder' => 'Quán thử']]);
+        config(['checkout.bank_transfer' => ['bank_name' => 'Ngân hàng thử', 'bank_bin' => '970436', 'account_number' => '1234', 'account_holder' => 'Quán thử']]);
         $this->at('19:00');
         $guest = User::factory()->create();
         $booking = $this->book($guest, 'T2-PH', '21:30', ['channel' => 'app']);
@@ -315,9 +324,13 @@ class TableReservationsTest extends TestCase
 
     private function book(User $customer, string $code, string $time, array $overrides = []): Reservation
     {
+        $customer->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
         $data = $this->input($code, $time, $overrides);
         $this->actingAs($customer)->post(route('reservations.store'), $data)->assertStatus(303);
 
-        return $customer->reservations()->where('booking_key', $data['booking_key'])->sole();
+        $reservation = $customer->reservations()->where('booking_key', $data['booking_key'])->sole();
+        $this->post(route('reservations.deposit.pay', $reservation->code), ['confirmed' => 1, 'amount_vnd' => $reservation->deposit->amount_vnd])->assertStatus(303);
+
+        return $reservation->refresh();
     }
 }

@@ -5,6 +5,7 @@
         <dt class="text-sm">Vị trí</dt>
         <dd>Tầng {{ $reservation->seat->floor }} · {{ \App\Models\ReservationSeat::KINDS[$reservation->seat->kind] }} {{ $reservation->seat->code }} · {{ $reservation->party_size }} khách</dd>
     </div>
+    <div><dt class="text-sm">Ngày tạo đặt bàn</dt><dd><x-customer.order-time :date="$reservation->created_at" /></dd></div>
     <div><dt class="text-sm">Giờ hẹn</dt><dd><x-customer.order-time :date="$reservation->scheduled_at" /></dd></div>
     <div><dt class="text-sm">Liên hệ</dt><dd class="wrap-anywhere">{{ $reservation->contact_name }} · {{ $reservation->phone }}</dd></div>
     @if ($reservation->arrived_at !== null)

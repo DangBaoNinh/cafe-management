@@ -243,10 +243,12 @@ class RecipeInventoryTest extends TestCase
 
     private function checkout(User $customer, Product $product, ProductSize $size, Topping $topping, int $cups): Order
     {
+        config(['checkout.bank_transfer' => ['bank_name' => 'VCB', 'account_number' => '1234567', 'account_holder' => 'QUAN']]);
         app(ShoppingCart::class)->add($customer, $product->id, ['size_id' => $size->id, 'topping_ids' => [$topping->id]], $cups);
         $details = [
             'cart_version' => $customer->cart()->sole()->version, 'recipient_name' => 'Khách thử',
-            'phone' => '0901234567', 'fulfillment_type' => 'pickup', 'method' => 'cod',
+            'phone' => '0901234567', 'fulfillment_type' => 'pickup', 'method' => 'bank_transfer',
+            'pickup_time' => now('Asia/Ho_Chi_Minh')->addDay()->format('Y-m-d').' 12:00',
         ];
         $review = $this->actingAs($customer)->post(route('checkout.review'), $details)->assertOk();
         $key = $review->viewData('key');
@@ -255,6 +257,9 @@ class RecipeInventoryTest extends TestCase
             'accepted_total_vnd' => $review->viewData('quote')['order']['total_vnd'],
         ])->assertStatus(303);
 
-        return $customer->orders()->where('checkout_key', $key)->sole();
+        $order = $customer->orders()->where('checkout_key', $key)->sole();
+        $order->payment()->update(['status' => 'paid', 'paid_at' => now()]);
+
+        return $order;
     }
 }

@@ -27,7 +27,7 @@ class TableSessionOperationsController extends Controller
     public function index(): View
     {
         $seats = ReservationSeat::query()->with([
-            'activeReservation',
+            'activeReservation.deposit',
             'tableInvoices' => fn ($q) => $q->where('table_invoices.status', 'draft')->latest('table_invoices.updated_at')->latest('table_invoices.id'),
             'activeTableSession',
         ])

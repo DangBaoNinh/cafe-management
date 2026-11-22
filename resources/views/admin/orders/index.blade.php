@@ -19,6 +19,7 @@
         </header>
 
         @if($invoiceManagement)
+            @if($pendingDeposits > 0)<p role="status" class="terrasse-panel rounded p-4"><strong>{{ $pendingDeposits }} chứng từ đặt cọc đã nhận đang chờ trừ vào hóa đơn.</strong> <a class="underline" href="{{ route('admin.invoices.index', ['source' => 'deposit']) }}">Xem tiền cọc</a></p>@endif
             <section class="terrasse-panel space-y-3 rounded p-4" aria-labelledby="invoice-status-help">
                 <h2 id="invoice-status-help" class="text-lg font-semibold">Thay đổi trạng thái hóa đơn</h2>
                 <p>Ở cột Thao tác, chọn Thay đổi trạng thái để mở hóa đơn. Chọn trạng thái mới và xác minh trước khi cập nhật.</p>
@@ -70,21 +71,22 @@
                 </thead>
                 <tbody class="divide-y divide-terrasse-ink/15">
                     @forelse($orders as $order)
+                        @php($detailUrl = match($order->source) { 'legacy' => route('operations.invoices.tables.show', $order->number), 'deposit' => route('operations.deposits.show', $order->document_reference), default => route($detailRoute, $order->number) })
                         <tr>
                             <th scope="row" class="px-4 py-3">
-                                <flux:link :href="$order->source === 'legacy' ? route('operations.invoices.tables.show', $order->number) : route($detailRoute, $order->number)">{{ $order->number }}</flux:link>
+                                <flux:link :href="$detailUrl">{{ $order->number }}</flux:link>
                             </th>
                             <td class="px-4 py-3"><x-customer.order-time :date="Carbon\CarbonImmutable::parse($order->created_at, 'UTC')" /></td>
                             <td class="px-4 py-3">
-                                {{ $order->source === 'online' ? App\Enums\FulfillmentType::from($order->fulfillment)->label() : 'Tại quầy / bàn' }}
+                                {{ $order->source === 'deposit' ? 'Đặt cọc bàn' : ($order->source === 'online' ? App\Enums\FulfillmentType::from($order->fulfillment)->label() : 'Tại quầy / bàn') }}
                                 <span class="block text-xs">{{ $order->label }}</span>
                             </td>
                             <td class="px-4 py-3"><x-admin.order-state :state="$order->display_status" />@if($order->source === 'counter' && $order->payment_status === 'paid' && $order->status === 'cancelled')<span class="mt-1 block text-xs">Đã thu tiền · hoàn tiền riêng</span>@endif</td>
-                            <td class="px-4 py-3">{{ $order->source === 'online' ? App\Enums\OrderStatus::from($order->status)->label() : App\Enums\CounterOrderStatus::from($order->status)->label() }}</td>
+                            <td class="px-4 py-3">{{ $order->source === 'deposit' ? (new App\Models\ReservationDeposit(['status' => $order->status]))->statusLabel() : ($order->source === 'online' ? App\Enums\OrderStatus::from($order->status)->label() : App\Enums\CounterOrderStatus::from($order->status)->label()) }}</td>
                             <td class="px-4 py-3">{{ match($order->collection_method ?? $order->method) { 'cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'cod' => 'Thanh toán khi nhận', 'demo_gateway' => 'Cổng thanh toán mô phỏng', default => 'Chưa phân loại (hóa đơn cũ)' } }}</td>
                             <td class="px-4 py-3 text-right font-semibold"><x-customer.vnd :amount="(int) $order->total_vnd" /></td>
                             <td class="px-4 py-3">
-                                <flux:button size="sm" :href="$order->source === 'legacy' ? route('operations.invoices.tables.show', $order->number) : route($detailRoute, $order->number)">{{ ($order->source === 'counter' && $order->payment_status !== 'voided') || ($order->display_status === 'pending' && $order->source === 'online') ? ($invoiceManagement ? 'Thay đổi trạng thái' : 'Cập nhật trạng thái') : 'Xem chi tiết' }}</flux:button>
+                                <flux:button size="sm" :href="$detailUrl">{{ $order->source === 'deposit' ? 'Xem chứng từ cọc' : ((($order->source === 'counter' && $order->payment_status !== 'voided') || ($order->display_status === 'pending' && $order->source === 'online')) ? ($invoiceManagement ? 'Thay đổi trạng thái' : 'Cập nhật trạng thái') : 'Xem chi tiết') }}</flux:button>
                             </td>
                         </tr>
                     @empty

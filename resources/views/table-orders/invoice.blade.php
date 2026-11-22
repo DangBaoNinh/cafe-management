@@ -24,7 +24,12 @@
             <div><dt>Tổng số lượng</dt><dd>{{ $invoice->round->items->sum('quantity') }}</dd></div>
             <div><dt>Tiền món</dt><dd><x-customer.vnd :amount="$invoice->subtotal_vnd" /></dd></div>
             @foreach($invoice->fees as $fee)<div><dt>{{ $fee->label() }}</dt><dd><x-customer.vnd :amount="$fee->amount_vnd" /></dd></div>@endforeach
-            <div class="receipt-grand-total"><dt>{{ $invoice->status === 'paid' ? 'Tổng đã thanh toán' : 'Tổng tạm tính' }}</dt><dd><x-customer.vnd :amount="$invoice->total_vnd" /></dd></div>
+            @if($invoice->deposit_credit_vnd > 0)
+                <div><dt>Tổng tiền món và phụ phí</dt><dd><x-customer.vnd :amount="$invoice->total_vnd" /></dd></div>
+                <div><dt>Trừ tiền cọc</dt><dd>−<x-customer.vnd :amount="$invoice->deposit_credit_vnd" /></dd></div>
+            @endif
+            <div class="receipt-grand-total"><dt>{{ $invoice->deposit_credit_vnd > 0 ? 'Thanh toán thêm' : ($invoice->status === 'paid' ? 'Tổng đã thanh toán' : 'Tổng tạm tính') }}</dt><dd><x-customer.vnd :amount="$invoice->amount_due_vnd" /></dd></div>
+            @if($invoice->deposit_refund_vnd > 0)<div><dt>{{ $invoice->status === 'paid' ? 'Đã hoàn cọc dư bằng tiền mặt' : 'Cần hoàn cọc dư bằng tiền mặt' }}</dt><dd><x-customer.vnd :amount="$invoice->deposit_refund_vnd" /></dd></div>@endif
         </dl>
         @if($qrImage && $invoice->status === 'draft')
             <section class="receipt-payment">
@@ -45,7 +50,7 @@
     @if(!$adminInvoice && !$customer && $invoice->status === 'draft')
         <section class="receipt-actions" data-no-print>
             <p>Kiểm tra tạm tính và xác nhận đã thu đủ tiền {{ $invoice->method->label() }}.</p>
-            <form method="POST" action="{{ route('operations.invoices.prepaid.pay', $invoice) }}">@csrf<input type="hidden" name="revision" value="{{ $invoice->revision }}"><flux:button type="submit" variant="primary">Hoàn tất thanh toán</flux:button></form>
+            <form method="POST" action="{{ route('operations.invoices.prepaid.pay', $invoice) }}">@csrf<input type="hidden" name="revision" value="{{ $invoice->revision }}">@if($invoice->deposit_refund_vnd > 0)<label class="block"><input type="checkbox" name="deposit_refund_confirmed" value="1" required> Đã hoàn tiền mặt <x-customer.vnd :amount="$invoice->deposit_refund_vnd" /> cọc dư.</label>@endif<flux:button type="submit" variant="primary">Hoàn tất thanh toán</flux:button></form>
         </section>
     @endif
     @if($customer && $invoice->status === 'draft')

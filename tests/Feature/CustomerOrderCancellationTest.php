@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\UserRole;
+use App\Models\CustomerRefundRequest;
 use App\Models\Order;
 use App\Models\PaymentStatusHistory;
 use App\Models\User;
@@ -55,8 +56,9 @@ class CustomerOrderCancellationTest extends TestCase
         $this->assertSame(2, $payment->statusHistories()->count());
     }
 
-    public function test_paid_transfer_requires_a_manual_refund_and_keeps_the_original_receipt(): void
+    public function test_paid_transfer_requires_a_manual_refund_outside_demo_and_keeps_the_original_receipt(): void
     {
+        config(['checkout.customer_refund_demo' => false]);
         $owner = User::factory()->create();
         $order = $this->order($owner, method: 'bank_transfer');
         $payment = $order->payment()->sole();
@@ -111,19 +113,19 @@ class CustomerOrderCancellationTest extends TestCase
         $this->actingAs(User::factory()->create())->postJson($cancel, self::CANCELLATION)->assertNotFound();
         $this->actingAs($owner)->postJson(route('orders.cancel', 'CF-MISSING'), self::CANCELLATION)->assertNotFound();
         $this->postJson($cancel, [])->assertUnprocessable()->assertJsonValidationErrors(['confirm', 'expected_status']);
-        $this->postJson($cancel, [...self::CANCELLATION, 'expected_status' => 'confirmed', 'reason' => str_repeat('a', 501)])
+        $this->postJson($cancel, [...self::CANCELLATION, 'expected_status' => 'preparing', 'reason' => str_repeat('a', 501)])
             ->assertUnprocessable()->assertJsonValidationErrors(['expected_status', 'reason']);
 
         $this->get($show)->assertSee($cancel);
         foreach (OrderStatus::cases() as $status) {
-            if ($status === OrderStatus::Pending) {
+            if (in_array($status, [OrderStatus::Pending, OrderStatus::Confirmed], true)) {
                 continue;
             }
             $order->update(['status' => $status]);
             $this->postJson($cancel, self::CANCELLATION)->assertConflict();
             $this->assertSame($status, $order->refresh()->status);
         }
-        $order->update(['status' => OrderStatus::Confirmed]);
+        $order->update(['status' => OrderStatus::Preparing]);
         $this->post($cancel, self::CANCELLATION)->assertRedirect($show);
         $this->get($show)->assertOk()->assertSee('Đơn đã đổi trạng thái.')->assertDontSee($cancel);
         $this->assertSame(PaymentStatus::Pending, $order->payment()->sole()->status);
@@ -147,8 +149,64 @@ class CustomerOrderCancellationTest extends TestCase
         $this->assertSame(1, $order->payment()->sole()->statusHistories()->count());
     }
 
+    public function test_refund_request_for_paid_order_is_completed_once_by_admin_with_an_audit_reference(): void
+    {
+        config(['checkout.customer_refund_demo' => false]);
+        $owner = User::factory()->create();
+        $order = $this->order($owner, 'bank_transfer');
+        $order->payment()->update(['status' => PaymentStatus::Paid, 'paid_at' => now()]);
+        $this->actingAs($owner)->post(route('orders.cancel', $order->order_number), self::CANCELLATION)->assertStatus(303);
+        $refund = CustomerRefundRequest::sole();
+        $this->assertSame($order->total_vnd, $refund->amount_vnd);
+        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
+        $data = ['confirm' => 1, 'refund_reference' => 'BANK-REFUND-001'];
+        $this->post(route('operations.refunds.complete', $refund), $data)->assertRedirect();
+        $this->post(route('operations.refunds.complete', $refund), $data)->assertRedirect();
+        $this->assertSame(PaymentStatus::Refunded, $order->payment()->sole()->status);
+        $this->assertSame('BANK-REFUND-001', $order->payment()->sole()->refund_reference);
+        $this->assertNotNull($order->payment()->sole()->refunded_at);
+        $this->assertSame(1, $order->payment()->sole()->statusHistories()->where('to_status', 'refunded')->count());
+    }
+
+    public function test_demo_refund_is_automatic_before_preparation_but_preparing_orders_cannot_be_cancelled(): void
+    {
+        $owner = User::factory()->create();
+        $order = $this->order($owner, 'bank_transfer');
+        $order->update(['status' => OrderStatus::Confirmed]);
+        $order->payment()->sole()->forceFill(['status' => PaymentStatus::Paid, 'paid_at' => now(), 'collection_reference' => 'ORIGINAL-BANK'])->save();
+        $this->actingAs($owner)->post(route('orders.cancel', $order->order_number), [...self::CANCELLATION, 'expected_status' => 'confirmed'])->assertStatus(303);
+        $payment = $order->payment()->sole();
+        $this->assertSame(PaymentStatus::Refunded, $payment->status);
+        $this->assertSame('ORIGINAL-BANK', $payment->collection_reference);
+        $this->assertNotNull($payment->refunded_at);
+        $this->assertStringStartsWith('DEMO-REFUND-', $payment->refund_reference);
+        $this->assertDatabaseHas('customer_refund_requests', ['order_id' => $order->id, 'status' => 'completed', 'is_demo' => true]);
+        $this->postJson(route('orders.cancel', $order->order_number), self::CANCELLATION)->assertConflict();
+        $this->assertSame(1, $payment->statusHistories()->where('to_status', 'refunded')->count());
+        $preparing = $this->order($owner);
+        $preparing->update(['status' => OrderStatus::Preparing]);
+        $this->get(route('orders.show', $preparing->order_number))->assertOk()->assertSee('Đơn đang pha chế, không thể hủy.');
+        $this->postJson(route('orders.cancel', $preparing->order_number), self::CANCELLATION)->assertConflict();
+        $this->assertSame(OrderStatus::Preparing, $preparing->fresh()->status);
+    }
+
+    public function test_staff_invoice_access_is_limited_to_pickup_and_counter_invoices(): void
+    {
+        $owner = User::factory()->create();
+        $delivery = $this->order($owner, 'bank_transfer');
+        $delivery->forceFill(['fulfillment_type' => 'delivery'])->save();
+        $delivery->payment()->sole()->forceFill(['status' => PaymentStatus::Paid, 'paid_at' => now()])->save();
+        $pickup = $this->order($owner, 'bank_transfer');
+        $pickup->payment()->sole()->forceFill(['status' => PaymentStatus::Paid, 'paid_at' => now()])->save();
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]));
+        $this->get(route('operations.invoices.history'))->assertOk()->assertSee($pickup->order_number)->assertDontSee($delivery->order_number);
+        $this->get(route('operations.invoices.orders.show', $delivery->order_number))->assertForbidden();
+        $this->get(route('operations.invoices.orders.show', $pickup->order_number))->assertOk();
+    }
+
     private function order(User $owner, string $method = 'cod'): Order
     {
+        $owner->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
         $order = $owner->orders()->create([
             'order_number' => 'CF-'.Str::ulid(), 'checkout_key' => Str::uuid()->toString(),
             'request_hash' => hash('sha256', 'checkout'), 'recipient_name' => 'Khách nhận', 'phone' => '0901234567',

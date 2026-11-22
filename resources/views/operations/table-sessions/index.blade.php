@@ -10,9 +10,10 @@
                     @foreach($floorSeats as $seat)
                         @php($state = $seat->availability())
                         <li class="terrasse-panel min-w-0 space-y-4 p-4" data-table-code="{{ $seat->code }}">
+                            <x-reservations.order-warning :seat="$seat" />
                             <form method="POST" action="{{ route('operations.table-sessions.table.order', $seat->code) }}">
                                 @csrf
-                                <button type="submit" class="w-full space-y-2 text-left" @disabled($seat->tableInvoices->isEmpty() && in_array($state, ['held','inactive']))>
+                                <button type="submit" class="w-full space-y-2 text-left" @disabled($seat->tableInvoices->isEmpty() && $state === 'inactive')>
                                     <span class="block text-lg font-semibold">{{ $seat::KINDS[$seat->kind] }} {{ $seat->code }}</span>
                                     <span class="pill {{ $state === 'occupied' ? 'active' : '' }}">{{ $seat->availabilityLabel() }}</span>
                                     <span class="block text-sm underline">{{ $seat->tableInvoices->isNotEmpty() ? 'Mở lại tạm tính / thanh toán' : 'Order / chọn món' }}</span>

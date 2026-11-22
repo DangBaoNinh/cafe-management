@@ -12,8 +12,8 @@
         <header id="store-header" class="site-header container" tabindex="-1">
             <x-terrasse.brand :href="route('home')" />
             <nav class="site-nav" id="public-nav" aria-label="Điều hướng chính">
-                @foreach ([['home', 'home', 'Trang chủ'], ['menu.index', 'menu.*', 'Thực đơn'], ['spaces', 'spaces', 'Không gian'], ['story', 'story', 'Câu chuyện'], ['reservations.create', 'reservations.*', 'Đặt chỗ']] as [$route, $pattern, $label])
-                    <a href="{{ route($route) }}" @if(request()->routeIs($pattern)) aria-current="page" @endif @class(['active' => request()->routeIs($pattern)])>{{ $label }}</a>
+                @foreach ([['home', 'home', 'Trang chủ'], ['menu.index', 'menu.*', 'Thực đơn'], ['spaces', 'spaces', 'Không gian & đặt chỗ'], ['story', 'story', 'Câu chuyện']] as [$route, $pattern, $label])
+                    <a href="{{ route($route) }}" @if((request()->routeIs($pattern) || ($route === 'spaces' && request()->routeIs('reservations.create')))) aria-current="page" @endif @class(['active' => request()->routeIs($pattern)])>{{ $label }}</a>
                 @endforeach
                 @can('access-customer-orders')<a href="{{ route('orders.index') }}" @if(request()->routeIs('orders.*')) aria-current="page" @endif>Đơn của tôi</a>@endcan
                 @auth<a href="{{ route('support.index') }}" @if(request()->routeIs('support.*')) aria-current="page" @endif>Liên hệ</a>@endauth
@@ -22,6 +22,7 @@
                 @else
                     <a class="french-mobile-register" href="{{ route('register') }}">Đăng ký</a>
                 @endauth
+                @can('access-customer-orders')<a href="{{ route('reservations.index') }}">Lịch sử đặt bàn</a>@endcan
             </nav>
             <div class="nav-tools">
                 @can('manage-cart')<a class="icon-btn bag" href="{{ route('cart.index') }}" aria-label="Giỏ hàng"><x-theme.icon name="bag" /></a>@endcan

@@ -38,7 +38,7 @@
                                 @if (auth()->id() === $account->id)
                                     <span>Tài khoản của bạn</span>
                                 @else
-                                    <flux:button size="sm" :href="route('admin.accounts.edit', $account)">Chỉnh sửa<span class="sr-only"> {{ $account->email }}</span></flux:button>
+                                    <flux:button size="sm" :href="route('admin.accounts.edit', $account)">Chỉnh sửa / khóa tài khoản<span class="sr-only"> {{ $account->email }}</span></flux:button>
                                 @endif
                             </td>
                         </tr>

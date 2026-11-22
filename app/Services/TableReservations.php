@@ -16,7 +16,7 @@ class TableReservations
 {
     public function __construct(private BookingFees $fees) {}
 
-    /** @param array{seat_id:int, kind:string, party_size:int, pickup_time:string, contact_name:string, phone:string, channel:string, booking_key:string} $input */
+    /** @param array{seat_id:int, kind:string, party_size:int, pickup_time:string, contact_name:string, phone:string, channel:string, booking_key:string, deposit_required?:bool} $input */
     public function place(User $customer, array $input): Reservation
     {
         $hash = hash('sha256', json_encode($input, JSON_THROW_ON_ERROR));
@@ -38,19 +38,22 @@ class TableReservations
             $seat = ReservationSeat::query()->lockForUpdate()->findOrFail($input['seat_id']);
             $this->require($seat->is_active && $seat->kind === $input['kind'] && $seat->capacity >= $input['party_size'],
                 'Chỗ đã ngừng phục vụ hoặc không phù hợp với loại chỗ và số khách.');
-            $this->require($seat->walk_in_at === null && $seat->activeReservation()->lockForUpdate()->first() === null,
+            $this->require(ReservationCalendar::available($seat, $slot),
                 'Chỗ vừa được giữ hoặc đang sử dụng. Vui lòng chọn lại.');
             ReservationHours::query()->sharedLock()->sole()->validateSlot($slot);
 
             $reservation = $customer->reservations()->create([
-                'reservation_seat_id' => $seat->id, 'active_seat_id' => $seat->id,
+                'reservation_seat_id' => $seat->id, 'active_seat_id' => ($input['deposit_required'] ?? false) || ! $slot->setTimezone(BookingRules::TIMEZONE)->isToday() ? null : $seat->id,
                 'code' => strtoupper(bin2hex(random_bytes(8))), 'booking_key' => $input['booking_key'], 'request_hash' => $hash,
                 'contact_name' => $input['contact_name'], 'phone' => $input['phone'], 'party_size' => $input['party_size'],
                 'fee_channel' => $input['channel'],
                 'fee_bank_details' => $input['channel'] === 'app' ? $this->fees->onlineDetails() : null,
-                'status' => ReservationStatus::Confirmed,
+                'status' => ($input['deposit_required'] ?? false) ? ReservationStatus::PendingDeposit : ReservationStatus::Confirmed,
                 'scheduled_at' => $slot, 'arrival_deadline' => $slot->addMinutes(30),
             ]);
+            if ($input['deposit_required'] ?? false) {
+                app(ReservationDeposits::class)->create($reservation);
+            }
             $this->record($reservation, null, $customer, now());
 
             return $reservation;
@@ -66,12 +69,14 @@ class TableReservations
             BookingRules::authorizeBooking($customer);
             $this->require($reservation->canChange(), 'Chỉ đổi lịch còn hiệu lực trước giờ hẹn.');
             $this->require($reservation->revision === $revision, 'Lịch đã thay đổi. Vui lòng tải lại trang.');
-            $this->require($seat->is_active && $seat->walk_in_at === null && $reservation->active_seat_id === $seat->id,
+            $this->require($seat->is_active && $seat->walk_in_at === null,
                 'Chỗ đã thay đổi tình trạng. Vui lòng kiểm tra lịch.');
             $previous = $reservation->scheduled_at;
             $slot = BookingRules::replacementSlot($input, $previous);
+            $this->require(ReservationCalendar::available($seat, $slot, $reservation->id), 'Bàn đã được đặt trong ngày đã chọn.');
             ReservationHours::query()->sharedLock()->sole()->validateSlot($slot);
             $reservation->scheduled_at = $slot;
+            $reservation->active_seat_id = $slot->setTimezone(BookingRules::TIMEZONE)->isToday() ? $seat->id : null;
             $reservation->arrival_deadline = $slot->addMinutes(30);
             $reservation->revision++;
             $reservation->save();
@@ -80,35 +85,70 @@ class TableReservations
         }, 5);
     }
 
-    public function cancel(User $actor, string $code, ?string $reason = null): void
+    public function rescheduleByAdmin(User $actor, string $code, string $input, int $revision): void
     {
-        $staff = $reason !== null;
-        Gate::forUser($actor)->authorize($staff ? 'operate-orders' : 'access-customer-orders');
-        $target = Reservation::query()->where('code', $code)->when(! $staff, fn ($query) => $query->where('user_id', $actor->id))->firstOrFail();
-        DB::transaction(function () use ($target, $actor, $staff, $reason): void {
-            [, , $reservation] = $this->lock($target);
-            $this->require($staff
-                ? $reservation->status === ReservationStatus::Confirmed && now()->lt($reservation->arrival_deadline)
-                : $reservation->canChange(), 'Lịch không còn đủ điều kiện hủy.');
-            $this->finish($reservation, ReservationStatus::Cancelled, now(), $actor, $reason);
-            BookingFees::reverse($reservation);
+        Gate::forUser($actor)->authorize('access-admin');
+        $target = Reservation::query()->where('code', $code)->firstOrFail();
+        DB::transaction(function () use ($target, $input, $revision, $actor): void {
+            [, $seat, $reservation] = $this->lock($target);
+            $this->require($reservation->status === ReservationStatus::Confirmed && $reservation->revision === $revision,
+                'Chỉ điều chỉnh lịch đã đặt, chưa nhận khách và chưa bị thay đổi.');
+            $slot = BookingRules::slot($input);
+            ReservationHours::query()->sharedLock()->sole()->validateSlot($slot);
+            $this->require(ReservationCalendar::available($seat, $slot, $reservation->id), 'Bàn đã được đặt hoặc đang sử dụng trong ngày đã chọn.');
+            $reservation->forceFill(['scheduled_at' => $slot, 'arrival_deadline' => $slot->addMinutes(30),
+                'active_seat_id' => $slot->setTimezone(BookingRules::TIMEZONE)->isToday() ? $seat->id : null,
+                'revision' => $revision + 1])->save();
+            $this->record($reservation, ReservationStatus::Confirmed, $actor, now(), 'Quản trị viên điều chỉnh lịch đặt, giữ nguyên tiền cọc.');
         }, 5);
     }
 
-    public function checkIn(User $staff, string $code): void
+    public function cancel(User $actor, string $code, ?string $reason = null): void
+    {
+        $staff = $reason !== null;
+        Gate::forUser($actor)->authorize($staff ? 'access-admin' : 'access-customer-orders');
+        $target = Reservation::query()->where('code', $code)->when(! $staff, fn ($query) => $query->where('user_id', $actor->id))->firstOrFail();
+        DB::transaction(function () use ($target, $actor, $staff, $reason): void {
+            [$customer, , $reservation] = $this->lock($target);
+            if (! $staff && $reservation->status === ReservationStatus::PendingDeposit) {
+                return; // Leaving an unpaid request does not cancel the reservation or its deposit.
+            }
+            if (! $staff) {
+                $this->require(now()->lte($reservation->created_at->addMinutes(30)), 'Chỉ được hủy trong 30 phút kể từ lúc đặt.');
+                CustomerRefunds::requireBank($customer);
+            }
+            $this->require($staff
+                ? in_array($reservation->status, [ReservationStatus::Confirmed, ReservationStatus::PendingDeposit], true) && now()->lt($reservation->arrival_deadline)
+                : $reservation->canCustomerCancel(), 'Lịch không còn đủ điều kiện hủy.');
+            $this->finish($reservation, ReservationStatus::Cancelled, now(), $actor, $reason);
+            BookingFees::reverse($reservation);
+            $deposit = $reservation->deposit;
+            if (! $staff && $deposit?->status === 'paid') {
+                $deposit->update(['status' => 'refund_pending']);
+                CustomerRefunds::request($customer, $deposit->amount_vnd, $deposit->id);
+            } else {
+                app(ReservationDeposits::class)->forfeit($reservation, $reason);
+            }
+        }, 5);
+    }
+
+    public function checkIn(User $staff, string $code, bool $fromOrder = false): void
     {
         Gate::forUser($staff)->authorize('operate-orders');
         $target = Reservation::query()->where('code', $code)->firstOrFail();
-        DB::transaction(function () use ($target, $staff): void {
+        DB::transaction(function () use ($target, $staff, $fromOrder): void {
             [$customer, , $reservation] = $this->lock($target);
             $arrival = now();
             $this->require($reservation->status === ReservationStatus::Confirmed
-                && $arrival->gte($reservation->scheduled_at) && $arrival->lt($reservation->arrival_deadline),
-                'Chỉ check-in lịch đang giữ từ giờ hẹn đến trước hạn 30 phút.');
+                && $reservation->scheduled_at->setTimezone(BookingRules::TIMEZONE)->toDateString() === $arrival->setTimezone(BookingRules::TIMEZONE)->toDateString()
+                && ($arrival->gte($reservation->scheduled_at) || $fromOrder) && $arrival->lt($reservation->arrival_deadline),
+                'Chỉ nhận khách đúng ngày đặt và trước hạn nhận bàn.');
             $late = BookingRules::lateMinutes($reservation->scheduled_at, $arrival);
             if ($late > 5) {
                 $this->fees->add($reservation, 'late', ($late - 5) * 2000, $reservation->fee_channel, ['late_minutes' => $late]);
             }
+            $this->require(! $reservation->seat->activeTableSession()->exists() && $reservation->seat->walk_in_at === null, 'Bàn đang phục vụ khách khác.');
+            $reservation->active_seat_id = $reservation->reservation_seat_id;
             $reservation->arrived_at = $arrival;
             $reservation->status = ReservationStatus::CheckedIn;
             $reservation->save();
@@ -148,6 +188,7 @@ class TableReservations
             $reservation->no_show_at = $reservation->arrival_deadline;
             $this->finish($reservation, ReservationStatus::NoShow, $reservation->arrival_deadline, reason: 'Khách không đến trong 30 phút sau giờ hẹn.');
             BookingFees::reverse($reservation);
+            app(ReservationDeposits::class)->forfeit($reservation);
             BookingRules::recordAttendance($customer, false, $reservation->arrival_deadline);
 
             return true;
@@ -185,7 +226,7 @@ class TableReservations
         DB::transaction(function () use ($staff, $seatId, $arriving): void {
             $seat = ReservationSeat::query()->lockForUpdate()->findOrFail($seatId);
             if ($arriving) {
-                $this->require($seat->is_active && $seat->walk_in_at === null && $seat->activeReservation()->lockForUpdate()->first() === null,
+                $this->require($seat->is_active && $seat->walk_in_at === null && ! $seat->activeTableSession()->exists() && $seat->activeReservation?->status !== ReservationStatus::CheckedIn,
                     'Chỉ ghi khách trực tiếp vào chỗ đang trống.');
                 $seat->walk_in_at = now();
                 $seat->walk_in_actor_id = $staff->id;

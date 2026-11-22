@@ -13,15 +13,15 @@ use JsonException;
 
 class AdminCounterConfirmation
 {
-    public function issue(User $actor, TableInvoice $invoice, string $target, int $revision, ?string $reason): string
+    public function issue(User $actor, TableInvoice $invoice, string $target, int $revision, ?string $reason, bool $refundConfirmed = false): string
     {
         return Crypt::encryptString(json_encode([
             'actor_id' => $actor->id, 'invoice_id' => $invoice->id, 'target' => $target,
-            'revision' => $revision, 'reason' => $reason, 'payment_status' => $invoice->status, 'expires_at' => now()->addMinutes(10)->timestamp,
+            'revision' => $revision, 'reason' => $reason, 'payment_status' => $invoice->status, 'deposit_refund_confirmed' => $refundConfirmed, 'expires_at' => now()->addMinutes(10)->timestamp,
         ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
     }
 
-    /** @return array{target: string, revision: int, reason: ?string, payment_status: string} */
+    /** @return array{target: string, revision: int, reason: ?string, payment_status: string, deposit_refund_confirmed: bool} */
     public function read(User $actor, TableInvoice $invoice, string $token): array
     {
         try {
@@ -38,6 +38,7 @@ class AdminCounterConfirmation
             'target' => ['required', Rule::in(['completed', 'cancelled'])],
             'revision' => ['required', 'integer', 'min:1'],
             'payment_status' => ['required', Rule::in(['draft', 'paid'])],
+            'deposit_refund_confirmed' => ['required', 'boolean'],
             'reason' => ['present', 'nullable', 'string', 'max:500', 'required_if:target,cancelled', 'required_if:payment_status,paid'],
             'expires_at' => ['required', 'integer', 'gt:'.now()->timestamp],
         ]);
@@ -45,7 +46,7 @@ class AdminCounterConfirmation
             throw $this->invalid();
         }
 
-        return ['target' => $payload['target'], 'revision' => $payload['revision'], 'reason' => $payload['reason'], 'payment_status' => $payload['payment_status']];
+        return ['target' => $payload['target'], 'revision' => $payload['revision'], 'reason' => $payload['reason'], 'payment_status' => $payload['payment_status'], 'deposit_refund_confirmed' => $payload['deposit_refund_confirmed']];
     }
 
     private function invalid(): ValidationException

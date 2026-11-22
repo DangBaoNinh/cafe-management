@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
  * @property positive-int $id
  * @property string $name
  * @property string $email
+ * @property array{bank_name:string,account_number:string,account_holder:string}|null $linked_bank
  * @property string|null $phone
  * @property Carbon|null $email_verified_at
  * @property string $password
@@ -31,7 +32,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'email', 'phone', 'password'])]
-#[Hidden(['password', 'remember_token', 'booking_no_shows', 'booking_blocked_until', 'booking_last_arrived_at'])]
+#[Hidden(['password', 'remember_token', 'booking_no_shows', 'booking_blocked_until', 'booking_last_arrived_at', 'linked_bank'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -53,6 +54,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'linked_bank' => 'encrypted:array',
             'role' => UserRole::class,
             'is_active' => 'boolean',
             'booking_no_shows' => 'integer',

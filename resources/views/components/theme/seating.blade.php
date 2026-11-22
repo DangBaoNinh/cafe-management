@@ -1,6 +1,6 @@
-@props(['options' => []])
+@props(['options' => [], 'embedded' => false])
 @php($configuration = array_merge(['mode' => 'live'], $options))
-<section class="seating-experience container" data-public-seating data-seating-config="{{ json_encode($configuration, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}">
+<section @class(['seating-experience', 'container' => !$embedded, 'seating-experience--embedded' => $embedded]) data-public-seating data-seating-config="{{ json_encode($configuration, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}">
 <div class="seating-head">
 <div class="seating-summary">
 <span class="seat-availability-number" data-seat-available>—</span>
@@ -16,6 +16,7 @@
 <button class="btn secondary small" type="button" data-seat-refresh>
 <x-theme.icon name="clock" />Cập nhật</button>
 </div>
+<label class="field">Ngày đặt bàn <input type="date" data-seat-date value="{{ request('booking_date', request('pickup_date', now('Asia/Ho_Chi_Minh')->toDateString())) }}" min="{{ now('Asia/Ho_Chi_Minh')->toDateString() }}"></label>
 <div class="category-row" data-seat-areas aria-label="Chọn khu vực">
 </div>
 <div class="seating-layout">
@@ -43,7 +44,7 @@
 </i>Đang sử dụng</span>
 <span>
 <i class="reserved">
-</i>Đã giữ chỗ</span>
+</i>Đã đặt</span>
 <span>
 <i class="cleaning">
 </i>Đang chuẩn bị</span>

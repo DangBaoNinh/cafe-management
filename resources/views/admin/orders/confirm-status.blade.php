@@ -9,6 +9,7 @@
                 <dt>Hiện tại</dt><dd>{{ $invoice->order_status->label() }}</dd>
                 <dt>Chuyển sang</dt><dd>{{ App\Enums\CounterOrderStatus::from($target)->label() }}</dd>
                 <dt>Tổng tiền</dt><dd class="font-bold"><x-customer.vnd :amount="$invoice->total_vnd" /></dd>
+                <dt>Trừ cọc</dt><dd><x-customer.vnd :amount="$invoice->deposit_credit_vnd" /></dd><dt>Còn phải thu</dt><dd><x-customer.vnd :amount="$invoice->amount_due_vnd" /></dd><dt>Cọc dư hoàn tiền mặt</dt><dd><x-customer.vnd :amount="$invoice->deposit_refund_vnd" /></dd>
                 <dt>Phương thức</dt><dd>{{ $invoice->method->label() }}</dd>
                 @if($reason)<dt>Lý do</dt><dd class="wrap-anywhere">{{ $reason }}</dd>@endif
             </dl>

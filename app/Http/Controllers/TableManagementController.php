@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ReservationStatus;
 use App\Models\ReservationSeat;
 use App\Models\User;
 use App\Services\TableManagement;
@@ -13,7 +14,14 @@ class TableManagementController extends Controller
 {
     public function order(Request $request, ReservationSeat $reservationSeat, TableManagement $tables): RedirectResponse
     {
-        $invoice = $reservationSeat->tableInvoices()->where('table_invoices.status', 'draft')->latest('table_invoices.updated_at')->latest('table_invoices.id')->first();
+        $drafts = $reservationSeat->tableInvoices()->where('table_invoices.status', 'draft');
+        $current = $reservationSeat->activeTableSession;
+        if ($current !== null) {
+            $drafts->where('table_sessions.id', $current->id);
+        } elseif ($reservationSeat->activeReservation?->status === ReservationStatus::CheckedIn) {
+            $drafts->where('table_sessions.reservation_id', $reservationSeat->activeReservation->id);
+        }
+        $invoice = $drafts->latest('table_invoices.updated_at')->latest('table_invoices.id')->first();
         if ($invoice !== null) {
             return to_route('operations.invoices.prepaid.show', $invoice, 303);
         }

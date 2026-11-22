@@ -4,20 +4,28 @@
         <h1 class="text-2xl font-semibold">Đối chiếu đặt chỗ</h1>
         @include('reservations.feedback')
         @include('reservations.summary')
+        @can('access-admin') @include('reservations.deposit') @endcan
         @if ($reservation->status === \App\Enums\ReservationStatus::Confirmed)
             <section class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
-                <h2 class="text-lg font-semibold">Check-in</h2>
-                @if (now()->lt($reservation->scheduled_at))
-                    <p>Chờ đến giờ hẹn để ghi nhận khách đến.</p>
-                @elseif (now()->gte($reservation->arrival_deadline))
+                @can('access-admin')<details class="space-y-3"><summary class="cursor-pointer font-bold">Điều chỉnh ngày / giờ đặt bàn</summary>
+                    <form method="POST" action="{{ route('operations.reservations.reschedule', $reservation->code) }}" class="space-y-3">@csrf
+                        <input type="hidden" name="revision" value="{{ $reservation->revision }}">
+                        <flux:input type="date" name="pickup_date" label="Ngày đến" :value="$reservation->scheduled_at->setTimezone('Asia/Ho_Chi_Minh')->format('Y-m-d')" required />
+                        <flux:input type="time" name="pickup_clock" label="Giờ đến" :value="$reservation->scheduled_at->setTimezone('Asia/Ho_Chi_Minh')->format('H:i')" required step="300" />
+                        <label><input type="checkbox" name="confirm" value="1" required> Xác nhận thay đổi lịch, giữ nguyên tiền cọc.</label>
+                        <flux:button type="submit">Cập nhật lịch đặt</flux:button>
+                    </form>
+                </details>@endcan
+                <h2 class="text-lg font-semibold">Nhận khách / mở quyền thao tác bàn</h2><p>Chỉ nhận khách đúng ngày đặt. Xác nhận tại đây mới áp dụng cọc cho order.</p>
+                @if (now()->gte($reservation->arrival_deadline))
                     <p>Đã quá hạn check-in. Hệ thống sẽ ghi nhận không đến.</p>
                 @else
                     <form method="POST" action="{{ route('operations.reservations.check-in', $reservation->code) }}">
                         @csrf
-                        <flux:button type="submit" variant="primary">Ghi nhận khách đến</flux:button>
+                        <flux:button type="submit" variant="primary" :disabled="$reservation->scheduled_at->setTimezone('Asia/Ho_Chi_Minh')->toDateString() !== now('Asia/Ho_Chi_Minh')->toDateString()">Ghi nhận khách đến</flux:button>
                     </form>
                 @endif
-                @if (now()->lt($reservation->arrival_deadline))
+                @if (auth()->user()->can('access-admin') && now()->lt($reservation->arrival_deadline))
                     <details class="border-t border-terrasse-ink/15 pt-3">
                         <summary class="cursor-pointer font-semibold">Hủy lịch</summary>
                         <form method="POST" action="{{ route('operations.reservations.cancel', $reservation->code) }}" class="mt-3 space-y-3">

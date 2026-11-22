@@ -56,7 +56,13 @@ if (pickupCheckout) {
 
     const updatePickupFields = () => {
         const pickup = fulfillment.value === 'pickup';
-        const scheduled = pickup && mode.value === 'scheduled';
+        if (pickup) mode.value = 'scheduled';
+        const scheduled = pickup;
+        const cod = pickupCheckout.querySelector('select[name="method"] option[value="cod"]');
+        if (cod) {
+            cod.disabled = cod.hidden = pickup;
+            if (pickup && pickupCheckout.elements.method.value === 'cod') pickupCheckout.elements.method.value = 'bank_transfer';
+        }
 
         options.hidden = options.disabled = !pickup;
         slot.hidden = slot.disabled = !scheduled;
@@ -68,3 +74,11 @@ if (pickupCheckout) {
     window.addEventListener('pageshow', updatePickupFields);
     updatePickupFields();
 }
+
+const expireCancellationButtons = () => {
+    document.querySelectorAll('[data-cancel-until]').forEach(button => {
+        if (Date.now() > Number(button.dataset.cancelUntil)) button.disabled = true;
+    });
+};
+expireCancellationButtons();
+setInterval(expireCancellationButtons, 1000);

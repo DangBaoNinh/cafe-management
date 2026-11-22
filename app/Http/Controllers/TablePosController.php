@@ -11,6 +11,7 @@ use App\Models\TableRound;
 use App\Models\TableSession;
 use App\Models\User;
 use App\Services\BankTransferQr;
+use App\Services\ReservationDeposits;
 use App\Services\TableInvoices;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,7 +40,7 @@ class TablePosController extends Controller
         $invoice = $invoices->save($tableSession, $request->selections(), $request->submissionKey(),
             $request->filled('round_id') ? $request->integer('round_id') : null, $request->integer('revision'),
             CollectionMethod::from($request->validated('method')), $request->integer('accepted_total_vnd'),
-            $request->boolean('changes_confirmed'), $request->validated('intent') === 'pay', $actor);
+            $request->boolean('changes_confirmed'), $request->validated('intent') === 'pay', $actor, $request->boolean('deposit_refund_confirmed'));
 
         if ($invoice->status !== 'paid') {
             return to_route('operations.invoices.prepaid.show', $invoice, 303)->with('status', 'Đã lưu tạm tính. Kiểm tra phiếu và bấm hoàn tất thanh toán.');
@@ -64,6 +65,7 @@ class TablePosController extends Controller
             'original' => $invoice->initial_items ?? ($round?->items->toArray() ?? []), 'saved' => $round !== null,
             'method' => $invoice?->method->value ?? 'cash', 'fees' => $fees['total'] + (int) ($invoice?->fees()->where('status', 'pending')->sum('amount_vnd') ?? 0),
             'originalTotal' => $invoice->total_vnd ?? ($round ? $round->total_vnd + $fees['total'] : null), 'customer' => $customer,
+            'deposit' => app(ReservationDeposits::class)->available($tableSession, $invoice),
         ];
         $submissionKey = $round->submission_key ?? (string) Str::uuid();
         $bankAvailable = $qr->details() !== null || $invoice?->bank_details !== null;
@@ -79,7 +81,7 @@ class TablePosController extends Controller
         $invoice->load(['tableSession.seat', 'round.items', 'fees']);
 
         return ['invoice' => $invoice, 'customer' => $customer,
-            'qrImage' => $invoice->method === CollectionMethod::BankTransfer && $invoice->bank_details !== null
-                ? $qr->image($invoice->bank_details, $invoice->total_vnd, $invoice->number) : null];
+            'qrImage' => $invoice->amount_due_vnd > 0 && $invoice->method === CollectionMethod::BankTransfer && $invoice->bank_details !== null
+                ? $qr->image($invoice->bank_details, $invoice->amount_due_vnd, $invoice->number) : null];
     }
 }

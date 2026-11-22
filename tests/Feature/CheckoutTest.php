@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\UserAddress;
 use App\Services\OrderNumbers;
 use App\Services\ShoppingCart;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -26,10 +27,17 @@ class CheckoutTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->travelTo(CarbonImmutable::parse('2026-11-23 10:00:00', 'Asia/Ho_Chi_Minh'));
+        $this->bank();
+    }
+
     public static function combinations(): array
     {
         return [
-            'pickup COD' => ['pickup', 'cod', 0],
+            'delivery COD' => ['delivery', 'cod', 23000],
             'pickup bank' => ['pickup', 'bank_transfer', 0],
             'delivery COD' => ['delivery', 'cod', 23000],
             'delivery bank' => ['delivery', 'bank_transfer', 23000],
@@ -177,6 +185,7 @@ class CheckoutTest extends TestCase
         $this->postJson(route('checkout.review'), $this->details(['method' => 'bank_transfer']))
             ->assertUnprocessable()->assertJsonValidationErrors('method');
 
+        $this->bank();
         $this->post(route('checkout.store'), $this->review($user))->assertRedirect();
         $order = $user->orders()->sole();
         $this->actingAs($outsider)->get(route('checkout.confirmation', $order->order_number))->assertNotFound();
@@ -269,10 +278,10 @@ class CheckoutTest extends TestCase
     public function test_checkout_exposes_the_demo_gateway_only_in_local_and_testing(): void
     {
         [$user] = $this->basket();
-        $this->actingAs($user)->get(route('checkout.create'))->assertOk()->assertSee('Chuyển khoản mô phỏng');
+        $this->actingAs($user)->get(route('checkout.create'))->assertOk()->assertSee('Ngân hàng liên kết (demo)');
         $details = ['method' => 'demo_gateway'];
         $this->app->instance('env', 'production');
-        $this->get(route('checkout.create'))->assertOk()->assertDontSee('Chuyển khoản mô phỏng');
+        $this->get(route('checkout.create'))->assertOk()->assertDontSee('Ngân hàng liên kết (demo)');
         $this->postJson(route('checkout.review'), $this->details($details), ['Sec-Fetch-Site' => 'same-origin'])
             ->assertUnprocessable()->assertJsonValidationErrors('method');
 
@@ -325,10 +334,28 @@ class CheckoutTest extends TestCase
         app(OrderNumbers::class)->next();
     }
 
+    public function test_pickup_requires_online_method_linked_bank_and_a_15_minute_lead(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-11-23 10:00:00', 'Asia/Ho_Chi_Minh'));
+        [$user] = $this->basket();
+        $this->bank();
+        $this->actingAs($user);
+        $data = $this->details(['method' => 'bank_transfer', 'pickup_time' => '2026-11-23 10:15']);
+        $this->postJson(route('checkout.review'), [...$data, 'method' => 'cod'])->assertUnprocessable()->assertJsonValidationErrors('method');
+        $this->postJson(route('checkout.review'), [...$data, 'pickup_time' => '2026-11-23 10:10'])->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
+        $this->postJson(route('checkout.review'), [...$data, 'pickup_time' => null])->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
+        $user->forceFill(['linked_bank' => null])->save();
+        $this->postJson(route('checkout.review'), [...$data, 'method' => 'demo_gateway'])->assertUnprocessable()->assertJsonValidationErrors('refund');
+        $this->post(route('checkout.review'), $data)->assertOk();
+        $user->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
+        $this->post(route('checkout.review'), [...$data, 'method' => 'demo_gateway'])->assertOk();
+    }
+
     private function details(array $overrides = []): array
     {
         return [
-            'cart_version' => '1', 'fulfillment_type' => 'pickup', 'method' => 'cod',
+            'cart_version' => '1', 'fulfillment_type' => 'pickup', 'method' => 'bank_transfer',
+            'pickup_time' => ($overrides['fulfillment_type'] ?? 'pickup') === 'pickup' ? '2026-11-23 12:00' : null,
             'recipient_name' => 'Khách nhận', 'phone' => '0901234567',
             ...$overrides,
         ];
@@ -337,6 +364,7 @@ class CheckoutTest extends TestCase
     private function basket(bool $withAddress = true): array
     {
         $user = User::factory()->create();
+        $user->forceFill(['linked_bank' => ['bank_name' => 'VCB', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
         $category = Category::create(['name' => 'Cà phê', 'slug' => 'ca-phe-'.$user->id]);
         $product = $category->products()->create(['name' => 'Cà phê sữa', 'slug' => 'ca-phe-sua-'.$user->id, 'allows_ice' => true]);
         $size = $product->sizes()->create(['code' => 'm', 'label' => 'Cỡ vừa', 'price_vnd' => 38000]);

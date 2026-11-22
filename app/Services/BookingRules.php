@@ -14,14 +14,14 @@ class BookingRules
 
     public const CHANGE_FEE = 10_000;
 
-    public static function slot(string $input): CarbonImmutable
+    public static function slot(string $input, int $leadMinutes = 60): CarbonImmutable
     {
         $date = DateTimeImmutable::createFromFormat('!Y-m-d H:i', $input, new DateTimeZone(self::TIMEZONE));
         $slot = $date === false ? null : CarbonImmutable::instance($date);
         if ($slot === null || $slot->format('Y-m-d H:i') !== $input
             || $slot->format('H:i') < '07:00' || $slot->format('H:i') > '22:30'
-            || $slot->minute % 5 !== 0 || $slot->lt(now()->addHour())) {
-            throw ValidationException::withMessages(['pickup_time' => 'Chọn giờ từ 07:00 đến 22:30 theo bước 5 phút và đặt trước ít nhất 60 phút.']);
+            || $slot->minute % 5 !== 0 || $slot->lt(now()->addMinutes($leadMinutes))) {
+            throw ValidationException::withMessages(['pickup_time' => 'Chọn giờ từ 07:00 đến 22:30 theo bước 5 phút và đặt trước ít nhất '.$leadMinutes.' phút.']);
         }
 
         return $slot->utc();
@@ -36,9 +36,9 @@ class BookingRules
         );
     }
 
-    public static function replacementSlot(string $input, CarbonImmutable $previous): CarbonImmutable
+    public static function replacementSlot(string $input, CarbonImmutable $previous, int $leadMinutes = 60): CarbonImmutable
     {
-        $slot = self::slot($input);
+        $slot = self::slot($input, $leadMinutes);
         if ($slot->eq($previous)) {
             throw ValidationException::withMessages(['pickup_time' => 'Chọn giờ mới khác giờ đang hẹn.']);
         }

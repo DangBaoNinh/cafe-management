@@ -1,7 +1,7 @@
 export const statusLabels = {
   available: 'Còn chỗ',
   occupied: 'Đang sử dụng',
-  reserved: 'Đã giữ chỗ',
+  reserved: 'Đã đặt',
   cleaning: 'Đang chuẩn bị',
   maintenance: 'Tạm ngừng',
   unknown: 'Chưa rõ',
@@ -48,7 +48,7 @@ export function validateSnapshot(raw) {
       area_id: String(table.area_id),
       capacity: table.capacity,
       status,
-      scheduled_at: status === 'reserved' && appointment > observed ? table.scheduled_at : null,
+      scheduled_at: status === 'reserved' && Number.isFinite(appointment) ? table.scheduled_at : null,
       seated_count:
         status === 'occupied' && Number.isInteger(table.seated_count)
           ? Math.max(0, Math.min(table.capacity, table.seated_count))

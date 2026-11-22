@@ -13,7 +13,7 @@ class CancelCustomerOrderRequest extends FormRequest
     {
         return [
             'confirm' => ['accepted'],
-            'expected_status' => ['required', Rule::in([OrderStatus::Pending->value])],
+            'expected_status' => ['required', Rule::in([OrderStatus::Pending->value, OrderStatus::Confirmed->value])],
             'reason' => ['nullable', 'string', 'max:500'],
         ];
     }

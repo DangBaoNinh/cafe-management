@@ -22,14 +22,14 @@ class OrderController extends Controller
     {
         $filters = array_filter($request->validated(), fn ($value) => $value !== null);
 
-        return view('admin.orders.index', ['orders' => $listing->listing($filters), 'filters' => $filters]);
+        return view('admin.orders.index', ['orders' => $listing->listing($filters, false), 'filters' => $filters, 'pendingDeposits' => 0]);
     }
 
     public function show(string $number): View
     {
         $invoice = TableInvoice::query()->where('number', $number)->with(['tableSession.seat', 'round.items', 'round.events.actor', 'fees', 'revisions.actor'])->first();
         if ($invoice !== null) {
-            $qrImage = $invoice->bank_details === null ? null : app(BankTransferQr::class)->forSnapshot($invoice->bank_details, $invoice->total_vnd, $invoice->number);
+            $qrImage = $invoice->bank_details === null || $invoice->amount_due_vnd === 0 ? null : app(BankTransferQr::class)->forSnapshot($invoice->bank_details, $invoice->amount_due_vnd, $invoice->number);
 
             return view('admin.orders.counter', ['invoice' => $invoice, 'qrImage' => $qrImage, 'customer' => false]);
         }

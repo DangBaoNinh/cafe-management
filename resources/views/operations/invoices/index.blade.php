@@ -13,7 +13,7 @@
             <flux:input name="from" label="Từ ngày" type="date" :value="is_string(old('from')) ? old('from') : $from?->toDateString()" />
             <flux:input name="to" label="Đến ngày" type="date" :value="is_string(old('to')) ? old('to') : $to?->toDateString()" />
             <flux:select name="source" label="Loại hóa đơn">
-                @foreach(['all' => 'Tất cả', 'order' => 'Đơn giao / nhận tại quán', 'table' => 'Bàn / phòng'] as $value => $label)
+                @foreach(['all' => 'Tất cả', 'order' => (auth()->user()->can('access-admin') ? 'Đơn trực tuyến' : 'Đặt trước nhận tại quán'), 'table' => 'Bàn / phòng'] as $value => $label)
                     <flux:select.option :value="$value" :selected="$source === $value">{{ $label }}</flux:select.option>
                 @endforeach
             </flux:select>
@@ -27,9 +27,9 @@
                 <thead><tr><th class="p-4">Hóa đơn</th><th class="p-4">Khách / Chỗ</th><th class="p-4">{{ $history ? 'Thanh toán lúc' : 'Lập lúc' }}</th><th class="p-4">Giá trị hóa đơn</th><th class="p-4">Thanh toán</th><th class="p-4">Thao tác</th></tr></thead>
                 <tbody class="divide-y divide-terrasse-ink/15">
                     @forelse($bills as $bill)
-                        @php($url = match($bill->source) { 'order' => route('operations.invoices.orders.show', $bill->reference), 'prepaid' => auth()->user()->can('access-admin') ? route('admin.orders.show', $bill->display_number) : route('operations.invoices.prepaid.show', $bill->reference), default => route('operations.invoices.tables.show', $bill->reference) })
+                        @php($url = match($bill->source) { 'deposit' => route('operations.deposits.show', $bill->reference), 'order' => route('operations.invoices.orders.show', $bill->reference), 'prepaid' => auth()->user()->can('access-admin') ? route('admin.orders.show', $bill->display_number) : route('operations.invoices.prepaid.show', $bill->reference), default => route('operations.invoices.tables.show', $bill->reference) })
                         <tr>
-                            <td class="p-4"><a href="{{ $url }}" class="underline underline-offset-4">{{ $bill->display_number ?? 'BH-'.$bill->id }}</a><p class="terrasse-muted mt-1">{{ $bill->source === 'order' ? 'Đơn hàng' : 'Bàn / phòng' }}</p></td>
+                            <td class="p-4"><a href="{{ $url }}" class="underline underline-offset-4">{{ $bill->display_number ?? 'BH-'.$bill->id }}</a><p class="terrasse-muted mt-1">{{ $bill->source === 'deposit' ? 'Đặt cọc' : ($bill->source === 'order' ? 'Đơn hàng' : 'Bàn / phòng') }}</p></td>
                             <td class="p-4">{{ $bill->label }}</td>
                             <td class="p-4"><x-customer.order-time :date="\Carbon\CarbonImmutable::parse($bill->event_at, 'UTC')" /></td>
                             <td class="p-4"><x-customer.vnd :amount="(int) $bill->amount_vnd" /></td>

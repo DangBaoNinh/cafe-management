@@ -34,7 +34,7 @@ class AdminOrderManagementTest extends TestCase
         }
         $index = route('admin.orders.index');
         $filter = ['number' => 'cf-match-', 'from' => '2026-11-21', 'to' => '2026-11-21', 'status' => 'ready', 'method' => 'bank_transfer'];
-        $this->actingAs($admin)->get(route('admin.dashboard'))->assertSee($index);
+        $this->actingAs($admin)->get(route('admin.dashboard'))->assertSee(route('admin.invoices.index'));
         $this->get($index)->assertOk()->assertSee('CF-OTHER');
         $this->get(route('admin.orders.index', $filter))->assertOk()
             ->assertSeeInOrder(['CF-MATCH-END', '23:59 21/11/2026', 'CF-MATCH-START', '00:00 21/11/2026'])

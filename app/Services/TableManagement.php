@@ -43,7 +43,7 @@ class TableManagement
                 $this->require($current === 'free', 'Chỉ ngừng phục vụ khi bàn đang trống.');
                 $this->reservations->setSeatActive($actor, $seat->id, false);
             } elseif ($status === 'occupied') {
-                $this->require($current === 'free', 'Bàn đã được đặt hoặc đang ngừng phục vụ. Hãy xử lý lượt đặt trước khi nhận khách.');
+                $this->require(in_array($current, ['free', 'held'], true), 'Bàn đang ngừng phục vụ.');
                 $this->reservations->walkIn($actor, $seat->id, true);
             } elseif ($status === 'free') {
                 if ($current === 'inactive') {

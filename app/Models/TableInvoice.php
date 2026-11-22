@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Guarded([])]
 class TableInvoice extends Model
 {
-    protected $attributes = ['status' => 'draft', 'order_status' => 'pending_payment'];
+    protected $attributes = ['status' => 'draft', 'order_status' => 'pending_payment', 'deposit_credit_vnd' => 0, 'deposit_refund_vnd' => 0];
 
     public function getRouteKeyName(): string
     {
@@ -50,10 +50,15 @@ class TableInvoice extends Model
         return $this->hasMany(PickupFee::class);
     }
 
+    public function getAmountDueVndAttribute(): int
+    {
+        return max(0, $this->total_vnd - $this->deposit_credit_vnd);
+    }
+
     protected function casts(): array
     {
         return ['method' => CollectionMethod::class, 'order_status' => CounterOrderStatus::class, 'selections' => 'array', 'initial_items' => 'array', 'bank_details' => 'array',
-            'subtotal_vnd' => 'integer', 'fees_vnd' => 'integer', 'total_vnd' => 'integer', 'revision' => 'integer',
+            'subtotal_vnd' => 'integer', 'fees_vnd' => 'integer', 'total_vnd' => 'integer', 'revision' => 'integer', 'deposit_credit_vnd' => 'integer', 'deposit_refund_vnd' => 'integer',
             'paid_at' => 'immutable_datetime', 'payment_reported_at' => 'immutable_datetime'];
     }
 

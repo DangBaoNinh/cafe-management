@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum ReservationStatus: string
 {
+    case PendingDeposit = 'pending_deposit';
     case Confirmed = 'confirmed';
     case CheckedIn = 'checked_in';
     case Completed = 'completed';
@@ -13,7 +14,8 @@ enum ReservationStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Confirmed => 'Đã giữ chỗ',
+            self::PendingDeposit => 'Chờ đặt cọc',
+            self::Confirmed => 'Đã đặt chỗ',
             self::CheckedIn => 'Đang sử dụng',
             self::Completed => 'Đã trả chỗ',
             self::Cancelled => 'Đã hủy',

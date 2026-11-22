@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Models\CustomerRefundRequest;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
@@ -72,6 +73,8 @@ class ManualPayment
             $payment->refund_reference = $reference;
             $payment->refunded_at = now();
             $payment->save();
+            CustomerRefundRequest::query()->where('order_id', $order->id)->where('status', 'pending')
+                ->update(['status' => 'completed', 'completed_at' => now(), 'completed_by' => $actor->id, 'refund_reference' => $reference]);
             $this->recordHistory($payment, $actor, PaymentStatus::RefundPending, $note);
         }, 5);
     }

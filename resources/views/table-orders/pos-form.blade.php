@@ -54,8 +54,10 @@
             <dl class="space-y-2 border-t border-terrasse-ink/20 pt-3 text-sm">
                 <div class="flex justify-between"><dt>Tiền món</dt><dd data-pos-subtotal>0 ₫</dd></div>
                 <div class="flex justify-between"><dt>Phụ phí tại quầy</dt><dd>{{ number_format($config['fees'], 0, ',', '.') }} ₫</dd></div>
+                <div class="flex justify-between"><dt>Trừ tiền cọc đã nhận</dt><dd data-pos-deposit>0 ₫</dd></div><div class="flex justify-between"><dt>Cọc dư cần hoàn tiền mặt</dt><dd data-pos-refund>0 ₫</dd></div>
                 <div class="flex justify-between text-lg font-semibold"><dt>Tổng phải thu</dt><dd data-pos-total>0 ₫</dd></div>
             </dl>
+            <label data-pos-refund-confirmation hidden class="flex items-start gap-2 text-sm"><input type="checkbox" name="deposit_refund_confirmed" value="1">Đã hoàn tiền mặt phần cọc dư cho khách.</label>
             @if(!$customer)
                 <input type="hidden" name="payment_confirmed" value="1">
                 <p class="terrasse-muted text-sm">Bấm Hoàn tất thanh toán để xác nhận đã nhận đủ tiền theo phương thức đã chọn.</p>
