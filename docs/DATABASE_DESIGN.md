@@ -10,7 +10,7 @@ Dùng MySQL InnoDB, `utf8mb4`, PK `BIGINT UNSIGNED` cho bảng nghiệp vụ và
 
 | Bảng | Trường chính và quan hệ | Ràng buộc và truy vấn |
 | --- | --- | --- |
-| `users` (mở rộng) | `id`, `name`, `email`, `password` hash, `role`, `is_active`, thông tin Fortify hiện có | Email chuẩn hóa unique. Vai trò mặc định customer. Thay đổi vai trò chỉ qua UC04. |
+| `users` (mở rộng) | `id`, `name`, `email`, `phone` nullable, `password` hash, `role`, `is_active`, thông tin Fortify hiện có | Email chuẩn hóa unique. Điện thoại hồ sơ là giá trị gợi ý cho checkout và giữ chỗ; snapshot đơn/lịch vẫn là nguồn lịch sử. Vai trò mặc định customer. Thay đổi vai trò chỉ qua UC04. |
 | `user_addresses` | `id`, `user_id` → users, người nhận, điện thoại, tỉnh/thành, quận/huyện, phường/xã, địa chỉ chi tiết, `is_default` | Index `user_id`. Unique khóa sinh nullable theo `user_id` khi là địa chỉ mặc định. Khóa user khi đổi mặc định. |
 | `categories` | `id`, `name`, `slug`, `is_active`, `sort_order` | Slug unique. Index trạng thái/thứ tự. |
 | `products` | `id`, `category_id`, `name`, `slug`, mô tả, đường dẫn ảnh, `is_active`, `allows_sugar`, `allows_ice` | Slug unique. Index `category_id,is_active`. Ảnh lưu qua Laravel filesystem. |
@@ -28,6 +28,8 @@ Dùng MySQL InnoDB, `utf8mb4`, PK `BIGINT UNSIGNED` cho bảng nghiệp vụ và
 | `payments` | `id`, `order_id`, `method`, `status`, `amount_vnd`, `transfer_details` JSON nullable, `collection_reference`, `refund_reference`, `paid_at`, `refunded_at` | Một payment/đơn. Unique `method,collection_reference` khi có tham chiếu. Số tiền bằng tổng đơn. Thông tin tài khoản nhận chuyển khoản được lưu lúc chốt để hướng dẫn của đơn giữ nguyên khi cấu hình thay đổi. |
 | `order_status_histories` | `id`, `order_id`, `actor_id` → users nullable, `from_status`, `to_status`, `reason`, `created_at` | Append-only. Index `order_id,id`. Actor null dành cho sự kiện hệ thống. |
 | `payment_status_histories` | `id`, `payment_id`, `actor_id` → users nullable, `from_status`, `to_status`, `reason`, `created_at` | Append-only. Index `payment_id,id`. |
+| `support_conversations` | `id`, `user_id` → users, chủ đề, trạng thái open/closed, thời điểm tin cuối, người/thời điểm đóng nullable | Index `user_id,last_message_at` và `status,last_message_at`; khách chỉ đọc dữ liệu của mình. |
+| `support_messages` | `id`, `support_conversation_id` → support_conversations, `sender_id` → users, nội dung, thời điểm đọc nullable | Lịch sử trao đổi append-only, index `support_conversation_id,id`. |
 
 Bảy bảng hạ tầng đã có gồm `password_reset_tokens`, `sessions`, `cache`, `cache_locks`, `jobs`, `job_batches` và `failed_jobs`. Bảng `users` đã được tính ở nhóm nghiệp vụ.
 

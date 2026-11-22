@@ -1,7 +1,7 @@
 @php
     $fields = [
         'recipient_name' => old('recipient_name', $addresses->first()?->recipient_name ?? $customer->name),
-        'phone' => old('phone', $addresses->first()?->phone),
+        'phone' => old('phone', $addresses->first()?->phone ?? $customer->phone),
         'coupon_code' => old('coupon_code'),
     ];
     $fulfillment = old('fulfillment_type', 'pickup');

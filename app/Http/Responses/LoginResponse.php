@@ -18,6 +18,8 @@ class LoginResponse extends FortifyLoginResponse
             return redirect()->intended(route('operations.orders.index'));
         }
 
-        return parent::toResponse($request);
+        return $request->wantsJson()
+            ? parent::toResponse($request)
+            : redirect()->route('home');
     }
 }

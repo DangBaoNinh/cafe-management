@@ -20,6 +20,7 @@
             ['operations.payments.index', 'operations.payments.*', 'Đối chiếu thanh toán'],
             ['operations.invoices.index', 'operations.invoices.index', 'Hóa đơn thanh toán'],
             ['operations.invoices.history', 'operations.invoices.history', 'Lịch sử hóa đơn'],
+            ['operations.support.index', 'operations.support.*', 'Tin nhắn khách hàng'],
         ],
         'Cửa hàng' => $canAdminister ? [
             ['admin.categories.index', 'admin.categories.*', 'Quản lý danh mục'],

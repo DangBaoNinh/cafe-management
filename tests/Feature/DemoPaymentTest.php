@@ -26,7 +26,7 @@ class DemoPaymentTest extends TestCase
         $this->actingAs($customer)->post($start)->assertStatus(303);
         $session = $payment->demoSessions()->sole();
         $gateway = route('orders.demo-payment.show', [$order->order_number, $session->reference]);
-        $this->get($gateway)->assertOk()->assertSee('Thanh toán thành công')->assertSee('42.000');
+        $this->get($gateway)->assertOk()->assertSee('Tôi đã hoàn tất chuyển khoản')->assertSee($session->reference)->assertSee('42.000');
         $this->get($detail)->assertOk()->assertSee('Chờ thanh toán');
         $this->post($start)->assertRedirect($gateway);
         $this->assertDatabaseCount('demo_payment_sessions', 1);

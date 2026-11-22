@@ -6,7 +6,7 @@
     <section class="mx-auto max-w-3xl space-y-6">
         <header class="space-y-2">
             <flux:link :href="route('orders.index')">Về Đơn của tôi</flux:link>
-            <h1 class="text-3xl font-semibold tracking-tight wrap-anywhere sm:text-4xl">Đơn {{ $order->order_number }}</h1>
+            <h1 class="font-mono text-3xl font-semibold tabular-nums tracking-normal wrap-anywhere sm:text-4xl">Đơn {{ $order->order_number }}</h1>
             <p class="text-sm">Đặt lúc <x-customer.order-time :date="$order->created_at" /></p>
         </header>
 

@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
  * @property positive-int $id
  * @property string $name
  * @property string $email
+ * @property string|null $phone
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property UserRole $role
@@ -29,7 +30,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'phone', 'password'])]
 #[Hidden(['password', 'remember_token', 'booking_no_shows', 'booking_blocked_until', 'booking_last_arrived_at'])]
 class User extends Authenticatable
 {
@@ -82,6 +83,12 @@ class User extends Authenticatable
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    /** @return HasMany<SupportConversation, $this> */
+    public function supportConversations(): HasMany
+    {
+        return $this->hasMany(SupportConversation::class);
     }
 
     /**

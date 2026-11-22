@@ -269,10 +269,10 @@ class CheckoutTest extends TestCase
     public function test_checkout_exposes_the_demo_gateway_only_in_local_and_testing(): void
     {
         [$user] = $this->basket();
-        $this->actingAs($user)->get(route('checkout.create'))->assertOk()->assertSee('Cổng thanh toán mô phỏng');
+        $this->actingAs($user)->get(route('checkout.create'))->assertOk()->assertSee('Chuyển khoản mô phỏng');
         $details = ['method' => 'demo_gateway'];
         $this->app->instance('env', 'production');
-        $this->get(route('checkout.create'))->assertOk()->assertDontSee('Cổng thanh toán mô phỏng');
+        $this->get(route('checkout.create'))->assertOk()->assertDontSee('Chuyển khoản mô phỏng');
         $this->postJson(route('checkout.review'), $this->details($details), ['Sec-Fetch-Site' => 'same-origin'])
             ->assertUnprocessable()->assertJsonValidationErrors('method');
 

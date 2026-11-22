@@ -16,6 +16,7 @@
                     <a href="{{ route($route) }}" @if(request()->routeIs($pattern)) aria-current="page" @endif @class(['active' => request()->routeIs($pattern)])>{{ $label }}</a>
                 @endforeach
                 @can('access-customer-orders')<a href="{{ route('orders.index') }}" @if(request()->routeIs('orders.*')) aria-current="page" @endif>Đơn của tôi</a>@endcan
+                @auth<a href="{{ route('support.index') }}" @if(request()->routeIs('support.*')) aria-current="page" @endif>Liên hệ</a>@endauth
                 @auth
                     <form method="POST" action="{{ route('logout') }}" class="french-mobile-logout">@csrf<button type="submit">Đăng xuất</button></form>
                 @else

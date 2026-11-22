@@ -18,6 +18,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\CustomerSupportController;
 use App\Http\Controllers\DeliveryFeeController;
 use App\Http\Controllers\DemoDeliveryController;
 use App\Http\Controllers\DemoPaymentController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\OperationsInvoiceController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Controllers\OperationsSupportController;
 use App\Http\Controllers\PublicSeatingController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationOperationsController;
@@ -83,6 +85,14 @@ Route::prefix('orders')->name('orders.')->middleware(['auth', 'can:access-custom
     });
 });
 
+Route::prefix('lien-he')->name('support.')->middleware(['auth', 'can:access-customer-orders'])->group(function () {
+    Route::get('/', [CustomerSupportController::class, 'index'])->name('index');
+    Route::get('moi', [CustomerSupportController::class, 'create'])->name('create');
+    Route::post('/', [CustomerSupportController::class, 'store'])->name('store');
+    Route::get('{conversation}', [CustomerSupportController::class, 'show'])->whereNumber('conversation')->name('show');
+    Route::post('{conversation}/phan-hoi', [CustomerSupportController::class, 'reply'])->whereNumber('conversation')->name('reply');
+});
+
 Route::post('payments/demo/callback', [DemoPaymentController::class, 'callback'])
     ->middleware(EnsureDemoPaymentEnabled::class)->withoutMiddleware(PreventRequestForgery::class)->name('payments.demo.callback');
 
@@ -115,6 +125,13 @@ Route::get('operations/preparation', [OrderPreparationController::class, 'index'
 
 Route::get('operations/handoff', [OrderHandoffController::class, 'index'])
     ->middleware(['auth', 'can:operate-orders'])->name('operations.handoff.index');
+
+Route::prefix('operations/ho-tro')->name('operations.support.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [OperationsSupportController::class, 'index'])->name('index');
+    Route::get('{conversation}', [OperationsSupportController::class, 'show'])->whereNumber('conversation')->name('show');
+    Route::post('{conversation}/phan-hoi', [OperationsSupportController::class, 'reply'])->whereNumber('conversation')->name('reply');
+    Route::post('{conversation}/dong', [OperationsSupportController::class, 'close'])->whereNumber('conversation')->name('close');
+});
 
 Route::prefix('operations/pickups')->name('operations.pickups.')->middleware(['auth', 'can:operate-orders'])->group(function () {
     Route::get('/', [ScheduledPickupController::class, 'index'])->name('index');

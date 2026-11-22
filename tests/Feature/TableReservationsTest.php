@@ -97,7 +97,7 @@ class TableReservationsTest extends TestCase
         $preferences = ['party_size' => 6, 'seat_id' => $room->id];
         $destination = route('reservations.create', $preferences);
         $this->get($destination)->assertRedirect(route('login'));
-        $this->post(route('login'), ['email' => $owner->email, 'password' => 'password'])->assertRedirect($destination);
+        $this->post(route('login'), ['email' => $owner->email, 'password' => 'password'])->assertRedirect(route('home'));
         $this->get($destination)->assertOk()->assertSee('T2-PH')->assertDontSee('T1-PH')
             ->assertSeeHtml('name="seat_id" value="'.$room->id.'"')
             ->assertViewHas('filters', ['pickup_date' => '2026-11-21', 'pickup_clock' => null, 'kind' => 'room', 'party_size' => 6, 'floor' => 2]);

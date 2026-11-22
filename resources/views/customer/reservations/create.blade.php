@@ -3,6 +3,10 @@
         <flux:link :href="route('reservations.index')">Lịch đặt của tôi</flux:link>
         <header class="french-booking-hero"><div><p class="eyebrow">Une place pour vous</p><h1>Đặt chỗ tại quán</h1><p class="terrasse-muted mt-4">Một chiếc bàn nhỏ, một cuộc hẹn thật đẹp. Chọn ngày, giờ và góc ngồi phù hợp với bạn.</p></div><img src="{{ asset('french-theme/assets/interior.webp') }}" alt="Không gian bên khung cửa xanh của Toàn" width="1122" height="1402"></header>
         @include('reservations.feedback')
+        <section class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-5">
+            <div><p class="eyebrow">Sơ đồ tương tác</p><h2 class="text-xl font-semibold">Chọn chỗ trên mô hình 3D hoặc danh sách 2D</h2><p class="terrasse-muted text-sm">Chọn một chỗ trống để hệ thống đưa bạn về đúng biểu mẫu giữ chỗ.</p></div>
+            <x-theme.seating :options="['endpoint' => route('spaces.snapshot', absolute: false), 'reservationUrl' => route('reservations.create', absolute: false)]" />
+        </section>
         <form method="GET" action="{{ route('reservations.create') }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-5">
             @if ($preferredSeat)
                 <input type="hidden" name="seat_id" value="{{ $preferredSeat->id }}">
@@ -55,7 +59,7 @@
                         <flux:input name="contact_name" label="Tên liên hệ" maxlength="120" autocomplete="name"
                             :value="is_string(old('contact_name')) ? old('contact_name') : $customer->name" required />
                         <flux:input name="phone" label="Số điện thoại" type="tel" maxlength="13" autocomplete="tel"
-                            :value="is_string(old('phone')) ? old('phone') : ''" required />
+                            :value="is_string(old('phone')) ? old('phone') : ($customer->phone ?? '')" required />
                     </div>
                     <x-customer.pickup-fee-channel :$bankAvailable label="Kênh thu nếu phát sinh phụ phí" />
                     <flux:button type="submit" variant="primary">Xác nhận đặt chỗ</flux:button>

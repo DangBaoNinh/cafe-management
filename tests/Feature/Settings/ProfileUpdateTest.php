@@ -37,13 +37,16 @@ class ProfileUpdateTest extends TestCase
         Livewire::test('pages::settings.profile')
             ->set('name', '  Test User  ')
             ->set('email', '  Test@Example.com  ')
+            ->set('phone', ' 0901234567 ')
             ->call('updateProfileInformation')
             ->assertHasNoErrors()
             ->assertSet('name', 'Test User')
-            ->assertSet('email', 'test@example.com');
+            ->assertSet('email', 'test@example.com')
+            ->assertSet('phone', '0901234567');
 
         $this->assertSame('Test User', $user->refresh()->name);
         $this->assertSame('test@example.com', $user->email);
+        $this->assertSame('0901234567', $user->phone);
         $this->assertNull($user->email_verified_at);
         $this->assertSame(UserRole::Customer, $user->role);
         $this->assertDatabaseMissing('password_reset_tokens', ['email' => $oldEmail]);
@@ -52,7 +55,7 @@ class ProfileUpdateTest extends TestCase
         $this->post(route('login.store'), [
             'email' => 'Test@Example.com',
             'password' => 'password',
-        ])->assertRedirect(route('dashboard'));
+        ])->assertRedirect(route('home'));
         $this->assertAuthenticatedAs($user);
     }
 
