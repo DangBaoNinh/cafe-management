@@ -83,7 +83,7 @@ class DemoDeliveryTest extends TestCase
         $pickup = $this->order($owner, 'pickup');
         $delivery = $this->order($owner);
         $this->actingAs($staff)->get(route('operations.orders.show', $pickup->order_number))
-            ->assertOk()->assertDontSee('Tạo vận đơn mô phỏng')->assertSee('Hoàn tất đơn');
+            ->assertOk()->assertDontSee('Tạo vận đơn mô phỏng')->assertSee('Hoàn tất bàn giao');
         $this->postJson(route('operations.orders.demo-shipment.create', $pickup->order_number))->assertConflict();
         $this->post(route('operations.orders.handoff', $pickup->order_number), $this->handoffInput('pickup', 'ready', 'completed', 40000))
             ->assertStatus(303);
@@ -183,6 +183,7 @@ class DemoDeliveryTest extends TestCase
         return array_filter([
             'fulfillment_type' => $type, 'method' => 'cod', 'expected_status' => $from,
             'target_status' => $to, 'confirmed' => '1', 'cod_amount_vnd' => $amount,
+            'collection_method' => $to === 'completed' ? 'cash' : null,
         ], fn ($value) => $value !== null);
     }
 

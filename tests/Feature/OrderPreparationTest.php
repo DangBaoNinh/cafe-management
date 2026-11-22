@@ -125,7 +125,8 @@ class OrderPreparationTest extends TestCase
             $this->postJson($prepare, self::START)->assertForbidden();
         }
 
-        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))->get(route('dashboard'))->assertSee($queue);
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))->get(route('dashboard'))->assertRedirectToRoute('operations.orders.index');
+        $this->get(route('operations.orders.index'))->assertOk()->assertSee($queue);
         $this->assertSame(OrderStatus::Confirmed, $order->refresh()->status);
     }
 
@@ -139,6 +140,34 @@ class OrderPreparationTest extends TestCase
         $this->actingAs($staff)->post(route('operations.orders.prepare', $order->order_number), self::START)->assertServerError();
         $this->assertSame(OrderStatus::Confirmed, $order->refresh()->status);
         $this->assertSame(1, $order->statusHistories()->count());
+    }
+
+    public function test_quick_completion_from_queue_preserves_payment_and_rejects_stale_requests(): void
+    {
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+        $order = $this->order(User::factory()->create(), OrderStatus::Preparing);
+        $action = route('operations.orders.prepare', $order->order_number);
+        $this->actingAs($staff)->get(route('operations.preparation.index'))->assertOk()
+            ->assertSee('Đã hoàn tất')->assertSee($action)->assertSee('name="return_to"', false);
+        $this->post($action, [...self::READY, 'return_to' => 'preparation'])
+            ->assertStatus(303)->assertRedirectToRoute('operations.preparation.index');
+        $this->assertSame(OrderStatus::Ready, $order->refresh()->status);
+        $this->assertSame(PaymentStatus::Pending, $order->payment()->sole()->status);
+        $this->assertSame(1, $order->statusHistories()->where('to_status', 'ready')->count());
+        $this->postJson($action, [...self::READY, 'return_to' => 'preparation'])->assertConflict();
+        $this->assertSame(1, $order->statusHistories()->where('to_status', 'ready')->count());
+        $this->get(route('operations.preparation.index'))->assertDontSee($order->order_number);
+        $this->get(route('operations.handoff.index'))->assertSee($order->order_number);
+    }
+
+    public function test_quick_completion_cannot_skip_preparation_or_supply_an_external_redirect(): void
+    {
+        $order = $this->order(User::factory()->create());
+        $action = route('operations.orders.prepare', $order->order_number);
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
+            ->postJson($action, ['expected_status' => 'confirmed', 'target_status' => 'ready', 'return_to' => 'preparation'])->assertConflict();
+        $this->postJson($action, [...self::START, 'return_to' => 'https://example.test'])->assertUnprocessable();
+        $this->assertSame(OrderStatus::Confirmed, $order->refresh()->status);
     }
 
     private function order(User $owner, OrderStatus $status = OrderStatus::Confirmed, string $method = 'cod'): Order

@@ -33,7 +33,7 @@ class OrderHandoffTest extends MySqlTestCase
             ])->assertStatus(303);
             $this->assertSame('pending', $payment->refresh()->status->value);
             $this->assertNull($order->refresh()->completed_at);
-            $complete = [...$input, 'expected_status' => 'out_for_delivery', 'target_status' => 'completed', 'cod_amount_vnd' => '52000'];
+            $complete = [...$input, 'expected_status' => 'out_for_delivery', 'target_status' => 'completed', 'cod_amount_vnd' => '52000', 'collection_method' => 'cash'];
             $this->postJson($action, [...$complete, 'cod_amount_vnd' => '40000'])
                 ->assertUnprocessable()->assertJsonValidationErrors('cod_amount_vnd');
             $this->post($action, $complete)->assertStatus(303);

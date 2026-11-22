@@ -15,6 +15,7 @@
 
     <footer class="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-terrasse-ink/15 pt-3">
         <strong class="text-sm tabular-nums"><x-customer.vnd :$amount /></strong>
+        @isset($actions){{ $actions }}@endisset
         <flux:button :href="$href" size="sm" icon:trailing="arrow-up-right" :aria-label="'Chi tiết đơn '.$order->order_number">Chi tiết</flux:button>
     </footer>
 </article>

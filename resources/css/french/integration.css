@@ -230,3 +230,18 @@
 @media (prefers-reduced-motion: reduce) {
     .french-theme *, .french-theme *::before, .french-theme *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 }
+
+@media print {
+    .french-theme .admin-sidebar, .french-theme .admin-topbar, .french-theme .admin-sidebar-backdrop,
+    .french-theme [data-no-print], .french-theme .jardin-skip { display: none !important; }
+    .french-theme .admin-shell { display: block; }
+    .french-theme .admin-content { max-width: none; padding: 0; }
+    .terrasse.french-theme, .dark .terrasse.french-theme {
+        --paper: #fff; --white: #fff; --ink: #000; --ink-soft: #333;
+        --terrasse-paper: #fff; --terrasse-ink: #000; --terrasse-muted: #333; --terrasse-line: #bbb;
+        background: #fff; color: #000; color-scheme: light;
+    }
+    .invoice-sheet { max-width: none; font-size: 12pt; }
+    .invoice-sheet h1 { font-size: 24pt !important; }
+    .invoice-sheet article { break-inside: avoid; }
+}

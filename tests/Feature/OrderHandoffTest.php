@@ -25,7 +25,7 @@ class OrderHandoffTest extends TestCase
 
     private const PICKUP = [
         'fulfillment_type' => 'pickup', 'method' => 'cod', 'expected_status' => 'ready',
-        'target_status' => 'completed', 'confirmed' => '1', 'cod_amount_vnd' => '40000',
+        'target_status' => 'completed', 'confirmed' => '1', 'cod_amount_vnd' => '40000', 'collection_method' => 'cash',
     ];
 
     public function test_pickup_completes_directly_and_records_cod_and_order_at_the_same_time(): void
@@ -42,13 +42,13 @@ class OrderHandoffTest extends TestCase
             'expected_status' => 'preparing', 'target_status' => 'ready',
         ])->assertStatus(303);
         $this->get($queue)->assertOk()->assertSee($order->order_number);
-        $this->get($show)->assertOk()->assertSee('Số tiền COD đã thu (VND)')->assertSee('Hoàn tất đơn')
+        $this->get($show)->assertOk()->assertSee('Số tiền COD đã thu (VND)')->assertSee('Hoàn tất bàn giao')
             ->assertDontSee('Đánh dấu đang giao');
         $this->postJson($action, [...self::DISPATCH, 'fulfillment_type' => 'pickup'])->assertConflict();
 
         $this->freezeSecond();
-        $this->post($action, self::PICKUP)->assertStatus(303)->assertRedirect($show);
-        $this->get($show)->assertOk()->assertSee('Đã hoàn tất đơn hàng.')->assertSee('Hoàn tất lúc')->assertDontSee($action);
+        $this->post($action, self::PICKUP)->assertStatus(303)->assertRedirectToRoute('operations.invoices.orders.show', $order->order_number);
+        $this->get($show)->assertOk()->assertSee('Hoàn tất lúc')->assertDontSee($action);
         $this->get($queue)->assertOk()->assertDontSee($order->order_number);
         $this->postJson($action, self::PICKUP)->assertConflict();
 
@@ -75,13 +75,13 @@ class OrderHandoffTest extends TestCase
         $action = route('operations.orders.handoff', $order->order_number);
         $complete = [...self::PICKUP, 'fulfillment_type' => 'delivery', 'expected_status' => 'out_for_delivery'];
 
-        $this->actingAs($staff)->get($show)->assertOk()->assertSee('Đánh dấu đang giao')->assertDontSee('Hoàn tất đơn');
+        $this->actingAs($staff)->get($show)->assertOk()->assertSee('Đánh dấu đang giao')->assertDontSee('Hoàn tất bàn giao');
         $this->postJson($action, [...$complete, 'expected_status' => 'ready'])->assertConflict();
         $this->postJson($action, [...self::DISPATCH, 'cod_amount_vnd' => 40000])
             ->assertUnprocessable()->assertJsonValidationErrors('cod_amount_vnd');
         $this->post($action, self::DISPATCH)->assertStatus(303);
         $this->postJson($action, self::DISPATCH)->assertConflict();
-        $this->get($show)->assertOk()->assertSee('Nếu chưa giao được')->assertSee('Hoàn tất đơn');
+        $this->get($show)->assertOk()->assertSee('Nếu chưa giao được')->assertSee('Hoàn tất bàn giao');
         $this->assertSame(OrderStatus::OutForDelivery, $order->refresh()->status);
         $this->assertNull($order->completed_at);
         $this->assertSame(PaymentStatus::Pending, $order->payment()->sole()->status);
@@ -146,7 +146,8 @@ class OrderHandoffTest extends TestCase
             $this->actingAs($actor)->get($queue)->assertForbidden();
             $this->postJson($action, self::PICKUP)->assertForbidden();
         }
-        $this->actingAs($staff)->get(route('dashboard'))->assertSee($queue);
+        $this->actingAs($staff)->get(route('dashboard'))->assertRedirectToRoute('operations.orders.index');
+        $this->get(route('operations.orders.index'))->assertOk()->assertSee($queue);
         $this->postJson($action, [...self::PICKUP, 'fulfillment_type' => 'delivery'])
             ->assertConflict()->assertJsonValidationErrors('fulfillment_type');
         $this->postJson($action, [...self::PICKUP, 'method' => 'bank_transfer', 'cod_amount_vnd' => null])
@@ -170,6 +171,7 @@ class OrderHandoffTest extends TestCase
         $this->assertNull($order->completed_at);
         $this->assertSame(PaymentStatus::Pending, $payment->status);
         $this->assertNull($payment->paid_at);
+        $this->assertNull($payment->collection_method);
         $this->assertSame(1, $payment->statusHistories()->count());
         $this->assertSame(1, $order->statusHistories()->count());
     }
@@ -185,6 +187,60 @@ class OrderHandoffTest extends TestCase
         $payment = $order->payment()->sole();
         $this->assertSame(PaymentStatus::Paid, $payment->status);
         $this->assertSame(0, $payment->amount_vnd);
+    }
+
+    public function test_completed_handoff_tab_is_separate_and_keeps_its_pagination_filter(): void
+    {
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+        $owner = User::factory()->create();
+        $active = $this->order($owner);
+        $completed = [];
+        for ($i = 0; $i < 16; $i++) {
+            $order = $this->order($owner, status: OrderStatus::Completed);
+            $order->completed_at = now()->subMinutes($i);
+            $order->save();
+            $completed[] = $order;
+        }
+        $this->actingAs($staff)->get(route('operations.handoff.index'))->assertOk()
+            ->assertSee($active->order_number)->assertDontSee($completed[0]->order_number);
+        $this->get(route('operations.handoff.index', ['view' => 'completed']))->assertOk()
+            ->assertSee($completed[0]->order_number)->assertDontSee($active->order_number)
+            ->assertSee(route('operations.invoices.orders.show', $completed[0]->order_number))
+            ->assertSee('view=completed')->assertSee('page=2')->assertViewHas('orders', fn ($orders) => $orders->total() === 16);
+        $this->get(route('operations.handoff.index', ['view' => 'completed', 'page' => 2]))->assertOk()->assertSee($completed[15]->order_number);
+        $this->getJson(route('operations.handoff.index', ['view' => 'invalid']))->assertUnprocessable();
+    }
+
+    public function test_cash_and_transfer_handoffs_issue_paid_invoices_and_preserve_checkout_method(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]));
+        foreach (['cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản'] as $method => $label) {
+            $order = $this->order(User::factory()->create());
+            $action = route('operations.orders.handoff', $order->order_number);
+            $invoice = route('operations.invoices.orders.show', $order->order_number);
+            $this->post($action, [...self::PICKUP, 'collection_method' => $method])->assertRedirect($invoice);
+            $payment = $order->payment()->sole();
+            $this->assertSame('cod', $payment->method->value);
+            $this->assertSame($method, $payment->collection_method->value);
+            $this->assertSame('paid', $payment->status->value);
+            $this->get($invoice)->assertOk()->assertSee('Đã thanh toán')->assertSee($label)->assertSee('In hóa đơn');
+            $this->get(route('operations.invoices.history'))->assertOk()->assertSee($order->order_number)->assertSee('Thực thu: '.$label);
+            $this->postJson($action, [...self::PICKUP, 'collection_method' => $method])->assertConflict();
+            $this->assertSame(1, $payment->statusHistories()->where('to_status', 'paid')->count());
+        }
+    }
+
+    public function test_handoff_requires_a_valid_collection_choice_without_writing_payment(): void
+    {
+        $order = $this->order(User::factory()->create());
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]));
+        foreach ([null, '', 'card', ['cash']] as $method) {
+            $this->postJson(route('operations.orders.handoff', $order->order_number), [...self::PICKUP, 'collection_method' => $method])
+                ->assertUnprocessable()->assertJsonValidationErrors('collection_method');
+        }
+        $this->assertSame('ready', $order->refresh()->status->value);
+        $this->assertSame('pending', $order->payment()->sole()->status->value);
+        $this->assertNull($order->payment()->sole()->collection_method);
     }
 
     private function order(

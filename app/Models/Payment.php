@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CollectionMethod;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property PaymentMethod $method
+ * @property CollectionMethod|null $collection_method
  * @property PaymentStatus $status
  * @property array{bank_name: string, account_number: string, account_holder: string}|null $transfer_details
  */
@@ -59,6 +61,7 @@ class Payment extends Model
     {
         return [
             'method' => PaymentMethod::class,
+            'collection_method' => CollectionMethod::class,
             'status' => PaymentStatus::class,
             'amount_vnd' => 'integer',
             'transfer_details' => 'array',

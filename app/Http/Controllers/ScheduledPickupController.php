@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CollectionMethod;
+use App\Http\Requests\CompleteScheduledPickupRequest;
 use App\Models\PickupFee;
 use App\Models\ScheduledPickup;
 use App\Models\User;
@@ -73,17 +75,26 @@ class ScheduledPickupController extends Controller
     public function arrive(Request $request, string $code, ScheduledPickups $pickups): RedirectResponse
     {
         $channel = $request->validate(['channel' => ['required', Rule::in(array_keys(PickupFee::CHANNELS))]])['channel'];
+        $request->validate(['return_to' => ['nullable', Rule::in(['order'])]]);
         $pickups->arrive($this->user($request), $code, $channel);
+
+        if ($request->input('return_to') === 'order') {
+            $pickup = ScheduledPickup::query()->with('order')->where('code', $code)->firstOrFail();
+
+            return to_route('operations.orders.show', $pickup->order->order_number, 303)->with('status', 'Đã ghi nhận khách đến và chốt phụ phí.');
+        }
 
         return $this->result($code, 'Đã ghi nhận khách đến và chốt phụ phí.');
     }
 
-    public function handoff(Request $request, string $code, ScheduledPickups $pickups): RedirectResponse
+    public function handoff(CompleteScheduledPickupRequest $request, string $code, ScheduledPickups $pickups): RedirectResponse
     {
-        $amount = $request->validate(['collected_vnd' => ['nullable', 'integer', 'min:0']])['collected_vnd'] ?? null;
-        $pickups->handoff($this->user($request), $code, $amount === null ? null : (int) $amount);
+        $amount = $request->validated('collected_vnd');
+        $pickups->handoff($this->user($request), $code, $amount === null ? null : (int) $amount,
+            $request->filled('collection_method') ? CollectionMethod::from($request->validated('collection_method')) : null);
+        $pickup = ScheduledPickup::query()->with('order')->where('code', $code)->firstOrFail();
 
-        return $this->result($code, 'Đã bàn giao đơn và đánh dấu phiếu đã dùng.');
+        return to_route('operations.invoices.orders.show', $pickup->order->order_number, 303)->with('status', 'Đã hoàn tất bàn giao và thanh toán. Phiếu nhận đã được sử dụng.');
     }
 
     public function resolve(Request $request, string $code, int $fee, PickupFees $fees): RedirectResponse

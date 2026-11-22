@@ -15,7 +15,6 @@ use App\Models\UserAddress;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -32,6 +31,7 @@ class Checkout
         private VietnamAddressCatalog $catalog,
         private InventoryControl $inventory,
         private InventoryRecipes $recipes,
+        private OrderNumbers $numbers,
     ) {}
 
     /** @return Quote */
@@ -254,7 +254,7 @@ class Checkout
     {
         $order = $user->orders()->create([
             ...$quote['order'],
-            'order_number' => 'CF-'.Str::ulid(),
+            'order_number' => $this->numbers->next(),
             'checkout_key' => $key,
             'request_hash' => $requestHash,
             'status' => OrderStatus::Pending,

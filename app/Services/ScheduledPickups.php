@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CollectionMethod;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Models\Order;
@@ -70,12 +71,12 @@ class ScheduledPickups
         }, 5);
     }
 
-    public function handoff(User $actor, string $code, ?int $collected): void
+    public function handoff(User $actor, string $code, ?int $collected, ?CollectionMethod $collectionMethod = null): void
     {
         Gate::forUser($actor)->authorize('operate-orders');
         $orderId = ScheduledPickup::query()->where('code', $code)->firstOrFail()->order_id;
 
-        DB::transaction(function () use ($actor, $orderId, $collected): void {
+        DB::transaction(function () use ($actor, $orderId, $collected, $collectionMethod): void {
             $order = Order::query()->lockForUpdate()->findOrFail($orderId);
             $pickup = $order->scheduledPickup()->lockForUpdate()->firstOrFail();
             $this->require($pickup->isOpen($order), 'Phiếu đã dùng, đã hết hạn hoặc đơn đã kết thúc.');
@@ -89,7 +90,7 @@ class ScheduledPickups
             $this->require(($collected ?? 0) === $invoice['total'], 'Số tiền đã thu phải khớp hóa đơn tại quầy.');
 
             $this->handoff->advanceLocked($order, $payment, OrderStatus::Completed,
-                $payment->method === PaymentMethod::Cod ? $invoice['items'] : null, $actor);
+                $payment->method === PaymentMethod::Cod ? $invoice['items'] : null, $actor, collectionMethod: $collectionMethod);
             $pickup->fees()->where('channel', 'counter')->where('status', 'pending')->update([
                 'status' => 'paid', 'paid_at' => $order->completed_at, 'counter_actor_id' => $actor->id,
             ]);

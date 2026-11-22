@@ -46,6 +46,7 @@
         </section>
 
         @if ($tableSession->billed_at !== null)
+            <flux:link :href="route('operations.invoices.tables.show', $tableSession)">Xem / in hóa đơn</flux:link>
             @include('table-orders.bill')
         @endif
 
