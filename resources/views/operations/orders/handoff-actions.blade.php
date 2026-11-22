@@ -20,7 +20,7 @@
             <input type="hidden" name="method" value="{{ $payment->method->value }}">
 
             @if (! $dispatching && $payment->method === PaymentMethod::Cod)
-                <x-operations.collection-method />
+                <x-operations.collection-method :amount="$order->total_vnd" :memo="$order->order_number" />
                 <div class="space-y-2">
                     <label class="block text-sm font-medium" for="cod-amount">Số tiền COD đã thu (VND)</label>
                     <flux:input id="cod-amount" name="cod_amount_vnd" inputmode="numeric" pattern="[0-9]+" :value="is_scalar(old('cod_amount_vnd')) ? old('cod_amount_vnd') : $order->total_vnd" required />

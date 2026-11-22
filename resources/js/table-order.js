@@ -62,6 +62,7 @@ for (const form of document.querySelectorAll('[data-table-order]')) {
         const product = field(row, 'product_id');
         product.value = String(selection.product_id ?? '');
         field(row, 'quantity').value = selection.quantity ?? 1;
+        field(row, 'notes').value = selection.notes ?? '';
         container.append(row);
         showOptions(row, selection);
         if (focus) product.focus();

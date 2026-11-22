@@ -32,8 +32,11 @@ class BestSellingProducts
             ->join('product_sizes', 'product_sizes.id', '=', 'table_round_items.product_size_id')
             ->join('table_rounds', 'table_rounds.id', '=', 'table_round_items.table_round_id')
             ->join('table_sessions', 'table_sessions.id', '=', 'table_rounds.table_session_id')
-            ->where('table_rounds.status', TableRoundStatus::Served->value)
-            ->where('table_sessions.paid_at', '>=', $from)->where('table_sessions.paid_at', '<', $until)
+            ->leftJoin('table_invoices', 'table_invoices.table_round_id', '=', 'table_rounds.id')
+            ->where(function ($query) use ($from, $until): void {
+                $query->where(fn ($legacy) => $legacy->where('table_sessions.billing_mode', 'legacy')->where('table_rounds.status', TableRoundStatus::Served->value)->where('table_sessions.paid_at', '>=', $from)->where('table_sessions.paid_at', '<', $until))
+                    ->orWhere(fn ($prepaid) => $prepaid->where('table_invoices.status', 'paid')->where('table_invoices.order_status', 'completed')->where('table_invoices.paid_at', '>=', $from)->where('table_invoices.paid_at', '<', $until));
+            })
             ->select('product_sizes.product_id', 'table_round_items.quantity');
 
         $sales = DB::query()->fromSub($orderCups->unionAll($tableCups), 'paid_cups')

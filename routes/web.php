@@ -31,7 +31,10 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationOperationsController;
 use App\Http\Controllers\ScheduledPickupController;
 use App\Http\Controllers\StorefrontChatController;
+use App\Http\Controllers\TableInvoiceController;
+use App\Http\Controllers\TableManagementController;
 use App\Http\Controllers\TableOrderController;
+use App\Http\Controllers\TablePosController;
 use App\Http\Controllers\TableSessionOperationsController;
 use App\Http\Middleware\EnsureDemoDeliveryEnabled;
 use App\Http\Middleware\EnsureDemoPaymentEnabled;
@@ -48,6 +51,11 @@ Route::post('tro-chuyen', StorefrontChatController::class)
     ->middleware('throttle:storefront-chat')->name('storefront-chat.reply');
 
 Route::prefix('goi-mon/{reservationSeat:code}')->name('table-orders.')->group(function () {
+    Route::get('access/{tableSession}', [TableOrderController::class, 'access'])->whereUuid('tableSession')->middleware('signed')->name('access');
+    Route::get('order', [TableOrderController::class, 'pos'])->name('pos');
+    Route::post('invoices', [TableOrderController::class, 'invoiceStore'])->name('invoice.store');
+    Route::get('invoices/{tableInvoice}', [TableOrderController::class, 'invoiceShow'])->whereUuid('tableInvoice')->name('invoice.show');
+    Route::post('invoices/{tableInvoice}/report', [TableOrderController::class, 'reportPayment'])->whereUuid('tableInvoice')->middleware('throttle:30,1')->name('invoice.report');
     Route::get('/', [TableOrderController::class, 'show'])->name('show');
     Route::post('join', [TableOrderController::class, 'join'])->middleware('throttle:table-order-access')->name('join');
     Route::post('rounds', [TableOrderController::class, 'store'])->name('store');
@@ -137,6 +145,8 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
 });
 
 Route::prefix('operations/invoices')->name('operations.invoices.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('prepaid/{tableInvoice}', [TableInvoiceController::class, 'show'])->whereUuid('tableInvoice')->name('prepaid.show');
+    Route::post('prepaid/{tableInvoice}/pay', [TableInvoiceController::class, 'pay'])->whereUuid('tableInvoice')->name('prepaid.pay');
     Route::get('/', [OperationsInvoiceController::class, 'index'])->name('index');
     Route::get('history', [OperationsInvoiceController::class, 'index'])->name('history');
     Route::get('orders/{number}', [OperationsInvoiceController::class, 'order'])->name('orders.show');
@@ -144,6 +154,10 @@ Route::prefix('operations/invoices')->name('operations.invoices.')->middleware([
 });
 
 Route::prefix('operations/table-sessions')->name('operations.table-sessions.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::post('tables/{reservationSeat:code}/order', [TableManagementController::class, 'order'])->name('table.order');
+    Route::post('tables/{reservationSeat:code}/status', [TableManagementController::class, 'status'])->name('table.status');
+    Route::get('{tableSession}/order', [TablePosController::class, 'show'])->whereUuid('tableSession')->name('pos');
+    Route::post('{tableSession}/order', [TablePosController::class, 'store'])->whereUuid('tableSession')->name('pos.store');
     Route::get('/', [TableSessionOperationsController::class, 'index'])->name('index');
     Route::get('seats/{reservationSeat:code}/qr', [TableSessionOperationsController::class, 'qr'])->name('qr');
     Route::post('seats/{reservationSeat:code}', [TableSessionOperationsController::class, 'open'])->name('open');

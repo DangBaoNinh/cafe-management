@@ -17,7 +17,8 @@ class TableRoundRequest extends FormRequest
         return [
             'submission_key' => ['required', 'uuid'],
             'lines' => ['required', 'array', 'list', 'min:1', 'max:12'],
-            'lines.*' => ['required', 'array:product_id,size_id,quantity,sugar_level,ice_level,topping_ids'],
+            'lines.*' => ['required', 'array:product_id,size_id,quantity,sugar_level,ice_level,topping_ids,notes'],
+            'lines.*.notes' => ['nullable', 'string', 'max:500'],
             'lines.*.product_id' => ['required', 'integer', 'min:1'],
             'lines.*.size_id' => ['required', 'integer', 'min:1'],
             'lines.*.quantity' => ['required', 'integer', 'between:1,'.CartItem::MAX_QUANTITY],
@@ -36,6 +37,7 @@ class TableRoundRequest extends FormRequest
             'lines.*.product_id' => 'món', 'lines.*.size_id' => 'size', 'lines.*.quantity' => 'số ly',
             'lines.*.sugar_level' => 'mức đường', 'lines.*.ice_level' => 'mức đá',
             'lines.*.topping_ids' => 'topping', 'lines.*.topping_ids.*' => 'topping',
+            'lines.*.notes' => 'lưu ý món',
         ];
     }
 
@@ -52,14 +54,21 @@ class TableRoundRequest extends FormRequest
                 'sugar_level' => isset($line['sugar_level']) ? (string) $line['sugar_level'] : null,
                 'ice_level' => isset($line['ice_level']) ? (string) $line['ice_level'] : null,
                 'topping_ids' => $toppings,
+                'notes' => $line['notes'] ?? null,
             ];
         }
 
-        return $selections;
+        return TableRounds::canonicalSelections($selections);
     }
 
     public function submissionKey(): string
     {
         return strtolower($this->validated('submission_key'));
+    }
+
+    public function messages(): array
+    {
+        return ['lines.*.notes.max' => 'Lưu ý mỗi món không được vượt quá 500 ký tự.',
+            'lines.*.notes.string' => 'Lưu ý món phải là văn bản.'];
     }
 }

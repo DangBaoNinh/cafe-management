@@ -66,8 +66,8 @@
                         <x-slot:icon><flux:icon.truck class="size-5" /></x-slot:icon>
                     </x-terrasse.account-link>
 
-                    <x-terrasse.account-link :href="route('operations.payments.index')" title="Đối chiếu thanh toán"
-                        description="Tra cứu khoản chờ đối chiếu hoặc hoàn tiền.">
+                    <x-terrasse.account-link :href="route('operations.invoices.index')" title="Hóa đơn thanh toán"
+                        description="Tra cứu và thanh toán hóa đơn đã lưu.">
                         <x-slot:icon><flux:icon.credit-card class="size-5" /></x-slot:icon>
                     </x-terrasse.account-link>
                 </ul>

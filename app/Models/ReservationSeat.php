@@ -4,10 +4,17 @@ namespace App\Models;
 
 use App\Enums\ReservationStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ReservationSeat extends Model
 {
+    /** @return HasManyThrough<TableInvoice, TableSession, $this> */
+    public function tableInvoices(): HasManyThrough
+    {
+        return $this->hasManyThrough(TableInvoice::class, TableSession::class, 'reservation_seat_id', 'table_session_id');
+    }
+
     public const KINDS = ['table' => 'Bàn', 'room' => 'Phòng họp'];
 
     public $timestamps = false;

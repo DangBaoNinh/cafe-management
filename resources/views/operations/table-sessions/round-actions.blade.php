@@ -21,6 +21,7 @@
 @if ($round->status->next() !== [])
     <div class="flex flex-wrap items-start gap-2">
         @foreach ($round->status->next() as $next)
+            @continue($round->invoice?->status === 'paid' && $next->needsReason())
             @php
                 $label = match ($next) {
                     TableRoundStatus::Accepted => 'Tiếp nhận',

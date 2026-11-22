@@ -26,9 +26,9 @@
                 <thead><tr><th class="p-4">Hóa đơn</th><th class="p-4">Khách / Chỗ</th><th class="p-4">{{ $history ? 'Thanh toán lúc' : 'Lập lúc' }}</th><th class="p-4">Giá trị hóa đơn</th><th class="p-4">Thanh toán</th><th class="p-4">Thao tác</th></tr></thead>
                 <tbody class="divide-y divide-terrasse-ink/15">
                     @forelse($bills as $bill)
-                        @php($url = $bill->source === 'order' ? route('operations.invoices.orders.show', $bill->reference) : route('operations.invoices.tables.show', $bill->reference))
+                        @php($url = match($bill->source) { 'order' => route('operations.invoices.orders.show', $bill->reference), 'prepaid' => route('operations.invoices.prepaid.show', $bill->reference), default => route('operations.invoices.tables.show', $bill->reference) })
                         <tr>
-                            <td class="p-4"><a href="{{ $url }}" class="underline underline-offset-4">{{ $bill->source === 'order' ? $bill->reference : 'BH-'.$bill->id }}</a><p class="terrasse-muted mt-1">{{ $bill->source === 'order' ? 'Đơn hàng' : 'Bàn / phòng' }}</p></td>
+                            <td class="p-4"><a href="{{ $url }}" class="underline underline-offset-4">{{ $bill->display_number ?? 'BH-'.$bill->id }}</a><p class="terrasse-muted mt-1">{{ $bill->source === 'order' ? 'Đơn hàng' : 'Bàn / phòng' }}</p></td>
                             <td class="p-4">{{ $bill->label }}</td>
                             <td class="p-4"><x-customer.order-time :date="\Carbon\CarbonImmutable::parse($bill->event_at, 'UTC')" /></td>
                             <td class="p-4"><x-customer.vnd :amount="(int) $bill->amount_vnd" /></td>

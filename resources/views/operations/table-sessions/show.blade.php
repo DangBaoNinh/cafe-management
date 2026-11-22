@@ -10,6 +10,13 @@
         </div>
         @include('table-orders.feedback')
 
+        @if($tableSession->billing_mode === 'prepaid')
+            <section class="terrasse-panel flex flex-wrap items-center justify-between gap-4 p-4">
+                <div><h2 class="font-semibold">Thanh toán ngay khi order</h2><p class="text-sm">Mỗi order có hóa đơn riêng. Thu tiền không thay đổi trạng thái sử dụng bàn.</p></div>
+                @if($tableSession->status === TableSessionStatus::Open)<flux:button variant="primary" :href="route('operations.table-sessions.pos', $tableSession)">Order / chọn món</flux:button>@endif
+            </section>
+        @endif
+
         @if ($tableSession->reservation)
             <flux:link :href="route('operations.reservations.show', $tableSession->reservation->code)">Xem lượt đặt và đối chiếu phụ phí</flux:link>
         @endif
@@ -25,12 +32,12 @@
                     <flux:link :href="route('table-orders.show', $tableSession->seat->code)">Trang gọi món của bàn</flux:link>
                 </div>
             </section>
-            <details class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4" @if ($errors->has('lines') || old('lines')) open @endif>
+            @if($tableSession->billing_mode !== 'prepaid')<details class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4" @if ($errors->has('lines') || old('lines')) open @endif>
                 <summary class="cursor-pointer font-semibold">Nhập món thay khách</summary>
                 <div class="pt-4">
                     @include('table-orders.form', ['action' => route('operations.table-sessions.store', $tableSession), 'submitLabel' => 'Ghi lượt gọi'])
                 </div>
-            </details>
+            </details>@endif
         @endif
 
         <section class="space-y-3">
@@ -50,6 +57,14 @@
             @include('table-orders.bill')
         @endif
 
+        @if($tableSession->billing_mode === 'prepaid')
+            <section class="terrasse-panel space-y-3 p-4"><h2 class="font-semibold">Quản lý sử dụng bàn</h2>
+                @if($tableSession->status !== TableSessionStatus::Closed)
+                    <p>Trả chỗ là thao tác riêng. Các hóa đơn vẫn được lưu và tra cứu sau khi bàn đã trống.</p>
+                    <form method="POST" action="{{ route('operations.table-sessions.update', [$tableSession, 'close']) }}">@csrf<flux:button type="submit">Xác nhận khách rời đi / trả chỗ</flux:button></form>
+                @else<p>Đã trả chỗ.</p>@endif
+            </section>
+        @else
         <section class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <h2 class="text-lg font-semibold">Tính tiền và trả chỗ</h2>
             @if ($tableSession->status === TableSessionStatus::Open)
@@ -85,5 +100,6 @@
                 <p>Đã trả chỗ.</p>
             @endif
         </section>
+        @endif
     </section>
 </x-layouts::admin>

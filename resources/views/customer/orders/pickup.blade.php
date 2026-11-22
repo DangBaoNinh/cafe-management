@@ -15,6 +15,7 @@
             <p>{{ \App\Models\PickupFee::CHANNELS[$fee->channel] }} · {{ $fee->statusLabel() }}</p>
             @if ($pickup->isOpen($order) && $fee->channel === 'app' && $fee->status === 'pending' && $fee->bank_details !== null)
                 <p>{{ $fee->bank_details['bank_name'] }} · {{ $fee->bank_details['account_number'] }} · {{ $fee->bank_details['account_holder'] }}</p>
+                <x-payment-qr :amount="$fee->amount_vnd" :memo="$fee->transfer_code" :bank="$fee->bank_details" />
                 <p>Nội dung chuyển khoản <strong class="font-mono">{{ $fee->transfer_code }}</strong></p>
             @endif
         </div>

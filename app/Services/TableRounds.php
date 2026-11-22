@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CounterOrderStatus;
 use App\Enums\TableRoundStatus;
 use App\Enums\TableSessionStatus;
 use App\Models\Product;
@@ -14,8 +15,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 /**
- * @phpstan-type Selection array{product_id: int, size_id: int, quantity: int, sugar_level: ?string, ice_level: ?string, topping_ids: list<int>}
- * @phpstan-type PricedLine array{product_size_id: int, product_name: string, size_label: string, quantity: int, sugar_level: ?string, ice_level: ?string, toppings: list<array{id: int, name: string, price_vnd: int}>, unit_price_vnd: int, line_total_vnd: int}
+ * @phpstan-type Selection array{product_id: int, size_id: int, quantity: int, sugar_level: ?string, ice_level: ?string, topping_ids: list<int>, notes?: ?string}
+ * @phpstan-type PricedLine array{product_size_id: int, product_name: string, size_label: string, quantity: int, sugar_level: ?string, ice_level: ?string, toppings: list<array{id: int, name: string, price_vnd: int}>, unit_price_vnd: int, line_total_vnd: int, notes: ?string}
  */
 class TableRounds
 {
@@ -25,6 +26,26 @@ class TableRounds
         private InventoryRecipes $recipes,
         private InventoryStock $stock,
     ) {}
+
+    /**
+     * @param  list<Selection>  $selections
+     * @return list<Selection>
+     */
+    public static function canonicalSelections(array $selections): array
+    {
+        return array_map(static function (array $line): array {
+            $toppings = $line['topping_ids'];
+            sort($toppings, SORT_NUMERIC);
+            $result = ['product_id' => $line['product_id'], 'size_id' => $line['size_id'], 'quantity' => $line['quantity'],
+                'sugar_level' => $line['sugar_level'], 'ice_level' => $line['ice_level'], 'topping_ids' => $toppings];
+            $notes = trim($line['notes'] ?? '');
+            if ($notes !== '') {
+                $result['notes'] = $notes;
+            }
+
+            return $result;
+        }, $selections);
+    }
 
     /** @param list<Selection> $selections */
     public function submit(TableSession $target, array $selections, string $key, ?User $actor = null): TableRound
@@ -65,13 +86,27 @@ class TableRounds
             $trackStock = $next === TableRoundStatus::Preparing && $this->inventory->lockForOperation();
             $session = TableSession::query()->lockForUpdate()->findOrFail($target->id);
             $round = $session->rounds()->findOrFail($roundId);
-            $this->require(in_array($session->status, [TableSessionStatus::Open, TableSessionStatus::Closing], true) && $session->billed_at === null,
+            $prepaid = $session->billing_mode === 'prepaid';
+            $this->require($prepaid || (in_array($session->status, [TableSessionStatus::Open, TableSessionStatus::Closing], true) && $session->billed_at === null),
                 'Hóa đơn đã chốt hoặc phiên đã kết thúc.');
+            if ($prepaid && ! in_array($next, [TableRoundStatus::Rejected, TableRoundStatus::Cancelled], true)) {
+                $this->require(false, 'Order tại quầy không quản lý pha chế hoặc phục vụ trong hệ thống.');
+            }
+            if ($prepaid && $next->needsReason()) {
+                $this->require($round->invoice?->status !== 'paid', 'Hóa đơn đã thanh toán được giữ nguyên. Hãy xử lý hoàn tiền riêng khi cần hủy.');
+            }
             $this->require($round->status === $expected && in_array($next, $round->status->next(), true), 'Lượt đã đổi trạng thái hoặc thao tác sai thứ tự.');
             $this->require(! $next->needsReason() || filled($reason), 'Nhập lý do từ chối hoặc hủy lượt.');
             if ($trackStock) {
                 $round->setRelation('tableSession', $session);
                 $this->stock->consume($round, $actor);
+            }
+            if ($prepaid && $next->needsReason() && $round->invoice !== null) {
+                $invoice = $round->invoice;
+                $invoice->status = 'voided';
+                $invoice->order_status = CounterOrderStatus::Cancelled;
+                $invoice->save();
+                $invoice->fees()->where('status', 'pending')->update(['table_invoice_id' => null]);
             }
             $round->update(['status' => $next]);
             $round->events()->create([
@@ -84,7 +119,7 @@ class TableRounds
      * @param  list<Selection>  $selections
      * @return list<PricedLine>
      */
-    private function price(array $selections): array
+    public function price(array $selections): array
     {
         $products = Product::query()->visibleInCatalog()->whereKey(array_values(array_unique(array_column($selections, 'product_id'))))
             ->with(['activeSizes', 'activeToppings'])->get()->keyBy('id');
@@ -114,6 +149,7 @@ class TableRounds
                     'id' => $topping->id, 'name' => $topping->name, 'price_vnd' => $topping->price_vnd,
                 ])->all()),
                 'unit_price_vnd' => $quote['unit_price_vnd'], 'line_total_vnd' => $quote['unit_price_vnd'] * $selection['quantity'],
+                'notes' => $selection['notes'] ?? null,
             ];
         }
 

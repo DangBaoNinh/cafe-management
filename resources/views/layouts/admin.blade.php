@@ -2,7 +2,7 @@
 
 @php
     $canAdminister = auth()->user()?->can('access-admin');
-    $workspaceHome = $canAdminister ? 'admin.dashboard' : 'operations.orders.index';
+    $workspaceHome = $canAdminister ? 'admin.dashboard' : 'operations.table-sessions.index';
     $sections = [
         'Quản trị' => $canAdminister ? [
             ['admin.dashboard', 'admin.dashboard', 'Tổng quan quản trị'],
@@ -11,13 +11,12 @@
             ['admin.accounts.index', 'admin.accounts.*', 'Quản lý tài khoản'],
         ] : [],
         'Vận hành' => [
+            ['operations.table-sessions.index', 'operations.table-sessions.*', 'Nhận order'],
             ['operations.orders.index', 'operations.orders.*', 'Đơn chờ xác nhận'],
             ['operations.preparation.index', 'operations.preparation.*', 'Pha chế'],
             ['operations.handoff.index', 'operations.handoff.*', 'Bàn giao'],
             ['operations.pickups.index', 'operations.pickups.*', 'Lịch nhận tại quán'],
             ['operations.reservations.index', 'operations.reservations.*', 'Lịch đặt bàn và phòng'],
-            ['operations.table-sessions.index', 'operations.table-sessions.*', 'Gọi món tại bàn'],
-            ['operations.payments.index', 'operations.payments.*', 'Đối chiếu thanh toán'],
             ['operations.invoices.index', 'operations.invoices.index', 'Hóa đơn thanh toán'],
             ['operations.invoices.history', 'operations.invoices.history', 'Lịch sử hóa đơn'],
         ],
