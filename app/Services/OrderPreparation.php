@@ -11,11 +11,14 @@ use Illuminate\Validation\ValidationException;
 
 class OrderPreparation
 {
+    public function __construct(private InventoryControl $inventory, private InventoryStock $stock) {}
+
     public function advance(User $actor, string $number, OrderStatus $expected, OrderStatus $target): void
     {
         Gate::forUser($actor)->authorize('operate-orders');
 
         DB::transaction(function () use ($actor, $number, $expected, $target): void {
+            $trackInventory = $target === OrderStatus::Preparing && $this->inventory->lockForOperation();
             $order = Order::query()->where('order_number', $number)->lockForUpdate()->firstOrFail();
             $required = match ($target) {
                 OrderStatus::Preparing => OrderStatus::Confirmed,
@@ -28,6 +31,10 @@ class OrderPreparation
 
             if ($target === OrderStatus::Preparing && ! $order->payment()->lockForUpdate()->first()?->allowsPreparation()) {
                 throw $this->conflict($number, 'payment', 'Thanh toán chưa đủ điều kiện để bắt đầu pha chế.');
+            }
+
+            if ($trackInventory) {
+                $this->stock->consume($order, $actor);
             }
 
             $order->update(['status' => $target]);

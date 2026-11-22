@@ -19,6 +19,12 @@ class Topping extends Model
         return $this->belongsToMany(Product::class, 'product_toppings');
     }
 
+    /** @return BelongsToMany<Ingredient, $this> */
+    public function recipeIngredients(): BelongsToMany
+    {
+        return $this->belongsToMany(Ingredient::class)->withPivot('quantity');
+    }
+
     /** @param Builder<Topping> $query */
     #[Scope]
     protected function active(Builder $query): void

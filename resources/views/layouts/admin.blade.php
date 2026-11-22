@@ -22,6 +22,7 @@
             ['admin.categories.index', 'admin.categories.*', 'Quản lý danh mục'],
             ['admin.products.index', 'admin.products.*', 'Quản lý sản phẩm'],
             ['admin.toppings.index', 'admin.toppings.*', 'Quản lý topping'],
+            ['admin.inventory.index', 'admin.inventory.*', 'Kho nguyên liệu'],
             ['admin.delivery-settings.edit', 'admin.delivery-settings.*', 'Cấu hình giao hàng'],
             ['admin.coupons.index', 'admin.coupons.*', 'Mã giảm giá'],
         ] : [],

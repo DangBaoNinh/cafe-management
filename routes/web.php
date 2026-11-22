@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliverySettingsController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\InventoryRecipeController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductOptionController;
@@ -138,6 +140,20 @@ Route::prefix('operations/reservations')->name('operations.reservations.')->midd
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::get('/', [InventoryController::class, 'index'])->name('index');
+        Route::post('enable', [InventoryController::class, 'enable'])->name('enable');
+        Route::post('ingredients', [InventoryController::class, 'store'])->name('store');
+        Route::get('ingredients/{ingredient}', [InventoryController::class, 'show'])->whereNumber('ingredient')->name('show');
+        Route::patch('ingredients/{ingredient}', [InventoryController::class, 'update'])->whereNumber('ingredient')->name('update');
+        Route::post('ingredients/{ingredient}/movements', [InventoryController::class, 'record'])->whereNumber('ingredient')->name('record');
+
+        Route::prefix('recipes/{kind}/{option}')->name('recipes.')->where(['kind' => 'size|topping', 'option' => '[0-9]+'])->group(function () {
+            Route::get('/', [InventoryRecipeController::class, 'show'])->name('show');
+            Route::post('/', [InventoryRecipeController::class, 'store'])->name('store');
+            Route::delete('{ingredient}', [InventoryRecipeController::class, 'destroy'])->whereNumber('ingredient')->name('destroy');
+        });
+    });
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{number}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{number}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');

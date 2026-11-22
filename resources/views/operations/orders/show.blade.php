@@ -12,7 +12,7 @@
         @if (session('status'))
             <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
-        @foreach (['expected_status', 'decision', 'target_status', 'payment', 'fulfillment_type', 'method', 'shipment', 'event'] as $field)
+        @foreach (['expected_status', 'decision', 'target_status', 'payment', 'inventory', 'fulfillment_type', 'method', 'shipment', 'event'] as $field)
             @error($field)
                 <p role="alert" class="rounded-lg border border-terrasse-danger/30 bg-terrasse-danger-surface p-4 text-sm text-terrasse-danger">{{ $message }}</p>
             @enderror

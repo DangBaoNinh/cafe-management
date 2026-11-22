@@ -99,5 +99,14 @@ Khách mở **Đặt chỗ**, chọn giờ, loại chỗ và số người để
 
 Quản trị viên có thể bật hoặc ngừng phục vụ từng chỗ đang trống và thu hẹp giờ nhận đặt bàn, phòng trong khung 07:00–22:30. Điều chỉnh giờ áp dụng cho lịch tạo mới hoặc đổi giờ. Lịch đã xác nhận vẫn check-in theo giờ đã hẹn.
 
+### Kho nguyên liệu theo công thức
+
+Chạy `php artisan migrate` khi cập nhật UC29. Kho bắt đầu ở trạng thái tắt kiểm soát tồn khi pha chế. Quản trị viên mở **Kho nguyên liệu** tại `/admin/inventory` để khai báo nguyên liệu, chọn đơn vị cơ sở (g, ml, cái) và đặt ngưỡng cảnh báo. Mở **Công thức** cạnh từng size và topping để nhập định lượng cho một ly hoặc một phần topping. Số lượng hỗ trợ tối đa ba chữ số thập phân.
+
+1. Hoàn thiện công thức các size và topping đang bán. Xử lý các đơn đang chờ xác nhận hoặc chưa pha chế mà chưa có định lượng đầy đủ theo quy trình hiện tại.
+2. Tạm dừng pha chế trong lúc chuyển sang quy trình mới. Chọn **Kiểm kê** cho từng nguyên liệu, nhập số tồn thực tế và lý do tồn đầu kỳ. Lưu phiếu kể cả khi thực tế còn 0.
+3. Chọn **Bật kiểm soát tồn** rồi tiếp tục pha chế. Từ thời điểm đó, thao tác **Bắt đầu pha chế** trừ kho theo định lượng đã chốt lúc đặt hàng. Nhân viên thấy tên tùy chọn thiếu công thức hoặc số lượng nguyên liệu thiếu ngay trên đơn.
+4. Khi thiếu tồn, ghi nhận nguyên liệu bổ sung rồi thử bắt đầu pha chế lại. Với đơn đã đặt thiếu công thức, xử lý hủy theo quy trình đơn hàng rồi đặt lại sau khi bổ sung công thức. Đối chiếu các khoản hao hụt hoặc trả lại thực tế bằng **Điều chỉnh** có lý do.
+
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md)
 - [Tiến độ và kết quả kiểm tra](docs/PROGRESS.md)

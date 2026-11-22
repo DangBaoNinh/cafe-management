@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property OrderStatus $status
  * @property CarbonImmutable|null $completed_at
  * @property array<string, string|null>|null $address_snapshot
+ * @property array{quantities: array<int, int>, missing: list<string>}|null $inventory_snapshot
  */
 #[Fillable([
     'order_number', 'checkout_key', 'request_hash', 'coupon_id', 'coupon_code', 'recipient_name',
@@ -81,6 +82,7 @@ class Order extends Model
     {
         return [
             'address_snapshot' => 'array',
+            'inventory_snapshot' => 'array',
             'fulfillment_type' => FulfillmentType::class,
             'status' => OrderStatus::class,
             'subtotal_vnd' => 'integer',
