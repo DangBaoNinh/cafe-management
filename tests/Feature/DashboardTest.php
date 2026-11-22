@@ -29,12 +29,12 @@ class DashboardTest extends TestCase
     public function test_account_shortcuts_match_the_users_permissions(): void
     {
         $shopping = ['addresses.index', 'orders.index'];
-        $operations = ['operations.orders.index', 'operations.preparation.index', 'operations.handoff.index', 'operations.payments.index'];
+        $operations = ['operations.orders.index', 'operations.preparation.index', 'operations.handoff.index', 'operations.invoices.index'];
 
         foreach (UserRole::cases() as $role) {
             $user = User::factory()->create(['role' => $role]);
             if ($role === UserRole::Staff) {
-                $this->actingAs($user)->get(route('dashboard'))->assertRedirectToRoute('operations.orders.index');
+                $this->actingAs($user)->get(route('dashboard'))->assertRedirectToRoute('operations.table-sessions.index');
 
                 continue;
             }
@@ -64,7 +64,7 @@ class DashboardTest extends TestCase
         $page = $this->actingAs($staff)->followingRedirects()->get(route('dashboard'))->assertOk()
             ->assertDontSeeText('Tài khoản của bạn');
 
-        foreach (['operations.orders.index', 'operations.preparation.index', 'operations.handoff.index', 'operations.payments.index'] as $route) {
+        foreach (['operations.orders.index', 'operations.preparation.index', 'operations.handoff.index', 'operations.invoices.index'] as $route) {
             $page->assertSee(route($route));
         }
         $page->assertDontSee(route('admin.dashboard'))->assertDontSee(route('cart.index'));

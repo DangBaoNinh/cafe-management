@@ -40,7 +40,7 @@ class OrderIntakeTest extends TestCase
         }
 
         $staff = User::factory()->create(['role' => UserRole::Staff]);
-        $this->actingAs($staff)->get(route('dashboard'))->assertSee($index);
+        $this->actingAs($staff)->get(route('dashboard'))->assertRedirectToRoute('operations.table-sessions.index');
         $this->get($index)->assertOk()->assertDontSee(route('admin.accounts.index'));
         $this->get($show)->assertOk()->assertSee($decide);
         $this->get(route('admin.dashboard'))->assertForbidden();

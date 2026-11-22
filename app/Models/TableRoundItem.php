@@ -4,11 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /** @property list<array{id: int, name: string, price_vnd: int}> $toppings */
-#[Fillable(['product_size_id', 'product_name', 'size_label', 'quantity', 'sugar_level', 'ice_level', 'toppings', 'unit_price_vnd', 'line_total_vnd'])]
+#[Fillable(['product_size_id', 'product_name', 'size_label', 'quantity', 'sugar_level', 'ice_level', 'toppings', 'unit_price_vnd', 'line_total_vnd', 'notes'])]
 class TableRoundItem extends Model
 {
+    /** @return BelongsTo<ProductSize, $this> */
+    public function size(): BelongsTo
+    {
+        return $this->belongsTo(ProductSize::class, 'product_size_id');
+    }
+
     public $timestamps = false;
 
     /** @return array<string, string> */

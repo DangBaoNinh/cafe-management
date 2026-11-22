@@ -31,6 +31,9 @@ class TableOrderingTest extends MySqlTestCase
             $this->postJson($path)->assertConflict();
 
             $session = $seat->activeTableSession()->sole();
+            // Preserve coverage of settlement for sessions created before prepaid billing.
+            $session->billing_mode = 'legacy';
+            $session->save();
             $category = Category::create(['name' => 'Menu thử', 'slug' => Str::uuid()->toString()]);
             $product = $category->products()->create(['name' => 'Trà thử', 'slug' => Str::uuid()->toString()]);
             $size = $product->sizes()->create(['code' => 'm', 'label' => 'Vừa', 'price_vnd' => 10000]);

@@ -146,7 +146,7 @@ class OrderHandoffTest extends TestCase
             $this->actingAs($actor)->get($queue)->assertForbidden();
             $this->postJson($action, self::PICKUP)->assertForbidden();
         }
-        $this->actingAs($staff)->get(route('dashboard'))->assertRedirectToRoute('operations.orders.index');
+        $this->actingAs($staff)->get(route('dashboard'))->assertRedirectToRoute('operations.table-sessions.index');
         $this->get(route('operations.orders.index'))->assertOk()->assertSee($queue);
         $this->postJson($action, [...self::PICKUP, 'fulfillment_type' => 'delivery'])
             ->assertConflict()->assertJsonValidationErrors('fulfillment_type');

@@ -42,7 +42,7 @@
                 @else
                     <form method="POST" action="{{ route('operations.pickups.handoff', $pickup->code) }}" class="space-y-3">
                         @csrf
-                        @if($order->payment?->method === \App\Enums\PaymentMethod::Cod)<x-operations.collection-method />@endif
+                        @if($order->payment?->method === \App\Enums\PaymentMethod::Cod)<x-operations.collection-method :amount="$invoice['total']" :memo="$order->order_number" />@endif
                         @if ($invoice['total'] > 0)
                             <flux:input name="collected_vnd" type="number" min="0" step="1" label="Số tiền thực thu tại quầy (₫)" :value="is_scalar(old('collected_vnd')) ? old('collected_vnd') : $invoice['total']" required />
                             <flux:error name="collected_vnd" />

@@ -60,6 +60,7 @@ class InventoryControl
                 $issues[] = "Còn {$openCount} đơn chưa pha chế thiếu ảnh chụp công thức. Tra các mã sau trong Quản lý đơn hàng và xử lý trước khi bật: {$numbers}.";
             }
             $openRounds = TableRound::query()->whereIn('status', [TableRoundStatus::Pending, TableRoundStatus::Accepted])
+                ->whereDoesntHave('invoice', fn ($invoice) => $invoice->where('order_status', 'completed'))
                 ->whereJsonLength('inventory_snapshot->missing', '>', 0)->count();
             if ($openRounds > 0) {
                 $issues[] = "Còn {$openRounds} lượt gọi tại bàn chưa pha chế thiếu công thức. Hãy xử lý trong Gọi món tại bàn trước khi bật.";

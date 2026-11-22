@@ -73,6 +73,9 @@
             </details>
         @endif
 
+        @if($payment?->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details)
+            <x-payment-qr :amount="$order->total_vnd" :memo="$order->order_number" :bank="$payment->transfer_details" />
+        @endif
         <x-customer.order-snapshot :order="$order" />
 
         @if ($order->statusHistories->isNotEmpty())

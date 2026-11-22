@@ -10,6 +10,9 @@
         @endif
     </div>
     @php($awaitingTransfer = $canSettle && $fee->status === 'pending')
+    @if($awaitingTransfer && $fee->channel === 'app' && $fee->bank_details)
+        <x-payment-qr :amount="$fee->amount_vnd" :memo="$fee->transfer_code" :bank="$fee->bank_details" />
+    @endif
     @if ($fee->channel === 'app' && ($awaitingTransfer || ($fee->status === 'voided' && $fee->transfer_result === null)))
         <details class="space-y-3">
             <summary class="cursor-pointer text-sm font-semibold">Đối chiếu qua sao kê</summary>

@@ -18,6 +18,7 @@
         @elseif ($payment->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details !== null)
             <div class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 <h2 class="font-semibold">Thông tin chuyển khoản</h2>
+                <x-payment-qr :amount="$order->total_vnd" :memo="$order->order_number" :bank="$payment->transfer_details" />
                 <dl class="grid gap-3 text-sm sm:grid-cols-2">
                     @foreach ([
                         'Ngân hàng' => $payment->transfer_details['bank_name'],

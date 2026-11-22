@@ -15,7 +15,9 @@ class LoginResponse extends FortifyLoginResponse
         }
 
         if (! $request->wantsJson() && $request->user()?->role === UserRole::Staff) {
-            return redirect()->intended(route('operations.orders.index'));
+            $request->session()->forget('url.intended');
+
+            return redirect()->route('operations.table-sessions.index');
         }
 
         return $request->wantsJson()

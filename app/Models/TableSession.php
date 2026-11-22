@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $billed_at
  * @property CarbonImmutable|null $paid_at
  */
-#[Fillable(['reference', 'reservation_seat_id', 'active_seat_id', 'reservation_id', 'opened_by', 'access_code', 'access_digest', 'status'])]
+#[Fillable(['reference', 'reservation_seat_id', 'active_seat_id', 'reservation_id', 'opened_by', 'access_code', 'access_digest', 'status', 'billing_mode'])]
 #[Hidden(['access_code', 'access_digest'])]
 class TableSession extends Model
 {
@@ -40,6 +40,12 @@ class TableSession extends Model
     public function rounds(): HasMany
     {
         return $this->hasMany(TableRound::class);
+    }
+
+    /** @return HasMany<TableInvoice, $this> */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(TableInvoice::class);
     }
 
     /** @return HasMany<PickupFee, $this> */
