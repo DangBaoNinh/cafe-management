@@ -1,6 +1,7 @@
 import './storefront-chat';
 import './french-theme';
 import './table-order';
+import './table-pos';
 
 const appearanceKey = 'flux.appearance';
 const systemAppearance = window.matchMedia('(prefers-color-scheme: dark)');

@@ -5,6 +5,7 @@ namespace App\Enums;
 enum TableRoundStatus: string
 {
     case Pending = 'pending';
+    case Completed = 'completed';
     case Accepted = 'accepted';
     case Preparing = 'preparing';
     case Ready = 'ready';
@@ -16,6 +17,7 @@ enum TableRoundStatus: string
     {
         return match ($this) {
             self::Pending => 'Chờ tiếp nhận',
+            self::Completed => 'Hoàn tất',
             self::Accepted => 'Đã tiếp nhận',
             self::Preparing => 'Đang pha',
             self::Ready => 'Sẵn sàng',

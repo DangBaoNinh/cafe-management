@@ -2,8 +2,11 @@
 
 return [
     'bank_transfer' => [
-        'bank_name' => env('CHECKOUT_BANK_NAME'),
-        'account_number' => env('CHECKOUT_BANK_ACCOUNT_NUMBER'),
-        'account_holder' => env('CHECKOUT_BANK_ACCOUNT_HOLDER'),
+        // Recipient supplied by the shop in docs/ui-preview/image.png (public payment information).
+        'bank_name' => env('CHECKOUT_BANK_NAME') ?: 'VietinBank',
+        'bank_bin' => env('CHECKOUT_BANK_BIN') ?: '970415',
+        'account_number' => env('CHECKOUT_BANK_ACCOUNT_NUMBER') ?: '100876266786',
+        'account_holder' => env('CHECKOUT_BANK_ACCOUNT_HOLDER') ?: 'NGUYEN QUANG THANH TOAN',
     ],
+    'shared_qr' => ['image' => 'payments/transfer-qr.png', 'account_number' => '100876266786', 'bank_bin' => '970415'],
 ];

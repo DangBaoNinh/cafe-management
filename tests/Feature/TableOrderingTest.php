@@ -39,7 +39,7 @@ class TableOrderingTest extends TestCase
 
         $this->get(route('operations.table-sessions.index'))->assertRedirectToRoute('login');
         $this->actingAs(User::factory()->create())->postJson(route('operations.table-sessions.open', $seat->code))->assertForbidden();
-        $this->actingAs($staff)->get(route('operations.table-sessions.index'))->assertOk()->assertSee('Gọi món tại bàn');
+        $this->actingAs($staff)->get(route('operations.table-sessions.index'))->assertOk()->assertSee('Nhận order');
         $session = $this->open($seat);
         $otherSession = $this->open($other);
         $this->postJson(route('operations.table-sessions.open', $seat->code))->assertConflict();
@@ -74,7 +74,7 @@ class TableOrderingTest extends TestCase
         $rounds = $session->rounds()->orderBy('id')->get();
         $this->assertCount(2, $rounds);
         $this->assertSame($staff->id, $rounds[1]->entered_by);
-        $this->get(route('operations.table-sessions.index'))->assertOk()->assertSee('2 lượt chờ tiếp nhận');
+        $this->get(route('operations.table-sessions.show', $session))->assertOk()->assertViewHas('rounds', fn ($items) => $items->count() === 2);
         $this->postJson(route('operations.table-sessions.advance', [$otherSession, $first->id]), [
             'expected' => 'pending', 'target' => 'accepted',
         ])->assertNotFound();
@@ -169,7 +169,7 @@ class TableOrderingTest extends TestCase
         $this->assertNull($session->access_code);
         $this->assertSame('free', $seat->fresh()->availability());
         $this->assertSame(ReservationStatus::Completed, $booking->fresh()->status);
-        $this->get(route('operations.table-sessions.index'))->assertOk()->assertSee('Phiên đã đóng')->assertSee('60.000');
+        $this->get(route('operations.invoices.history', ['source' => 'table']))->assertOk()->assertSee('60.000');
 
         $newSession = $this->open($seat);
         Auth::forgetGuards();
@@ -269,7 +269,12 @@ class TableOrderingTest extends TestCase
     {
         $this->post(route('operations.table-sessions.open', $seat->code))->assertStatus(303);
 
-        return $seat->activeTableSession()->sole();
+        // These regression scenarios represent sessions opened before prepaid billing was introduced.
+        $session = $seat->activeTableSession()->sole();
+        $session->billing_mode = 'legacy';
+        $session->save();
+
+        return $session;
     }
 
     private function join(ReservationSeat $seat, TableSession $session): void

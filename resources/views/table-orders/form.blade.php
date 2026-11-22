@@ -37,6 +37,9 @@
                     <button type="button" data-remove-order-line class="justify-self-start rounded-lg border border-terrasse-ink/30 px-3 py-2 text-sm">Bỏ dòng</button>
                 </div>
                 <div data-product-options class="space-y-3"></div>
+                <label class="grid gap-1 text-sm">Lưu ý cho món này
+                    <textarea data-field="notes" maxlength="500" rows="2" class="w-full rounded-lg border border-terrasse-ink/30 bg-terrasse-paper p-2" placeholder="Ví dụ: ít ngọt, để riêng đá…"></textarea>
+                </label>
                 <p data-line-price class="text-sm font-semibold" aria-live="polite"></p>
             </fieldset>
         </template>

@@ -58,6 +58,10 @@
             @endif
         </dl>
 
+        @if($payment->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details)
+            <x-payment-qr :amount="$payment->amount_vnd" :memo="$payment->order->order_number" :bank="$payment->transfer_details" />
+        @endif
+
         @if ($canReconcileDemo)
             <form method="POST" action="{{ route('operations.payments.demo-reconcile', $payment->order->order_number) }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
                 @csrf

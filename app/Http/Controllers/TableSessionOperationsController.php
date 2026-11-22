@@ -19,6 +19,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 
 class TableSessionOperationsController extends Controller
@@ -27,34 +28,40 @@ class TableSessionOperationsController extends Controller
     {
         $seats = ReservationSeat::query()->with([
             'activeReservation',
-            'activeTableSession' => fn ($sessions) => $sessions->withCount([
-                'rounds as pending_rounds_count' => fn ($rounds) => $rounds->where('status', TableRoundStatus::Pending),
-            ]),
+            'tableInvoices' => fn ($q) => $q->where('table_invoices.status', 'draft')->latest('table_invoices.updated_at')->latest('table_invoices.id'),
+            'activeTableSession',
         ])
             ->orderBy('floor')->orderBy('position')->get()->toBase()->groupBy('floor');
-        $closedSessions = TableSession::query()->where('status', TableSessionStatus::Closed)
-            ->with('seat')->orderByDesc('closed_at')->orderByDesc('id')->paginate(12);
 
-        return view('operations.table-sessions.index', compact('seats', 'closedSessions'));
+        return view('operations.table-sessions.index', compact('seats'));
     }
 
     public function qr(ReservationSeat $reservationSeat): Response
     {
         $writer = new Writer(new ImageRenderer(new RendererStyle(320, 4), new SvgImageBackEnd));
-        $image = $writer->writeString(route('table-orders.show', $reservationSeat->code));
+        $current = $reservationSeat->activeTableSession()->first();
+        $destination = $current?->billing_mode === 'prepaid'
+            ? URL::temporarySignedRoute('table-orders.access', now()->addDay(), ['reservationSeat' => $reservationSeat->code, 'tableSession' => $current])
+            : route('table-orders.show', $reservationSeat->code);
+        $image = $writer->writeString($destination);
 
-        return response($image, 200, ['Content-Type' => 'image/svg+xml; charset=UTF-8', 'X-Content-Type-Options' => 'nosniff']);
+        return response($image, 200, ['Content-Type' => 'image/svg+xml; charset=UTF-8', 'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store']);
     }
 
     public function open(Request $request, ReservationSeat $reservationSeat, TableSessions $sessions): RedirectResponse
     {
-        return $this->result($sessions->open($this->actor($request), $reservationSeat), 'Đã mở phiên gọi món.');
+        $session = $sessions->open($this->actor($request), $reservationSeat);
+
+        return to_route('operations.table-sessions.pos', $session, 303)->with('status', 'Đã mở phiên. Chọn món và thanh toán order.');
     }
 
-    public function show(TableSession $tableSession): Response
+    public function show(TableSession $tableSession): Response|RedirectResponse
     {
+        if ($tableSession->billing_mode === 'prepaid') {
+            return to_route('operations.table-sessions.index');
+        }
         $tableSession->load(['seat', 'reservation', 'fees']);
-        $rounds = $tableSession->rounds()->with(['items', 'events.actor'])->orderBy('id')->get();
+        $rounds = $tableSession->rounds()->with(['items', 'events.actor', 'invoice'])->orderBy('id')->get();
         $products = $tableSession->status === TableSessionStatus::Open
             ? Product::query()->visibleInCatalog()->with(['activeSizes', 'activeToppings'])->orderBy('name')->get()
             : collect();
@@ -113,6 +120,10 @@ class TableSessionOperationsController extends Controller
 
     private function result(TableSession $session, string $message): RedirectResponse
     {
+        if ($session->billing_mode === 'prepaid') {
+            return to_route('operations.table-sessions.index', status: 303)->with('status', $message);
+        }
+
         return to_route('operations.table-sessions.show', $session, 303)->with('status', $message);
     }
 

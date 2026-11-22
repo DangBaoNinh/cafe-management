@@ -39,6 +39,7 @@ class TableSessions
                         'reference' => Str::uuid()->toString(), 'reservation_seat_id' => $seat->id, 'active_seat_id' => $seat->id,
                         'reservation_id' => $reservation?->id, 'opened_by' => $actor->id, 'access_code' => $pin,
                         'access_digest' => $this->digest($pin), 'status' => TableSessionStatus::Open,
+                        'billing_mode' => 'prepaid',
                     ]);
                 } catch (UniqueConstraintViolationException $exception) {
                     if ($attempt === 4) {
@@ -65,6 +66,7 @@ class TableSessions
     {
         DB::transaction(function () use ($target): void {
             $session = $this->lock($target);
+            $this->require($session->billing_mode !== 'prepaid', 'Hãy mở tạm tính của từng order để thanh toán ngay.');
             $this->require($session->status === TableSessionStatus::Open, 'Phiên này đang được tính tiền hoặc đã kết thúc.');
             if ($session->checkout_requested_at === null) {
                 $session->checkout_requested_at = now();
@@ -78,6 +80,7 @@ class TableSessions
         Gate::forUser($actor)->authorize('operate-orders');
         DB::transaction(function () use ($actor, $target): void {
             $session = $this->lock($target);
+            $this->require($session->billing_mode !== 'prepaid', 'Phiên trả trước thanh toán theo từng order; quản lý trả chỗ riêng.');
             $this->require($session->status === TableSessionStatus::Open, 'Chỉ khóa gọi thêm khi phiên đang mở.');
             $session->status = TableSessionStatus::Closing;
             $session->locked_by = $actor->id;
@@ -147,7 +150,7 @@ class TableSessions
             if ($session->status === TableSessionStatus::Closed) {
                 return;
             }
-            $this->require($session->status === TableSessionStatus::Paid, 'Chỉ trả chỗ sau khi thu tiền và xác nhận khách rời đi.');
+            $this->require($session->billing_mode === 'prepaid' || $session->status === TableSessionStatus::Paid, 'Chỉ trả chỗ sau khi thu tiền và xác nhận khách rời đi.');
             $reservation = $session->reservation()->lockForUpdate()->first();
             $session->status = TableSessionStatus::Closed;
             $session->active_seat_id = null;

@@ -125,7 +125,7 @@ class OrderPreparationTest extends TestCase
             $this->postJson($prepare, self::START)->assertForbidden();
         }
 
-        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))->get(route('dashboard'))->assertRedirectToRoute('operations.orders.index');
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))->get(route('dashboard'))->assertRedirectToRoute('operations.table-sessions.index');
         $this->get(route('operations.orders.index'))->assertOk()->assertSee($queue);
         $this->assertSame(OrderStatus::Confirmed, $order->refresh()->status);
     }
