@@ -2,7 +2,9 @@
     <section class="mx-auto max-w-3xl space-y-6">
         <header class="space-y-2">
             <flux:link :href="route('operations.orders.index')">Về hàng đợi</flux:link>
-            <h1 class="text-2xl font-semibold wrap-anywhere sm:text-3xl">Đơn {{ $order->order_number }}</h1>
+            <h1 class="text-2xl font-semibold wrap-anywhere sm:text-3xl">
+                Đơn <span class="font-mono text-base tracking-normal slashed-zero sm:text-xl">{{ $order->order_number }}</span>
+            </h1>
             <p class="text-sm">Đặt lúc <x-customer.order-time :date="$order->created_at" /></p>
             <flux:link :href="route('operations.invoices.orders.show', $order->order_number)">Xem / in hóa đơn</flux:link>
             @if ($order->completed_at !== null)
