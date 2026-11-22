@@ -43,7 +43,7 @@ class ReservationOperationsController extends Controller
     public function seats(): View
     {
         return view('operations.reservations.seats', [
-            'seats' => ReservationSeat::query()->with('activeReservation:id,code,active_seat_id,status')
+            'seats' => ReservationSeat::query()->with(['activeReservation:id,code,active_seat_id,status', 'activeTableSession'])
                 ->orderBy('floor')->orderBy('position')->get()->toBase()->groupBy('floor'),
             'hours' => ReservationHours::query()->sole(),
         ]);
@@ -61,7 +61,7 @@ class ReservationOperationsController extends Controller
 
     public function show(string $code, BookingFees $fees): View
     {
-        $reservation = Reservation::query()->with(['seat', 'fees', 'events'])->where('code', $code)->firstOrFail();
+        $reservation = Reservation::query()->with(['seat', 'fees', 'events', 'tableSession'])->where('code', $code)->firstOrFail();
 
         return view('operations.reservations.show', [
             'reservation' => $reservation, 'counterTotal' => $fees->counterTotal($reservation),

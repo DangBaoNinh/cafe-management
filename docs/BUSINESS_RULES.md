@@ -57,3 +57,5 @@ Các quy tắc dưới đây áp dụng cho hai UC mới. Thông số vận hàn
 | --- | --- |
 | BR30 | Trang chủ hiển thị tối đa 5 món còn bán có số ly cao nhất trong ngày hiện tại và 29 ngày trước theo giờ Việt Nam. Chỉ tính món từ giao dịch đã hoàn tất và thanh toán. Gộp size và topping theo món. Đồng hạng xếp theo ID món tăng dần. |
 | BR31 | Dùng định lượng đã lưu lúc tạo đơn hoặc lượt gọi. Trừ tồn đúng một lần khi bắt đầu pha chế, cùng giao dịch với cập nhật trạng thái. Thiếu định lượng hoặc tồn thì giữ nguyên cả hai. Hủy sau pha chế không tự hoàn kho. Điều chỉnh theo lượng thực tế có lý do và người ghi. |
+| BR32 | Một bàn/phòng có tối đa một phiên gọi món chưa đóng. Nhân viên mở phiên cho khách đã check-in hoặc khách ghé trực tiếp. Khách gọi bằng QR gắn với chỗ và mã hiệu lực theo phiên, hoặc nhờ nhân viên nhập hộ. Gửi lại cùng yêu cầu chỉ ghi một lượt. |
+| BR33 | Khi chốt, khóa gọi thêm và xử lý hết lượt còn dang dở. Hóa đơn chỉ cộng các món đã phục vụ và khoản phụ phí phải thu tại quầy theo BR29. Ghi nhận thanh toán tại quầy một lần. Chỉ đóng phiên, thu hồi mã và trả chỗ sau khi đã thanh toán và nhân viên ghi nhận khách rời đi. |

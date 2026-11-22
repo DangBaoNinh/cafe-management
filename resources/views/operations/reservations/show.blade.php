@@ -29,20 +29,36 @@
                 @endif
             </section>
         @elseif ($reservation->status === \App\Enums\ReservationStatus::CheckedIn)
-            <form method="POST" action="{{ route('operations.reservations.release', $reservation->code) }}" class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
-                @csrf
-                <flux:button type="submit" variant="primary">Xác nhận khách rời đi và trả chỗ</flux:button>
-            </form>
+            @if ($reservation->tableSession)
+                <flux:link :href="route('operations.table-sessions.show', $reservation->tableSession)">Xem phiên gọi món và trả chỗ</flux:link>
+            @else
+                <div class="flex flex-wrap gap-2 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
+                    <form method="POST" action="{{ route('operations.table-sessions.open', $reservation->seat->code) }}">
+                        @csrf
+                        <flux:button type="submit" variant="primary">Mở phiên gọi món</flux:button>
+                    </form>
+                    <form method="POST" action="{{ route('operations.reservations.release', $reservation->code) }}">
+                        @csrf
+                        <flux:button type="submit">Xác nhận khách rời đi và trả chỗ</flux:button>
+                    </form>
+                </div>
+            @endif
         @endif
         <section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
             <h2 class="text-lg font-semibold">Phụ phí và hóa đơn tại quầy</h2>
             @forelse ($reservation->fees as $fee)
-                @include('operations.bookings.fee', ['canSettle' => $reservation->canSettleFees(), 'feeRoutes' => 'operations.reservations', 'bookingCode' => $reservation->code])
+                @include('operations.bookings.fee', [
+                    'canSettle' => $reservation->canSettleFees() && $reservation->tableSession?->billed_at === null,
+                    'feeRoutes' => 'operations.reservations',
+                    'bookingCode' => $reservation->code,
+                ])
             @empty
                 <p>Chưa phát sinh phụ phí.</p>
             @endforelse
             <p class="font-semibold">Còn phải thu tại quầy · {{ number_format($counterTotal, 0, ',', '.') }} ₫</p>
-            @if ($counterTotal > 0 && $reservation->arrived_at !== null && $reservation->canSettleFees())
+            @if ($counterTotal > 0 && $reservation->tableSession)
+                <flux:link :href="route('operations.table-sessions.show', $reservation->tableSession)">Thu phụ phí trên hóa đơn tại bàn</flux:link>
+            @elseif ($counterTotal > 0 && $reservation->arrived_at !== null && $reservation->canSettleFees())
                 <form method="POST" action="{{ route('operations.reservations.collect', $reservation->code) }}" class="space-y-3">
                     @csrf
                     <flux:input name="amount_vnd" type="number" min="1" step="1" label="Số tiền đã thu (₫)" required />

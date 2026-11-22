@@ -16,6 +16,7 @@
             ['operations.handoff.index', 'operations.handoff.*', 'Bàn giao'],
             ['operations.pickups.index', 'operations.pickups.*', 'Lịch nhận tại quán'],
             ['operations.reservations.index', 'operations.reservations.*', 'Lịch đặt bàn và phòng'],
+            ['operations.table-sessions.index', 'operations.table-sessions.*', 'Gọi món tại bàn'],
             ['operations.payments.index', 'operations.payments.*', 'Đối chiếu thanh toán'],
         ],
         'Cửa hàng' => $canAdminister ? [

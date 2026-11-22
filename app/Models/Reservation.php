@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property ReservationStatus $status
@@ -42,6 +43,12 @@ class Reservation extends Model
     public function fees(): HasMany
     {
         return $this->hasMany(PickupFee::class);
+    }
+
+    /** @return HasOne<TableSession, $this> */
+    public function tableSession(): HasOne
+    {
+        return $this->hasOne(TableSession::class);
     }
 
     public function canChange(): bool

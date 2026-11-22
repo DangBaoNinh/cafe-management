@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\UserRole;
+use App\Models\ReservationSeat;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\EloquentUserProvider;
@@ -40,6 +41,17 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(6)->by($request->ip() ?? 'unknown'),
             Limit::perMinute(30)->by('storefront-chat'),
         ]);
+        RateLimiter::for('table-order-access', function (Request $request): array {
+            $ip = $request->ip() ?? 'unknown';
+            $seat = $request->route('reservationSeat');
+            $code = $seat instanceof ReservationSeat ? $seat->code : strtoupper((string) $seat);
+
+            return [
+                Limit::perMinute(6)->by('seat-ip:'.$code.':'.$ip),
+                Limit::perMinute(24)->by('ip:'.$ip),
+                Limit::perMinute(60)->by('seat:'.$code),
+            ];
+        });
     }
 
     private function configureAuthorization(): void

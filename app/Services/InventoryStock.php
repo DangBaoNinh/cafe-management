@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\InventoryMovementKind;
 use App\Models\Ingredient;
 use App\Models\Order;
+use App\Models\TableRound;
 use App\Models\User;
 use App\Support\InventoryQuantity;
 use Illuminate\Support\Facades\DB;
@@ -49,15 +50,15 @@ class InventoryStock
         }, 5);
     }
 
-    /** Call in the preparation transaction with the source order already locked. */
-    public function consume(Order $order, User $actor): void
+    /** Call in the preparation transaction with the order or table session already locked. */
+    public function consume(Order|TableRound $source, User $actor): void
     {
-        $snapshot = $order->inventory_snapshot;
+        $snapshot = $source->inventory_snapshot;
         if ($snapshot === null || $snapshot['missing'] !== [] || $snapshot['quantities'] === []) {
             $missing = $snapshot['missing'] ?? [];
             $detail = $missing === [] ? 'Đơn chưa có ảnh chụp công thức.' : 'Đơn thiếu công thức đã chốt cho: '.implode(', ', $missing).'.';
 
-            throw $this->conflict($order, $detail);
+            throw $this->conflict($source, $detail);
         }
 
         $required = $snapshot['quantities'];
@@ -78,22 +79,23 @@ class InventoryStock
             }
         }
         if ($shortages !== []) {
-            throw $this->conflict($order, 'Không đủ nguyên liệu: '.implode(', ', $shortages).'.');
+            throw $this->conflict($source, 'Không đủ nguyên liệu: '.implode(', ', $shortages).'.');
         }
 
         foreach ($required as $id => $quantity) {
-            $this->move($ingredients[$id], $actor, InventoryMovementKind::Consumption, -$quantity, $order);
+            $this->move($ingredients[$id], $actor, InventoryMovementKind::Consumption, -$quantity, $source);
         }
     }
 
-    private function move(Ingredient $ingredient, User $actor, InventoryMovementKind $kind, int $change, ?Order $order = null, ?string $reason = null, ?string $entryKey = null): void
+    private function move(Ingredient $ingredient, User $actor, InventoryMovementKind $kind, int $change, Order|TableRound|null $source = null, ?string $reason = null, ?string $entryKey = null): void
     {
         $ingredient->stock += $change;
         $ingredient->stock_version++;
         $ingredient->save();
         $ingredient->movements()->create([
             'actor_id' => $actor->id,
-            'order_id' => $order?->id,
+            'order_id' => $source instanceof Order ? $source->id : null,
+            'table_round_id' => $source instanceof TableRound ? $source->id : null,
             'kind' => $kind,
             'quantity_change' => $change,
             'balance_after' => $ingredient->stock,
@@ -102,9 +104,11 @@ class InventoryStock
         ]);
     }
 
-    private function conflict(Order $order, string $message): ValidationException
+    private function conflict(Order|TableRound $source, string $message): ValidationException
     {
         return ValidationException::withMessages(['inventory' => $message])->status(409)
-            ->redirectTo(route('operations.orders.show', $order->order_number));
+            ->redirectTo($source instanceof Order
+                ? route('operations.orders.show', $source->order_number)
+                : route('operations.table-sessions.show', $source->tableSession));
     }
 }

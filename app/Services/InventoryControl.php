@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Enums\TableRoundStatus;
 use App\Models\Ingredient;
 use App\Models\Order;
 use App\Models\ProductSize;
+use App\Models\TableRound;
 use App\Models\Topping;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -56,6 +58,11 @@ class InventoryControl
             if ($openCount > 0) {
                 $numbers = $openOrders->orderBy('id')->limit(10)->pluck('order_number')->implode(', ');
                 $issues[] = "Còn {$openCount} đơn chưa pha chế thiếu ảnh chụp công thức. Tra các mã sau trong Quản lý đơn hàng và xử lý trước khi bật: {$numbers}.";
+            }
+            $openRounds = TableRound::query()->whereIn('status', [TableRoundStatus::Pending, TableRoundStatus::Accepted])
+                ->whereJsonLength('inventory_snapshot->missing', '>', 0)->count();
+            if ($openRounds > 0) {
+                $issues[] = "Còn {$openRounds} lượt gọi tại bàn chưa pha chế thiếu công thức. Hãy xử lý trong Gọi món tại bàn trước khi bật.";
             }
             if ($issues !== []) {
                 throw ValidationException::withMessages(['inventory_control' => $issues])->redirectTo(route('admin.inventory.index'));
