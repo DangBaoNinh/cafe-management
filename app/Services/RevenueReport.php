@@ -3,10 +3,8 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
-use App\Enums\PaymentStatus;
 use App\Models\Order;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -29,9 +27,7 @@ class RevenueReport
             ? 'DATE(completed_at, ?)'
             : "DATE(CONVERT_TZ(completed_at, '+00:00', ?))";
 
-        $rows = $orders->where('status', OrderStatus::Completed)
-            ->where('completed_at', '>=', $start)->where('completed_at', '<', $end)
-            ->whereHas('payment', fn (Builder $payment) => $payment->where('status', PaymentStatus::Paid))
+        $rows = $orders->paidCompletionsBetween($start, $end)
             ->selectRaw("$daySql AS local_day", [$from->format('P')])
             ->selectRaw('COUNT(*) AS orders, SUM(subtotal_vnd) AS subtotal, SUM(discount_vnd) AS discount')
             ->selectRaw('SUM(delivery_fee_vnd) AS delivery, SUM(total_vnd) AS total')

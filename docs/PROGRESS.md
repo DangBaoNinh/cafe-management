@@ -321,6 +321,12 @@
 - `composer ci:check` đạt Pint, PHPStan và 200 bài SQLite với 3.083 assertion. Bộ MySQL đạt 26 bài với 453 assertion. MySQL 8.4 riêng xác minh bốn tranh chấp giữa hai yêu cầu giữ cùng chỗ, đổi giờ và yêu cầu từ sơ đồ cũ, check-in và hủy quá hạn, trả chỗ và đặt lại.
 - `npm run build` thành công. Brave ở khổ 360 px kiểm chứng sơ đồ hai tầng, lọc chỗ theo sức chứa, đặt chỗ, phiếu xác nhận và trạng thái đã giữ. Hai migration UC27 đã chạy trên MySQL local.
 
+### UC28 đã kiểm thử, chờ nghiệm thu
+
+- Trang chủ hiển thị tối đa 5 món còn bán theo số ly từ các đơn hoàn tất và đã thanh toán trong ngày hiện tại và 29 ngày trước theo giờ Việt Nam. Hệ thống gộp các size theo món và xếp ID tăng dần khi đồng hạng. Khu vực tự ẩn nếu không có dữ liệu đủ điều kiện.
+- `composer ci:check` đạt Pint, PHPStan và 202 bài SQLite với 3.101 assertion. Bộ MySQL đạt 27 bài với 463 assertion. `npm run build` thành công. Đã kiểm tra HTTP 200 trên trang chủ với MySQL local.
+- AC-04 sẽ được kiểm thử khi UC30 có dữ liệu hóa đơn bàn đã thanh toán.
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

@@ -50,3 +50,9 @@ Các quy tắc dưới đây áp dụng cho hai UC mới. Thông số vận hàn
 | BR27 | Đến trễ 5 phút đầu miễn phí. Từ phút thứ 6, thu 2.000 ₫ cho mỗi phút vượt 5 phút và chốt tiền tại lần đầu nhân viên ghi nhận khách đến. Ví dụ trễ 6 phút thu 2.000 ₫, trễ 7 phút thu 4.000 ₫. Từ mốc giờ hẹn cộng 30 phút, lịch chưa ghi nhận khách đến bị hủy vì không đến. Với lịch 22:30, mốc này là 23:00. Khách đã check-in sử dụng bàn/phòng trong giờ mở cửa. |
 | BR28 | Ghi nhận không đến theo tài khoản, dùng chung cho UC26 và UC27. Hai lần liên tiếp khóa quyền đặt hai loại lịch trong 7 ngày kể từ lần thứ hai. Một lượt đến hợp lệ đặt lại chuỗi về 0. Khách vẫn đăng nhập, mua hàng bình thường và xem lịch đã đặt. Hết 7 ngày, quyền đặt lịch tự mở lại. Chỉ hủy do không đến mới tính vào chuỗi. |
 | BR29 | Màn hình tra mã hiển thị từng phụ phí đổi lịch hoặc đến trễ, số tiền, kênh thu và trạng thái Chờ thanh toán, Đã thanh toán hoặc Thất bại. Kênh ứng dụng chỉ chuyển Đã thanh toán khi hệ thống xác nhận giao dịch khớp khoản phí, số tiền và tham chiếu. Phí đã thanh toán hiển thị là đã thu và không cộng vào số phải trả tại quầy. Với kênh tại quầy, hóa đơn tự cộng khoản phí đúng một lần. Chỉ chuyển khoản phí từ ứng dụng sang quầy sau khi lần thanh toán trực tuyến đã thất bại, hết hạn hoặc được hủy. Ghi nhận kết quả và chuyển kênh theo cùng một khoản phí để tránh thu trùng. |
+
+## Quy tắc mở rộng UC28 đến UC30
+
+| Mã | Quy tắc |
+| --- | --- |
+| BR30 | Trang chủ hiển thị tối đa 5 món còn bán có số ly cao nhất trong ngày hiện tại và 29 ngày trước theo giờ Việt Nam. Chỉ tính món từ giao dịch đã hoàn tất và thanh toán. Gộp size và topping theo món. Đồng hạng xếp theo ID món tăng dần. |
