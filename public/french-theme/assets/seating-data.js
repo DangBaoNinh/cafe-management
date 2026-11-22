@@ -1,6 +1,6 @@
 export const statusLabels = {
   available: 'Còn chỗ',
-  occupied: 'Đang có khách',
+  occupied: 'Đang sử dụng',
   reserved: 'Đã giữ chỗ',
   cleaning: 'Đang chuẩn bị',
   maintenance: 'Tạm ngừng',
@@ -41,12 +41,14 @@ export function validateSnapshot(raw) {
       throw new Error('Invalid table record');
     seen.add(id);
     const status = Object.hasOwn(statusLabels, table.status) ? table.status : 'unknown';
+    const appointment = typeof table.scheduled_at === 'string' ? Date.parse(table.scheduled_at) : NaN;
     return {
       id,
       code: String(table.code).slice(0, 30),
       area_id: String(table.area_id),
       capacity: table.capacity,
       status,
+      scheduled_at: status === 'reserved' && appointment > observed ? table.scheduled_at : null,
       seated_count:
         status === 'occupied' && Number.isInteger(table.seated_count)
           ? Math.max(0, Math.min(table.capacity, table.seated_count))

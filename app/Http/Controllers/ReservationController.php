@@ -30,16 +30,30 @@ class ReservationController extends Controller
         $hours = ReservationHours::query()->sole();
         $filters = ['pickup_date' => now(BookingRules::TIMEZONE)->toDateString(), 'pickup_clock' => null,
             'kind' => 'table', 'party_size' => 2, 'floor' => null];
+        $seats = ReservationSeat::query()->with('activeReservation:id,active_seat_id,status')
+            ->orderBy('floor')->orderBy('position')->get();
+        $seatId = filter_var($request->query('seat_id'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $preferredSeat = $seatId === false ? null : $seats->find($seatId);
         $searched = $request->has('pickup_date');
         if ($searched) {
             $filters = $request->validate(array_diff_key($this->rules(), ['seat_id' => true, 'contact_name' => true, 'phone' => true, 'channel' => true, 'booking_key' => true]));
             $hours->validateSlot(BookingRules::slot($filters['pickup_date'].' '.$filters['pickup_clock']));
+            if ($preferredSeat && ($preferredSeat->kind !== $filters['kind'] || $preferredSeat->capacity < $filters['party_size']
+                || (! empty($filters['floor']) && $preferredSeat->floor !== (int) $filters['floor']))) {
+                $preferredSeat = null;
+            }
+        } elseif ($preferredSeat) {
+            $filters['kind'] = $preferredSeat->kind;
+            $filters['floor'] = $preferredSeat->floor;
+            $partySize = filter_var($request->query('party_size'), FILTER_VALIDATE_INT, ['options' => [
+                'min_range' => 1, 'max_range' => min(10, $preferredSeat->capacity),
+            ]]);
+            $filters['party_size'] = $partySize === false ? min(2, $preferredSeat->capacity) : $partySize;
         }
-        $seats = ReservationSeat::query()->with('activeReservation:id,active_seat_id,status')
-            ->orderBy('floor')->orderBy('position')->get()->toBase()->groupBy('floor');
 
         return view('customer.reservations.create', [
-            'seats' => $seats, 'filters' => $filters, 'searched' => $searched, 'customer' => $customer,
+            'seats' => $seats->toBase()->groupBy('floor'), 'filters' => $filters, 'searched' => $searched,
+            'preferredSeat' => $preferredSeat, 'customer' => $customer,
             'bankAvailable' => $checkout->bankDetails() !== null, 'bookingKey' => Str::uuid()->toString(), 'slots' => $hours->slots(),
         ]);
     }
@@ -77,7 +91,7 @@ class ReservationController extends Controller
 
     public function cancel(Request $request, string $code, TableReservations $bookings): RedirectResponse
     {
-        $request->validate(['confirm' => ['accepted']]);
+        $request->validate(['confirm' => ['accepted']], ['confirm.accepted' => 'Bạn cần xác nhận hủy lịch.']);
         $bookings->cancel($this->customer($request), $code);
 
         return to_route('reservations.show', $code, 303)->with('status', 'Đã hủy lịch và trả chỗ.');

@@ -365,6 +365,12 @@
 - Đã tích hợp video PixVerse người dùng gửi vào banner Toàn. Giữ nguyên file, dài khoảng 8,04 giây và kích thước 1024 × 688; tự phát tắt tiếng, lặp, có nút phát/tạm dừng và poster khi tải lỗi. Tôn trọng reduced motion/tiết kiệm dữ liệu, tạm dừng khi banner ra ngoài viewport hoặc tab bị ẩn, giải phóng media theo lifecycle Livewire.
 - Edge headless xác minh giải mã và phát video thật, điều khiển, phát lặp, offscreen pause, reduced motion với phát chủ động và fallback khi media trả 404. Mobile 390 px không tràn ngang, không phát sinh lỗi JavaScript. Build, cú pháp JS và 6 bài hồi quy catalog/trang chủ với 89 assertion đạt. Không thay database hoặc logic nghiệp vụ.
 
+### Đặt chỗ trên trang Không gian — chờ nghiệm thu
+
+- Sửa xác nhận hủy lịch bằng checkbox HTML. Giữ chỗ đã chọn qua đăng nhập và chọn sẵn chỗ còn phù hợp sau khi khách tìm giờ đến. Hướng dẫn trên sơ đồ giải thích hệ thống giữ chỗ và cấp mã ngay khi đặt thành công.
+- Chi tiết chỗ đã giữ công khai ngày giờ hẹn sắp tới theo giờ Việt Nam. Sơ đồ cập nhật theo lần lấy trạng thái kế tiếp sau khi đổi hoặc hủy. Chỗ đang sử dụng chỉ hiển thị trạng thái, không có giờ trống dự kiến.
+- Kiểm thử đạt 217 bài SQLite với 3.505 assertion, 29 bài MySQL với 526 assertion, Pint, PHPStan, build và kiểm tra cú pháp JS. Trình duyệt với SQLite riêng giữ đúng phòng T2-PH sau đăng nhập, chọn sẵn phòng, thấy giờ mới sau khi đổi và trả chỗ khi hủy qua form.
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

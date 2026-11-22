@@ -1,4 +1,18 @@
 import { validateSnapshot, statusLabels } from './seating-data.js';
+
+const vietnamTime = new Intl.DateTimeFormat('vi-VN', {
+  timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit',
+});
+const vietnamDate = new Intl.DateTimeFormat('vi-VN', {
+  timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit',
+});
+function formatAppointment(date) {
+  const { day, month } = Object.fromEntries(
+    vietnamDate.formatToParts(date).map(({ type, value }) => [type, value]),
+  );
+  return `${vietnamTime.format(date)} ngày ${day}/${month}`;
+}
+
 const escape = (value) =>
   String(value ?? '').replace(
     /[&<>"']/g,
@@ -53,7 +67,30 @@ export async function mountPublicSeating(root) {
     const table = snapshot?.tables.find((t) => t.id === id);
     if (!table) return;
     const available = !stale && table.status === 'available';
-    detail.innerHTML = `<div class="seat-detail-title"><span class="eyebrow">Chiếc bàn bạn chọn</span><h3>${escape(table.code)}</h3></div><div class="detail-row"><span>Khu vực</span><strong>${escape(snapshot.areas.find((a) => a.id === table.area_id)?.name)}</strong></div><div class="detail-row"><span>Sức chứa</span><strong>${table.capacity} người</strong></div><div class="detail-row"><span>Hiện tại</span><span class="badge ${stale ? 'unknown' : table.status}">${stale ? 'Chưa xác minh' : statusLabels[table.status]}</span></div><p class="form-help">${available ? 'Bạn có thể gửi yêu cầu đặt chỗ. Nhân viên sẽ xác nhận theo thời gian bạn chọn.' : stale ? 'Thông tin đang gián đoạn. Vui lòng cập nhật lại hoặc liên hệ quán.' : 'Bạn có thể chọn bàn khác hoặc gửi yêu cầu cho thời gian khác.'}</p>${reservationUrl ? `<a class="btn ${available ? '' : 'secondary'}" href="${escape(reservationUrl)}">${available ? 'Gửi yêu cầu đặt chỗ' : 'Xem trang đặt bàn'}</a>` : ''}`;
+    const appointment = !stale && table.scheduled_at ? new Date(table.scheduled_at) : null;
+    const guidance = {
+      available: 'Chọn giờ đến và xác nhận đặt chỗ. Hệ thống sẽ giữ chỗ và cấp mã ngay nếu chỗ còn trống.',
+      reserved: 'Chỗ này đã được giữ. Bạn có thể chọn chỗ trống khác hoặc cập nhật lại khi lượt giữ kết thúc.',
+      occupied: 'Bạn có thể chọn chỗ trống khác.',
+    };
+    let bookingLink = '';
+    if (reservationUrl) {
+      const url = new URL(reservationUrl);
+      if (available && !demo) {
+        url.searchParams.set('seat_id', table.id);
+        const partySize = Number(capacity.value);
+        if (partySize > 1 && partySize <= table.capacity) url.searchParams.set('party_size', partySize);
+      }
+      bookingLink = `<a class="btn ${available ? '' : 'secondary'}" href="${escape(url.href)}">${available ? 'Đặt chỗ này' : 'Xem trang đặt chỗ'}</a>`;
+    }
+    detail.innerHTML = `
+      <div class="seat-detail-title"><span class="eyebrow">Chỗ bạn chọn</span><h3>${escape(table.code)}</h3></div>
+      <div class="detail-row"><span>Khu vực</span><strong>${escape(snapshot.areas.find((a) => a.id === table.area_id)?.name)}</strong></div>
+      <div class="detail-row"><span>Sức chứa</span><strong>${table.capacity} người</strong></div>
+      <div class="detail-row"><span>Hiện tại</span><span class="badge ${stale ? 'unknown' : table.status}">${stale ? 'Chưa xác minh' : statusLabels[table.status]}</span></div>
+      ${appointment ? `<p class="form-help">Có lịch đặt lúc <time datetime="${appointment.toISOString()}">${formatAppointment(appointment)}</time></p>` : ''}
+      <p class="form-help">${stale ? 'Thông tin đang gián đoạn. Vui lòng cập nhật lại hoặc liên hệ quán.' : (guidance[table.status] ?? 'Bạn có thể chọn chỗ trống khác.')}</p>
+      ${bookingLink}`;
     root
       .querySelectorAll('[data-public-table]')
       .forEach((button) =>

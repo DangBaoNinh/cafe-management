@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Models\Reservation;
 use App\Models\ReservationSeat;
 use App\Models\User;
+use App\Services\BookingRules;
 use App\Services\TableSessions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -29,11 +30,12 @@ class PublicSeatingTest extends TestCase
     {
         $customer = User::factory()->create(['name' => 'Thông tin riêng của khách', 'email' => 'private@example.test']);
         $held = ReservationSeat::query()->where('code', 'T1-B01')->sole();
+        $scheduledAt = now()->addHours(2);
         Reservation::query()->forceCreate([
             'user_id' => $customer->id, 'reservation_seat_id' => $held->id, 'active_seat_id' => $held->id,
             'code' => 'PRIVATE-BOOKING', 'booking_key' => Str::uuid(), 'request_hash' => str_repeat('a', 64),
             'contact_name' => $customer->name, 'phone' => '0901234567', 'party_size' => 2, 'fee_channel' => 'counter',
-            'status' => 'confirmed', 'scheduled_at' => now()->addHours(2), 'arrival_deadline' => now()->addHours(2)->addMinutes(30),
+            'status' => 'confirmed', 'scheduled_at' => $scheduledAt, 'arrival_deadline' => $scheduledAt->copy()->addMinutes(30),
         ]);
         $occupied = ReservationSeat::query()->where('code', 'T1-B02')->sole();
         $occupied->walk_in_at = now();
@@ -48,11 +50,12 @@ class PublicSeatingTest extends TestCase
         $this->assertEqualsCanonicalizing(['observed_at', 'areas', 'tables'], array_keys($response->json()));
         $tables = collect($response->json('tables'))->keyBy('code');
         $this->assertSame('reserved', $tables['T1-B01']['status']);
+        $this->assertSame($scheduledAt->setTimezone(BookingRules::TIMEZONE)->format('Y-m-d\TH:iP'), $tables['T1-B01']['scheduled_at']);
         $this->assertSame('occupied', $tables['T1-B02']['status']);
         $this->assertSame('maintenance', $tables['T2-B01']['status']);
         $this->assertSame('available', $tables['T2-B02']['status']);
         foreach ($tables as $table) {
-            $this->assertEqualsCanonicalizing(['id', 'code', 'area_id', 'capacity', 'status'], array_keys($table));
+            $this->assertEqualsCanonicalizing(['id', 'code', 'area_id', 'capacity', 'status', 'scheduled_at'], array_keys($table));
         }
     }
 
