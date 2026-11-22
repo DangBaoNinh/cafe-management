@@ -48,7 +48,7 @@ class AuthenticationTest extends MySqlTestCase
             ])->assertSessionHasErrors(['email' => __('passwords.token')]);
 
             $this->post(route('login.store'), ['email' => strtoupper($email), 'password' => 'updated-password'])
-                ->assertRedirect(route('dashboard'));
+                ->assertRedirect(route('home'));
 
             $sessionId = session()->getId();
             $this->assertDatabaseHas('sessions', ['id' => $sessionId, 'user_id' => $user->id]);
