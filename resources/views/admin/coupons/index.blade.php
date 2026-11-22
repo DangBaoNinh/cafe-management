@@ -7,52 +7,23 @@
 
         <x-auth-session-status :status="session('status')" />
 
-        <div class="relative overflow-x-auto rounded-lg border border-terrasse-ink/15 bg-terrasse-paper">
-            <table class="w-full text-left text-sm">
-                <thead class="border-b border-terrasse-ink/15">
-                    <tr>
-                        <th scope="col" class="p-4">Mã</th>
-                        <th scope="col" class="p-4">Mức giảm</th>
-                        <th scope="col" class="p-4">Hiệu lực (giờ Việt Nam)</th>
-                        <th scope="col" class="p-4">Trạng thái</th>
-                        <th scope="col" class="p-4"><span class="sr-only">Thao tác</span></th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-terrasse-ink/15">
-                    @forelse ($coupons as $coupon)
-                        <tr>
-                            <th scope="row" class="p-4 text-left font-semibold wrap-anywhere">{{ $coupon->code }}</th>
-                            <td class="p-4 whitespace-nowrap">
-                                @if ($coupon->discount_type === \App\Enums\CouponDiscountType::Percentage)
-                                    {{ $coupon->discount_value }}%
-                                @else
-                                    {{ preg_replace('/\B(?=(\d{3})+(?!\d))/', '.', (string) $coupon->discount_value) }} ₫
-                                @endif
-                            </td>
-                            <td class="p-4">
-                                <div>{{ $coupon->starts_at->setTimezone(\App\Models\Coupon::LOCAL_TIMEZONE)->format('d/m/Y H:i') }}</div>
-                                <div>{{ $coupon->ends_at->setTimezone(\App\Models\Coupon::LOCAL_TIMEZONE)->format('d/m/Y H:i') }}</div>
-                            </td>
-                            <td class="p-4">
-                                {{ match (true) {
-                                    ! $coupon->is_active => 'Đã tắt',
-                                    $coupon->isAvailableAt($now) => 'Đang hiệu lực',
-                                    $now < $coupon->starts_at => 'Chưa bắt đầu',
-                                    default => 'Đã hết hạn',
-                                } }}
-                            </td>
-                            <td class="p-4 text-right">
-                                <flux:button size="sm" :href="route('admin.coupons.edit', $coupon)">
-                                    Chỉnh sửa<span class="sr-only"> {{ $coupon->code }}</span>
-                                </flux:button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="p-4">Chưa có mã giảm giá.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+        @if ($coupons->isEmpty())
+            <div class="coupon-empty-state">
+                <p class="coupon-summary__eyebrow">Ưu đãi</p>
+                <h2 class="terrasse-display text-3xl">Chưa có mã giảm giá</h2>
+                <p class="terrasse-muted max-w-md text-sm">Tạo phiếu ưu đãi đầu tiên để áp dụng tại bước đặt hàng.</p>
+            </div>
+        @else
+            <div class="grid gap-4 lg:grid-cols-2">
+                @foreach ($coupons as $coupon)
+                    <x-coupon.summary :$coupon :$now>
+                        <div class="flex justify-end border-t border-terrasse-ink/10 pt-4">
+                            <flux:button size="sm" :href="route('admin.coupons.edit', $coupon)">Chỉnh sửa<span class="sr-only"> {{ $coupon->code }}</span></flux:button>
+                        </div>
+                    </x-coupon.summary>
+                @endforeach
+            </div>
+        @endif
 
         {{ $coupons->links() }}
     </section>

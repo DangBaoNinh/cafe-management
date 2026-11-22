@@ -6,6 +6,10 @@
     <body class="terrasse french-theme french-auth antialiased">
         <main class="terrasse-auth flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
             <div class="french-auth-card flex w-full max-w-md flex-col gap-6">
+                <a href="{{ route('home') }}" class="french-auth-back" onclick="if (window.history.length > 1) { event.preventDefault(); window.history.back(); }">
+                    <span aria-hidden="true">←</span>
+                    <span>Quay về trang trước</span>
+                </a>
                 <x-terrasse.brand :href="route('home')" class="self-center" />
                 <div class="flex flex-col gap-6">
                     {{ $slot }}
