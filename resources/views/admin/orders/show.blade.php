@@ -4,7 +4,7 @@
 @php($payment = $order->payment)
 
 <x-layouts::admin :title="'Quản lý đơn '.$order->order_number">
-    <section class="mx-auto max-w-3xl space-y-6">
+    <section class="mx-auto max-w-3xl space-y-6" data-admin-order-actions data-order-number="{{ $order->order_number }}" data-current-status="{{ $order->status->label() }}">
         <header class="space-y-2">
             <flux:link :href="route('admin.orders.index')">Về danh sách đơn</flux:link>
             <h1 class="text-2xl font-semibold wrap-anywhere sm:text-3xl">Đơn {{ $order->order_number }}</h1>
@@ -61,6 +61,18 @@
             </details>
         @endif
 
+        <section class="space-y-3" aria-label="Điều chỉnh tiến trình đơn trực tuyến">
+            <h2 class="text-lg font-semibold">Điều chỉnh tiến trình đơn</h2>
+            @if($order->status === OrderStatus::Pending)
+                <form method="POST" action="{{ route('operations.orders.decide', $order->order_number) }}">@csrf<input type="hidden" name="expected_status" value="pending"><input type="hidden" name="decision" value="confirmed"><flux:button type="submit" variant="primary">Xác nhận đơn hàng</flux:button></form>
+            @elseif(in_array($order->status, [OrderStatus::Confirmed, OrderStatus::Preparing], true))
+                @include('operations.orders.preparation-actions')
+            @elseif($order->scheduledPickup !== null || $order->demoShipment !== null)
+                <flux:link :href="route('operations.orders.show', $order->order_number)">Cập nhật nhận hàng / bàn giao</flux:link>
+            @elseif(($target = $order->nextHandoffStatus()) !== null)
+                @include('operations.orders.handoff-actions', ['target' => $target])
+            @endif
+        </section>
         <x-customer.order-snapshot :order="$order" />
 
         <div class="space-y-3">
@@ -73,5 +85,14 @@
                 <x-admin.status-history :entries="$payment->statusHistories" :label-for-status="fn (string $status) => PaymentStatus::from($status)->label()" />
             </div>
         @endif
+        <dialog data-admin-status-dialog aria-labelledby="admin-status-dialog-title" class="m-auto w-full max-w-lg space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-6 text-terrasse-ink backdrop:bg-black/40">
+            <h2 id="admin-status-dialog-title" class="text-xl font-semibold">Xác minh cập nhật trạng thái</h2>
+            <p data-admin-status-summary class="wrap-anywhere"></p>
+            <p>Kiểm tra thông tin trước khi xác nhận. Chỉ cập nhật sau khi bạn đồng ý.</p>
+            <div class="flex flex-wrap gap-3">
+                <flux:button type="button" variant="primary" data-admin-status-approve>Xác nhận cập nhật</flux:button>
+                <flux:button type="button" data-admin-status-cancel>Quay lại</flux:button>
+            </div>
+        </dialog>
     </section>
 </x-layouts::admin>

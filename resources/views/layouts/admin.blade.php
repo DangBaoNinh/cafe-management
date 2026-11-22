@@ -7,6 +7,7 @@
         'Quản trị' => $canAdminister ? [
             ['admin.dashboard', 'admin.dashboard', 'Tổng quan quản trị'],
             ['admin.orders.index', 'admin.orders.*', 'Quản lý đơn hàng'],
+            ['admin.invoices.index', 'admin.invoices.*', 'Quản lý hóa đơn'],
             ['admin.customers.index', 'admin.customers.*', 'Tra cứu khách hàng'],
             ['admin.accounts.index', 'admin.accounts.*', 'Quản lý tài khoản'],
         ] : [],

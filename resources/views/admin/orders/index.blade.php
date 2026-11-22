@@ -1,104 +1,98 @@
-@use('App\Enums\OrderStatus')
-@use('App\Enums\PaymentMethod')
-
-<x-layouts::admin title="Quản lý đơn hàng">
+@php
+    $invoiceManagement = request()->routeIs('admin.invoices.*');
+    $listingRoute = $invoiceManagement ? 'admin.invoices.index' : 'admin.orders.index';
+    $detailRoute = $invoiceManagement ? 'admin.invoices.show' : 'admin.orders.show';
+@endphp
+<x-layouts::admin :title="$invoiceManagement ? 'Quản lý hóa đơn' : 'Quản lý đơn hàng'">
+    @php
+        $selectFilters = [
+            'source' => ['Nguồn đơn', ['online' => 'Trực tuyến', 'counter' => 'Tại quầy', 'legacy' => 'Hóa đơn bàn cũ']],
+            'display_status' => ['Trạng thái', ['paid' => 'Đã thanh toán', 'cancelled' => 'Đã hủy', 'pending' => 'Chờ thanh toán']],
+            'status' => ['Tiến trình đơn', [...collect(App\Enums\OrderStatus::cases())->mapWithKeys(fn ($status) => [$status->value => $status->label()])->all(), 'pending_payment' => 'Chờ thanh toán tại quầy']],
+            'method' => ['Phương thức thanh toán', ['cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'cod' => 'Thanh toán khi nhận', 'demo_gateway' => 'Cổng thanh toán mô phỏng', 'counter' => 'Tại quầy (hóa đơn cũ)']],
+        ];
+    @endphp
     <section class="space-y-6">
         <header class="space-y-2 border-b border-terrasse-ink/15 pb-5">
-            <h1 class="font-semibold">Quản lý đơn hàng</h1>
-            <p class="terrasse-muted text-sm">Tra cứu đơn, cách nhận và tình trạng thanh toán.</p>
+            <h1 class="font-semibold">{{ $invoiceManagement ? 'Quản lý hóa đơn' : 'Quản lý đơn hàng' }}</h1>
+            <p>Đơn trực tuyến và hóa đơn tại quầy được cập nhật từ cùng dữ liệu vận hành.</p>
         </header>
 
-        <form method="GET" action="{{ route('admin.orders.index') }}" class="terrasse-panel space-y-4 rounded-md p-4">
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-                <div class="min-w-0 space-y-2">
-                    <label class="block text-sm font-medium" for="order-number">Mã đơn</label>
-                    <flux:input id="order-number" name="number" :value="$filters['number'] ?? ''" placeholder="Mã hoặc đầu mã" maxlength="32" />
-                    <flux:error name="number" />
-                </div>
-                <div class="min-w-0 space-y-2">
-                    <label class="block text-sm font-medium" for="from">Đặt từ ngày</label>
-                    <flux:input id="from" name="from" type="date" :value="$filters['from'] ?? ''" />
-                    <flux:error name="from" />
-                </div>
-                <div class="min-w-0 space-y-2">
-                    <label class="block text-sm font-medium" for="to">Đặt đến ngày</label>
-                    <flux:input id="to" name="to" type="date" :value="$filters['to'] ?? ''" />
-                    <flux:error name="to" />
-                </div>
-                <div class="min-w-0 space-y-2">
-                    <label class="block text-sm font-medium" for="status">Trạng thái đơn</label>
-                    <flux:select id="status" name="status">
-                        <flux:select.option value="">Tất cả trạng thái</flux:select.option>
-                        @foreach (OrderStatus::cases() as $option)
-                            <flux:select.option :value="$option->value" :selected="($filters['status'] ?? '') === $option->value">{{ $option->label() }}</flux:select.option>
-                        @endforeach
-                    </flux:select>
-                    <flux:error name="status" />
-                </div>
-                <div class="min-w-0 space-y-2">
-                    <label class="block text-sm font-medium" for="method">Phương thức thanh toán</label>
-                    <flux:select id="method" name="method">
-                        <flux:select.option value="">Tất cả phương thức</flux:select.option>
-                        @foreach (PaymentMethod::cases() as $option)
-                            <flux:select.option :value="$option->value" :selected="($filters['method'] ?? '') === $option->value">{{ $option->label() }}</flux:select.option>
-                        @endforeach
-                    </flux:select>
-                    <flux:error name="method" />
-                </div>
+        @if($invoiceManagement)
+            <section class="terrasse-panel space-y-3 rounded p-4" aria-labelledby="invoice-status-help">
+                <h2 id="invoice-status-help" class="text-lg font-semibold">Thay đổi trạng thái hóa đơn</h2>
+                <p>Ở cột Thao tác, chọn Thay đổi trạng thái để mở hóa đơn. Chọn trạng thái mới và xác minh trước khi cập nhật.</p>
+                <p class="text-sm">Admin có thể đổi Hoàn tất/Đã hủy trên đơn đã thanh toán. Khoản đã thu và chứng từ được giữ nguyên; hoàn tiền xử lý riêng.</p>
+                <flux:link :href="route('admin.invoices.index', ['display_status' => 'pending'])">Xem hóa đơn chờ thanh toán</flux:link>
+            </section>
+        @endif
+        <form method="GET" action="{{ route($listingRoute) }}" class="terrasse-panel space-y-4 rounded p-4">
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <label>Mã đơn
+                    <flux:input name="number" :value="$filters['number'] ?? ''" placeholder="Mã hoặc đầu mã" maxlength="36" />
+                </label>
+                <label>Đặt từ ngày
+                    <flux:input name="from" type="date" :value="$filters['from'] ?? ''" />
+                </label>
+                <label>Đặt đến ngày
+                    <flux:input name="to" type="date" :value="$filters['to'] ?? ''" />
+                </label>
+                @foreach($selectFilters as $name => [$label, $options])
+                    <label>{{ $label }}
+                        <select name="{{ $name }}" class="mt-2 w-full rounded border p-2">
+                            <option value="">Tất cả</option>
+                            @foreach($options as $value => $text)
+                                <option value="{{ $value }}" @selected(($filters[$name] ?? '') === $value)>{{ $text }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                @endforeach
             </div>
-            <div class="flex flex-wrap items-center gap-4">
+            @if($errors->any())
+                <ul role="alert">
+                    @foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach
+                </ul>
+            @endif
+            <div class="flex gap-4">
                 <flux:button type="submit" variant="primary">Lọc đơn hàng</flux:button>
-                @if ($filters !== [])
-                    <flux:link :href="route('admin.orders.index')">Xóa bộ lọc</flux:link>
-                @endif
+                <flux:link :href="route($listingRoute)">Xóa bộ lọc</flux:link>
             </div>
         </form>
 
-        @if ($orders->isEmpty())
-            <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">
-                {{ $orders->total() > 0 ? 'Trang này không có đơn hàng.' : 'Không tìm thấy đơn hàng.' }}
-            </p>
-        @else
-            <div class="terrasse-panel max-w-full overflow-x-auto rounded-md" role="region" aria-label="Danh sách đơn hàng" tabindex="0">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-terrasse-ink/5 whitespace-nowrap">
-                        <tr>
-                            <th scope="col" class="px-4 py-3">Mã đơn</th>
-                            <th scope="col" class="px-4 py-3">Giờ đặt</th>
-                            <th scope="col" class="px-4 py-3">Cách nhận</th>
-                            <th scope="col" class="px-4 py-3">Trạng thái đơn</th>
-                            <th scope="col" class="px-4 py-3">Thanh toán</th>
-                            <th scope="col" class="px-4 py-3 text-right">Tổng tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-terrasse-ink/15">
-                        @foreach ($orders as $order)
-                            <tr>
-                                <th scope="row" class="px-4 py-3 whitespace-nowrap">
-                                    <flux:link :href="route('admin.orders.show', $order->order_number)">{{ $order->order_number }}</flux:link>
-                                </th>
-                                <td class="px-4 py-3 whitespace-nowrap"><x-customer.order-time :date="$order->created_at" /></td>
-                                <td class="min-w-36 px-4 py-3 wrap-anywhere">
-                                    {{ $order->fulfillment_type->label() }}
-                                    <span class="terrasse-muted block text-xs">{{ $order->recipient_name }}</span>
-                                </td>
-                                <td class="px-4 py-3 whitespace-nowrap"><x-terrasse.status :status="$order->status" /></td>
-                                <td class="min-w-36 px-4 py-3">
-                                    @if ($order->payment)
-                                        <x-terrasse.status :status="$order->payment->status" />
-                                        <span class="terrasse-muted block text-xs">{{ $order->payment->method->label() }}</span>
-                                    @else
-                                        <span class="terrasse-muted text-xs">Chưa có thông tin</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3 text-right font-semibold whitespace-nowrap tabular-nums"><x-customer.vnd :amount="$order->total_vnd" /></td>
-                            </tr>
+        <div class="terrasse-panel max-w-full overflow-x-auto rounded" role="region" aria-label="Danh sách đơn hàng" tabindex="0">
+            <table class="w-full text-left text-sm whitespace-nowrap">
+                <thead>
+                    <tr>
+                        @foreach(['Mã đơn', 'Giờ đặt', 'Nguồn / cách nhận', 'Trạng thái', 'Tiến trình đơn', 'Phương thức', 'Tổng tiền', 'Thao tác'] as $label)
+                            <th scope="col" class="px-4 py-3">{{ $label }}</th>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-terrasse-ink/15">
+                    @forelse($orders as $order)
+                        <tr>
+                            <th scope="row" class="px-4 py-3">
+                                <flux:link :href="$order->source === 'legacy' ? route('operations.invoices.tables.show', $order->number) : route($detailRoute, $order->number)">{{ $order->number }}</flux:link>
+                            </th>
+                            <td class="px-4 py-3"><x-customer.order-time :date="Carbon\CarbonImmutable::parse($order->created_at, 'UTC')" /></td>
+                            <td class="px-4 py-3">
+                                {{ $order->source === 'online' ? App\Enums\FulfillmentType::from($order->fulfillment)->label() : 'Tại quầy / bàn' }}
+                                <span class="block text-xs">{{ $order->label }}</span>
+                            </td>
+                            <td class="px-4 py-3"><x-admin.order-state :state="$order->display_status" />@if($order->source === 'counter' && $order->payment_status === 'paid' && $order->status === 'cancelled')<span class="mt-1 block text-xs">Đã thu tiền · hoàn tiền riêng</span>@endif</td>
+                            <td class="px-4 py-3">{{ $order->source === 'online' ? App\Enums\OrderStatus::from($order->status)->label() : App\Enums\CounterOrderStatus::from($order->status)->label() }}</td>
+                            <td class="px-4 py-3">{{ match($order->collection_method ?? $order->method) { 'cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'cod' => 'Thanh toán khi nhận', 'demo_gateway' => 'Cổng thanh toán mô phỏng', default => 'Chưa phân loại (hóa đơn cũ)' } }}</td>
+                            <td class="px-4 py-3 text-right font-semibold"><x-customer.vnd :amount="(int) $order->total_vnd" /></td>
+                            <td class="px-4 py-3">
+                                <flux:button size="sm" :href="$order->source === 'legacy' ? route('operations.invoices.tables.show', $order->number) : route($detailRoute, $order->number)">{{ ($order->source === 'counter' && $order->payment_status !== 'voided') || ($order->display_status === 'pending' && $order->source === 'online') ? ($invoiceManagement ? 'Thay đổi trạng thái' : 'Cập nhật trạng thái') : 'Xem chi tiết' }}</flux:button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="8" class="p-5">Không tìm thấy đơn hàng.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         {{ $orders->links() }}
     </section>
 </x-layouts::admin>

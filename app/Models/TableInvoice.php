@@ -56,4 +56,10 @@ class TableInvoice extends Model
             'subtotal_vnd' => 'integer', 'fees_vnd' => 'integer', 'total_vnd' => 'integer', 'revision' => 'integer',
             'paid_at' => 'immutable_datetime', 'payment_reported_at' => 'immutable_datetime'];
     }
+
+    /** @return HasMany<TableInvoiceRevision, $this> */
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(TableInvoiceRevision::class);
+    }
 }
