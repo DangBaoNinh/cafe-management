@@ -21,11 +21,6 @@
                 @else
                     <a class="french-mobile-register" href="{{ route('register') }}">Đăng ký</a>
                 @endauth
-                @auth
-                    <form method="POST" action="{{ route('logout') }}" class="french-mobile-logout">@csrf<button type="submit">Đăng xuất</button></form>
-                @else
-                    <a class="french-mobile-register" href="{{ route('register') }}">Đăng ký</a>
-                @endauth
             </nav>
             <div class="nav-tools">
                 @can('manage-cart')<a class="icon-btn bag" href="{{ route('cart.index') }}" aria-label="Giỏ hàng"><x-theme.icon name="bag" /></a>@endcan
