@@ -28,6 +28,8 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationOperationsController;
 use App\Http\Controllers\ScheduledPickupController;
 use App\Http\Controllers\StorefrontChatController;
+use App\Http\Controllers\TableOrderController;
+use App\Http\Controllers\TableSessionOperationsController;
 use App\Http\Middleware\EnsureDemoDeliveryEnabled;
 use App\Http\Middleware\EnsureDemoPaymentEnabled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -38,6 +40,13 @@ Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
 Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
 Route::post('tro-chuyen', StorefrontChatController::class)
     ->middleware('throttle:storefront-chat')->name('storefront-chat.reply');
+
+Route::prefix('goi-mon/{reservationSeat:code}')->name('table-orders.')->group(function () {
+    Route::get('/', [TableOrderController::class, 'show'])->name('show');
+    Route::post('join', [TableOrderController::class, 'join'])->middleware('throttle:table-order-access')->name('join');
+    Route::post('rounds', [TableOrderController::class, 'store'])->name('store');
+    Route::post('checkout', [TableOrderController::class, 'checkout'])->name('checkout');
+});
 
 Route::view('dashboard', 'customer.account')->middleware('auth')->name('dashboard');
 
@@ -119,6 +128,17 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
     Route::post('{number}/refund', [ManualPaymentController::class, 'refund'])->middleware('can:access-admin')->name('refund');
     Route::post('{number}/demo-reconcile', [DemoPaymentController::class, 'reconcile'])
         ->middleware([EnsureDemoPaymentEnabled::class, 'can:access-admin'])->name('demo-reconcile');
+});
+
+Route::prefix('operations/table-sessions')->name('operations.table-sessions.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [TableSessionOperationsController::class, 'index'])->name('index');
+    Route::get('seats/{reservationSeat:code}/qr', [TableSessionOperationsController::class, 'qr'])->name('qr');
+    Route::post('seats/{reservationSeat:code}', [TableSessionOperationsController::class, 'open'])->name('open');
+    Route::get('{tableSession}', [TableSessionOperationsController::class, 'show'])->whereUuid('tableSession')->name('show');
+    Route::post('{tableSession}/rounds', [TableSessionOperationsController::class, 'store'])->whereUuid('tableSession')->name('store');
+    Route::post('{tableSession}/rounds/{round}', [TableSessionOperationsController::class, 'advance'])->whereUuid('tableSession')->whereNumber('round')->name('advance');
+    Route::post('{tableSession}/actions/{action}', [TableSessionOperationsController::class, 'update'])
+        ->whereUuid('tableSession')->whereIn('action', ['lock', 'bill', 'pay', 'close'])->name('update');
 });
 
 Route::prefix('operations/reservations')->name('operations.reservations.')->middleware(['auth', 'can:operate-orders'])->group(function () {

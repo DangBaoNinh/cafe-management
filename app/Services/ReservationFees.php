@@ -28,6 +28,9 @@ class ReservationFees
         Gate::forUser($actor)->authorize('operate-orders');
         DB::transaction(function () use ($actor, $code, $feeId): void {
             $reservation = $this->lock($code);
+            if ($reservation->tableSession()->whereNotNull('billed_at')->exists()) {
+                throw ValidationException::withMessages(['fee' => 'Hóa đơn tại bàn đã chốt. Khoản phí này không thể chuyển sang quầy.']);
+            }
             $fee = $reservation->fees()->lockForUpdate()->findOrFail($feeId);
             $this->fees->moveToCounter($actor, $fee, $reservation->canSettleFees());
         }, 5);
@@ -48,6 +51,9 @@ class ReservationFees
         Gate::forUser($actor)->authorize('operate-orders');
         DB::transaction(function () use ($actor, $code, $amount): void {
             $reservation = $this->lock($code);
+            if ($reservation->tableSession()->exists()) {
+                throw ValidationException::withMessages(['amount_vnd' => 'Hãy thu phụ phí qua hóa đơn của phiên gọi món.']);
+            }
             $total = $this->fees->counterTotal($reservation);
             if (! in_array($reservation->status, [ReservationStatus::CheckedIn, ReservationStatus::Completed], true)
                 || $total === 0 || $amount !== $total) {

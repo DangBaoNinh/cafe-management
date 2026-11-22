@@ -1,6 +1,6 @@
 # Danh sách Use Case và nhiệm vụ kỹ thuật
 
-Danh sách dưới đây quản lý nhánh, phụ thuộc và trạng thái. Có **29 UC**, gồm **23 UC MVP** và **6 UC mở rộng**, cùng **3 nhiệm vụ kỹ thuật**. Mỗi mã giữ nguyên khi thêm việc mới. Các UC được sắp theo thứ tự phụ thuộc, nên UC20 xuất hiện trước UC18 và UC19.
+Danh sách dưới đây quản lý nhánh, phụ thuộc và trạng thái. Có **30 UC**, gồm **23 UC MVP** và **7 UC mở rộng**, cùng **3 nhiệm vụ kỹ thuật**. Mỗi mã giữ nguyên khi thêm việc mới. Các UC được sắp theo thứ tự phụ thuộc, nên UC20 xuất hiện trước UC18 và UC19.
 
 ## Trạng thái và cách dùng
 
@@ -56,3 +56,4 @@ P0 là luồng lõi hoặc điều kiện bắt buộc. P1 là nghiệp vụ MVP
 | UC27 | Đặt bàn hoặc phòng họp tại quán | Khách hàng, nhân viên, quản trị viên | Mở rộng | Giữ bàn hoặc phòng phù hợp trên hai tầng và check-in bằng mã đặt chỗ | P2 | UC01, UC04, TECH01, TECH03 | [UC27.md](use-cases/UC27.md) | `feature/table-reservations` | ACCEPTED | Sơ đồ hiển thị đúng tình trạng bàn/phòng; chỗ đang sử dụng không đặt được; nhân viên trả chỗ khi khách rời đi. |
 | UC28 | Hiển thị món bán chạy | Khách vãng lai, khách hàng | Mở rộng | Xếp hạng món trên trang chủ theo số ly bán | P2 | UC08, UC23 | [UC28.md](use-cases/UC28.md) | `feature/best-selling-products` | ACCEPTED | Cộng đúng theo món, lọc đơn và catalog theo tiêu chí, giữ thứ tự ổn định khi bằng số ly. |
 | UC29 | Quản lý tồn kho theo công thức | Quản trị viên, nhân viên pha chế | Mở rộng | Quản lý nguyên liệu, định lượng, tồn và tiêu hao | P2 | UC07, UC14, UC18, TECH03 | [UC29.md](use-cases/UC29.md) | `feature/recipe-inventory` | ACCEPTED | Tính đúng theo size, topping và số ly, trừ một lần và giữ nhật ký điều chỉnh. |
+| UC30 | Gọi món theo bàn hoặc phòng | Khách tại quán, nhân viên, quản trị viên | Mở rộng | Gọi nhiều lượt trong cùng phiên sử dụng bàn/phòng | P2 | UC10, UC17, UC18, UC20, UC27, UC29 | [UC30.md](use-cases/UC30.md) | `feature/table-ordering` | VERIFIED | Gửi đúng phiên, khóa gọi khi chốt, thu đúng một lần và trả chỗ sau khi khách rời đi. |

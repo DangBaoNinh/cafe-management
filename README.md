@@ -108,5 +108,14 @@ Chạy `php artisan migrate` khi cập nhật UC29. Kho bắt đầu ở trạng
 3. Chọn **Bật kiểm soát tồn** rồi tiếp tục pha chế. Từ thời điểm đó, thao tác **Bắt đầu pha chế** trừ kho theo định lượng đã chốt lúc đặt hàng. Nhân viên thấy tên tùy chọn thiếu công thức hoặc số lượng nguyên liệu thiếu ngay trên đơn.
 4. Khi thiếu tồn, ghi nhận nguyên liệu bổ sung rồi thử bắt đầu pha chế lại. Với đơn đã đặt thiếu công thức, xử lý hủy theo quy trình đơn hàng rồi đặt lại sau khi bổ sung công thức. Đối chiếu các khoản hao hụt hoặc trả lại thực tế bằng **Điều chỉnh** có lý do.
 
+### Gọi món tại bàn hoặc phòng
+
+Chạy `composer install`, `php artisan migrate` và `npm run build` khi cập nhật UC30. PHP cần bật `xmlwriter` để tạo mã QR. Mở trang vận hành từ địa chỉ mà điện thoại của khách truy cập được khi lấy QR để in.
+
+1. Nhân viên mở **Vận hành → Gọi món tại bàn**. Chọn **Mở phiên** cho khách ghé trực tiếp hoặc cho lượt đặt trước đã check-in. Mở **Mã QR** để lấy mã cố định của chỗ. Gửi mã phiên 8 số trên màn hình cho khách.
+2. Khách quét QR và nhập mã phiên trên trình duyệt. Khách có thể gửi nhiều lượt hoặc nhờ nhân viên chọn **Nhập món thay khách**. Nhân viên xử lý lượt trong phiên theo thứ tự tiếp nhận, pha chế, sẵn sàng và phục vụ.
+3. Khi tính tiền, nhân viên chọn **Khóa gọi thêm**, xử lý các lượt còn dang dở rồi **Chốt hóa đơn**. Nếu còn khoản phí qua ứng dụng đang chờ, mở lượt đặt chỗ để đối chiếu. Khoản đã thu không cộng vào hóa đơn tại bàn.
+4. Nhập đúng số tiền thực thu trên hóa đơn. Chọn **Xác nhận khách rời đi và trả chỗ** khi bàn hoặc phòng đã trống. Phiên đã đóng và hóa đơn còn tra được trong danh sách vận hành.
+
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md)
 - [Tiến độ và kết quả kiểm tra](docs/PROGRESS.md)

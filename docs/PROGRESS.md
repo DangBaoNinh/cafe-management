@@ -327,7 +327,7 @@
 
 - Trang chủ hiển thị tối đa 5 món còn bán theo số ly từ các đơn hoàn tất và đã thanh toán trong ngày hiện tại và 29 ngày trước theo giờ Việt Nam. Hệ thống gộp các size theo món và xếp ID tăng dần khi đồng hạng. Khu vực tự ẩn nếu không có dữ liệu đủ điều kiện.
 - `composer ci:check` đạt Pint, PHPStan và 202 bài SQLite với 3.101 assertion. Bộ MySQL đạt 27 bài với 463 assertion. `npm run build` thành công. Đã kiểm tra HTTP 200 trên trang chủ với MySQL local.
-- AC-04 sẽ được kiểm thử khi UC30 có dữ liệu hóa đơn bàn đã thanh toán.
+- AC-04 đã được kiểm chứng trên nhánh UC30. Bảng xếp hạng tính lượt đã phục vụ thuộc phiên đã thanh toán, kể cả sau khi trả chỗ. Lượt hủy và phiên chưa thanh toán bị loại.
 
 ### UC29 đã nghiệm thu
 
@@ -336,7 +336,14 @@
 - Quản trị viên quản lý danh mục nguyên liệu, ngưỡng tồn thấp và công thức theo size hoặc phần topping. Mỗi lần nhập kho, kiểm kê và điều chỉnh có người ghi, lý do và số dư sau biến động. Lượng theo đơn vị cơ sở dùng độ chính xác ba chữ số thập phân.
 - Checkout chốt định lượng theo số ly, size và topping. Khi kiểm soát tồn đã bật, thao tác bắt đầu pha chế khóa đơn và nguyên liệu theo thứ tự ID, trừ tồn, ghi sổ và cập nhật đơn trong cùng giao dịch. Đơn thiếu định lượng hoặc thiếu tồn giữ nguyên trạng thái. Hủy trước pha không tiêu hao, còn hủy sau pha giữ lịch sử tiêu hao.
 - `composer ci:check` đạt Pint, PHPStan và 207 bài trên SQLite với 3.250 assertion. Bộ MySQL đạt 28 bài với 494 assertion, gồm kiểm tra khóa giữa hai kết nối, gửi lặp và đơn tranh phần tồn cuối. `npm run build` thành công.
-- Migration đã chạy trên MySQL local. Kiểm soát tồn đang tắt và chỉ bật sau khi xử lý đơn cũ, hoàn thiện công thức và chốt tồn đầu kỳ theo [hướng dẫn vận hành](../README.md#kho-nguyên-liệu-theo-công-thức). Tiêu hao cho lượt gọi tại bàn thuộc UC30.
+- Migration đã chạy trên MySQL local. Kiểm soát tồn đang tắt và chỉ bật sau khi xử lý đơn cũ, hoàn thiện công thức và chốt tồn đầu kỳ theo [hướng dẫn vận hành](../README.md#kho-nguyên-liệu-theo-công-thức). UC30 dùng cùng sổ tiêu hao khi bắt đầu pha chế từng lượt.
+
+### UC30 đã kiểm thử, chờ nghiệm thu
+
+- Nhân viên mở phiên cho chỗ đã check-in hoặc khách ghé trực tiếp. Khách vào từ QR cố định bằng mã 8 số theo phiên và gọi nhiều lượt trên trình duyệt chưa đăng nhập. Nhân viên có thể nhập hộ, xem số lượt chờ theo bàn, xử lý từng lượt và tra phiên đã đóng.
+- Hệ thống chống gửi lặp, lưu giá và định lượng theo lượt, khóa cả hai kênh gọi thêm khi chốt. Hóa đơn cộng món đã phục vụ và khoản phụ phí chưa thu tại quầy. Thu đúng số tiền một lần và giữ chỗ đến khi nhân viên xác nhận khách rời đi.
+- Bốn bài HTTP cho UC30 đạt 159 assertion. `composer ci:check` đạt Pint, PHPStan và 212 bài kiểm thử với 3.412 assertion. Bộ MySQL đạt 29 bài với 526 assertion, gồm kiểm tra khóa chỗ và phiên trên hai kết nối độc lập. `npm run build` thành công.
+- Trình duyệt với dữ liệu thử đã vào phiên bằng mã, gửi hai dòng món có size và topping khác nhau, xem đúng tạm tính và yêu cầu tính tiền. Migration đã chạy trên MySQL local. [Hướng dẫn vận hành](../README.md#gọi-món-tại-bàn-hoặc-phòng).
 
 ## Việc còn lại
 

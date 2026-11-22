@@ -1,4 +1,5 @@
 import './storefront-chat';
+import './table-order';
 
 const appearanceKey = 'flux.appearance';
 const systemAppearance = window.matchMedia('(prefers-color-scheme: dark)');

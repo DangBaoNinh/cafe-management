@@ -18,6 +18,12 @@ class ReservationSeat extends Model
         return $this->hasOne(Reservation::class, 'active_seat_id');
     }
 
+    /** @return HasOne<TableSession, $this> */
+    public function activeTableSession(): HasOne
+    {
+        return $this->hasOne(TableSession::class, 'active_seat_id');
+    }
+
     public function availability(): string
     {
         return match (true) {

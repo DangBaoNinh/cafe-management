@@ -67,6 +67,10 @@
                                 <td class="p-3">
                                     @if ($movement->order)
                                         <flux:link :href="route('admin.orders.show', $movement->order->order_number)">{{ $movement->order->order_number }}</flux:link>
+                                    @elseif ($movement->tableRound)
+                                        <flux:link :href="route('operations.table-sessions.show', $movement->tableRound->tableSession).'#luot-'.$movement->tableRound->id">
+                                            {{ $movement->tableRound->tableSession->seat->code }} · Lượt {{ $movement->tableRound->id }}
+                                        </flux:link>
                                     @else
                                         {{ $movement->reason }}
                                     @endif

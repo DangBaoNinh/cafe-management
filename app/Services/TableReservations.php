@@ -122,11 +122,18 @@ class TableReservations
         Gate::forUser($staff)->authorize('operate-orders');
         $target = Reservation::query()->where('code', $code)->firstOrFail();
         DB::transaction(function () use ($target, $staff): void {
-            [, , $reservation] = $this->lock($target);
-            $this->require($reservation->status === ReservationStatus::CheckedIn, 'Chỉ trả chỗ sau khi đã check-in.');
-            $reservation->completed_at = now();
-            $this->finish($reservation, ReservationStatus::Completed, $reservation->completed_at, $staff);
+            [, $seat, $reservation] = $this->lock($target);
+            $this->require(! $seat->activeTableSession()->exists(), 'Hãy đóng phiên gọi món để trả chỗ.');
+            $this->releaseCheckedIn($reservation, $staff);
         }, 5);
+    }
+
+    /** Called with the seat and reservation locked, after any table session is closed. */
+    public function releaseCheckedIn(Reservation $reservation, User $staff): void
+    {
+        $this->require($reservation->status === ReservationStatus::CheckedIn, 'Chỉ trả chỗ sau khi đã check-in.');
+        $reservation->completed_at = now();
+        $this->finish($reservation, ReservationStatus::Completed, $reservation->completed_at, $staff);
     }
 
     public function expire(int $id, CarbonImmutable $asOf): bool
@@ -184,6 +191,7 @@ class TableReservations
                 $seat->walk_in_actor_id = $staff->id;
             } else {
                 $this->require($seat->walk_in_at !== null, 'Chỗ này không có khách đến trực tiếp.');
+                $this->require(! $seat->activeTableSession()->exists(), 'Hãy đóng phiên gọi món để trả chỗ.');
                 $seat->walk_in_at = null;
                 $seat->walk_out_at = now();
                 $seat->walk_out_actor_id = $staff->id;

@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\TableRoundStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class BestSellingProducts
 {
@@ -17,14 +19,25 @@ class BestSellingProducts
     public function topFive(Builder $catalog): Collection
     {
         $today = now(RevenueReport::TIMEZONE)->startOfDay();
-        $orders = Order::paidCompletionsBetween($today->subDays(29)->utc(), $today->addDay()->utc())->select('orders.id');
+        $from = $today->subDays(29)->utc();
+        $until = $today->addDay()->utc();
+        $orders = Order::paidCompletionsBetween($from, $until)->select('orders.id');
 
-        $sales = OrderItem::query()
+        $orderCups = OrderItem::query()
             ->join('product_sizes', 'product_sizes.id', '=', 'order_items.product_size_id')
             ->whereIn('order_items.order_id', $orders)
-            ->select('product_sizes.product_id')
-            ->selectRaw('SUM(order_items.quantity) AS cups_sold')
-            ->groupBy('product_sizes.product_id');
+            ->select('product_sizes.product_id', 'order_items.quantity')->toBase();
+
+        $tableCups = DB::table('table_round_items')
+            ->join('product_sizes', 'product_sizes.id', '=', 'table_round_items.product_size_id')
+            ->join('table_rounds', 'table_rounds.id', '=', 'table_round_items.table_round_id')
+            ->join('table_sessions', 'table_sessions.id', '=', 'table_rounds.table_session_id')
+            ->where('table_rounds.status', TableRoundStatus::Served->value)
+            ->where('table_sessions.paid_at', '>=', $from)->where('table_sessions.paid_at', '<', $until)
+            ->select('product_sizes.product_id', 'table_round_items.quantity');
+
+        $sales = DB::query()->fromSub($orderCups->unionAll($tableCups), 'paid_cups')
+            ->select('product_id')->selectRaw('SUM(quantity) AS cups_sold')->groupBy('product_id');
 
         return $catalog
             ->joinSub($sales, 'product_sales', 'product_sales.product_id', '=', 'products.id')

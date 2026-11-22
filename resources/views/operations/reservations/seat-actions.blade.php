@@ -1,4 +1,6 @@
-@if ($seat->activeReservation !== null)
+@if ($seat->activeTableSession !== null)
+    <flux:link :href="route('operations.table-sessions.show', $seat->activeTableSession)">Xem phiên gọi món</flux:link>
+@elseif ($seat->activeReservation !== null)
     <flux:link :href="route('operations.reservations.show', $seat->activeReservation->code)">Xem lượt đặt</flux:link>
 @elseif ($availability === 'free' || $seat->walk_in_at !== null)
     <form method="POST" action="{{ route('operations.reservations.walk-in', $seat->id) }}">

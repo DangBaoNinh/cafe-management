@@ -34,7 +34,7 @@ class InventoryController extends Controller
     {
         return view('admin.inventory.show', [
             'ingredient' => $ingredient,
-            'movements' => $ingredient->movements()->with(['actor', 'order'])->orderByDesc('id')->paginate(20),
+            'movements' => $ingredient->movements()->with(['actor', 'order', 'tableRound.tableSession.seat'])->orderByDesc('id')->paginate(20),
         ]);
     }
 
