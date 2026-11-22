@@ -1,4 +1,5 @@
 import './storefront-chat';
+import './french-theme';
 import './table-order';
 
 const appearanceKey = 'flux.appearance';

@@ -347,6 +347,19 @@
 - Bốn bài HTTP cho UC30 đạt 159 assertion. `composer ci:check` đạt Pint, PHPStan và 212 bài kiểm thử với 3.412 assertion. Bộ MySQL đạt 29 bài với 526 assertion, gồm kiểm tra khóa chỗ và phiên trên hai kết nối độc lập. `npm run build` thành công.
 - Trình duyệt với dữ liệu thử đã vào phiên bằng mã, gửi hai dòng món có size và topping khác nhau, xem đúng tạm tính và yêu cầu tính tiền. Migration đã chạy trên MySQL local. [Hướng dẫn vận hành](../README.md#gọi-món-tại-bàn-hoặc-phòng).
 
+## Theme Toàn Café & Jardin — chờ nghiệm thu
+
+- Đã giải nén và đối chiếu gói `Toan_French_Theme_Complete.zip` trên nhánh `feature/ui-redesign`. Chuyển trang chủ Jardin mới nhất sang Blade, thay nhận diện public/auth/admin/vận hành, thẻ món, giỏ và trang đặt chỗ; các form và dữ liệu nghiệp vụ tiếp tục dùng backend hiện có.
+- Bổ sung trang Câu chuyện và Không gian. Không gian 3D đọc snapshot công khai từ 20 bàn và 2 phòng thực tế, không trả thông tin khách hoặc giao dịch. Khi mất kết nối, bỏ thông báo còn chỗ và hiển thị chưa xác minh. Trợ lý dùng sprite của gói và endpoint chat hiện có.
+- `php artisan test --compact` đạt 215 bài với 3.465 assertion. Build, biên dịch Blade, Pint cho các file PHP thay đổi, PHPStan và kiểm tra cú pháp các module JS tích hợp đều đạt.
+- Chromium headless với SQLite riêng kiểm tra trang chủ/thực đơn tại 320, 390 và 1.440 px; đăng nhập, tùy chỉnh món và thêm giỏ bằng Livewire, checkout, đặt chỗ, quản trị/sơ đồ vận hành, sidebar và Escape, chuyển trang cài đặt bằng Livewire và chế độ tối. Các màn hình đã đo không tràn ngang toàn trang; không có lỗi JavaScript trong các kịch bản đã chạy. Mô hình quán có một canvas, đổi góc nhìn thực sự thay đổi hình; snapshot lỗi không giữ số chỗ khả dụng cũ.
+- Chưa kiểm chứng WebGL trên GPU/thiết bị thật; trình duyệt kiểm tra dùng renderer tương thích. Chưa chạy bộ tích hợp MySQL do chưa có cấu hình database thử riêng trong checkout hiện tại. Gói chưa chứa MP4 13 giây nên banner dùng poster đã gửi. Không chạy migration hoặc ghi dữ liệu thử vào MySQL cửa hàng. [Đối chiếu và hướng dẫn tích hợp](ui-preview/FRENCH_THEME_INTEGRATION.md).
+
+### Video banner trang chủ — đã tích hợp, chờ nghiệm thu
+
+- Đã tích hợp video PixVerse người dùng gửi vào banner Toàn. Giữ nguyên file, dài khoảng 8,04 giây và kích thước 1024 × 688; tự phát tắt tiếng, lặp, có nút phát/tạm dừng và poster khi tải lỗi. Tôn trọng reduced motion/tiết kiệm dữ liệu, tạm dừng khi banner ra ngoài viewport hoặc tab bị ẩn, giải phóng media theo lifecycle Livewire.
+- Edge headless xác minh giải mã và phát video thật, điều khiển, phát lặp, offscreen pause, reduced motion với phát chủ động và fallback khi media trả 404. Mobile 390 px không tràn ngang, không phát sinh lỗi JavaScript. Build, cú pháp JS và 6 bài hồi quy catalog/trang chủ với 89 assertion đạt. Không thay database hoặc logic nghiệp vụ.
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

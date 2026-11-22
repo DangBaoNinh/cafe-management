@@ -35,25 +35,22 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="terrasse font-sans antialiased">
+    <body class="terrasse french-theme french-admin antialiased">
         <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:bg-terrasse-paper focus:p-3">Đến nội dung chính</a>
-        <div class="terrasse-workspace">
-            <aside class="terrasse-sidebar min-w-0 px-4 py-4 lg:px-4 lg:py-7">
-                <x-terrasse.brand :href="route($workspaceHome)" :caption="$canAdminister ? 'Quản trị' : 'Vận hành'" class="mb-4 ms-1 lg:mb-7" />
-                <div class="hidden lg:block">
-                    @include('layouts.terrasse.internal-nav')
-                </div>
-                <details class="lg:hidden">
-                    <summary class="cursor-pointer rounded border border-white/25 px-3 py-2 text-sm font-semibold">Điều hướng nội bộ</summary>
-                    <div class="mt-3">
-                        @include('layouts.terrasse.internal-nav')
-                    </div>
-                </details>
+        <div class="admin-shell">
+            <button type="button" class="admin-sidebar-backdrop" data-admin-close aria-label="Đóng điều hướng" tabindex="-1"></button>
+            <aside id="admin-navigation" class="admin-sidebar" aria-label="Điều hướng nội bộ">
+                <div class="flex items-center justify-between gap-3"><x-terrasse.brand :href="route($workspaceHome)" :caption="$canAdminister ? 'Quản trị' : 'Vận hành'" /><button type="button" class="icon-btn french-sidebar-close" data-admin-close aria-label="Đóng điều hướng"><x-theme.icon name="close" /></button></div>
+                @include('layouts.terrasse.internal-nav')
+                <div class="sidebar-bottom"><div class="avatar" aria-hidden="true">{{ auth()->user()->initials() }}</div><div class="min-w-0"><strong class="wrap-anywhere">{{ auth()->user()->name }}</strong><span>{{ $canAdminister ? 'Quản trị viên' : 'Nhân viên' }}</span></div></div>
             </aside>
-
-            <main id="main-content" class="mx-auto w-full min-w-0 max-w-screen-2xl px-4 py-7 sm:px-8 lg:px-9 lg:py-10">
-                {{ $slot }}
-            </main>
+            <div class="admin-main">
+                <header class="admin-topbar">
+                    <div class="flex min-w-0 items-center gap-3"><button type="button" class="icon-btn admin-menu-toggle" data-admin-toggle aria-label="Mở điều hướng" aria-controls="admin-navigation" aria-expanded="false"><x-theme.icon name="menu" /></button><div class="breadcrumb">Toàn Café &amp; Jardin <span aria-hidden="true"> / </span><strong>{{ $title ?? ($canAdminister ? 'Quản trị' : 'Vận hành') }}</strong></div></div>
+                    <a class="french-account-link" href="{{ route('dashboard') }}"><x-theme.icon name="user" /><span>Tài khoản</span></a>
+                </header>
+                <main id="main-content" class="admin-content min-w-0">{{ $slot }}</main>
+            </div>
         </div>
     </body>
 </html>

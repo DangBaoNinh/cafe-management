@@ -1,6 +1,6 @@
 <x-layouts::customer title="Thực đơn">
     <section class="space-y-8">
-        <h1 class="text-3xl font-semibold tracking-tight sm:text-5xl">Thực đơn</h1>
+        <header class="french-menu-intro"><div><p class="eyebrow">La carte de Toàn</p><h1>Thực đơn</h1></div><p>Một ngụm thơm. Một chút ngọt ngào.<br>Chọn hương vị cho cuộc hẹn của bạn.</p></header>
 
         @if ($categories->isNotEmpty())
             <nav aria-label="Danh mục thực đơn" class="flex flex-wrap gap-2">
@@ -23,7 +23,7 @@
         @include('customer.menu.filters')
 
         @if ($products?->isNotEmpty())
-            <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <ul class="french-menu-grid grid gap-6">
                 @foreach ($products as $product)
                     <li class="min-w-0">
                         <x-customer.product-card :$product :filters="$detailFilters" />

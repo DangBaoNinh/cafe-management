@@ -1,5 +1,5 @@
 <x-layouts::customer title="Giỏ hàng">
-    <div class="mx-auto max-w-3xl space-y-6">
+    <div class="space-y-6">
         <header class="flex flex-wrap items-baseline justify-between gap-3">
             <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Giỏ hàng</h1>
             <flux:link :href="route('menu.index')">Về thực đơn</flux:link>
@@ -17,6 +17,8 @@
             </ul>
         @endif
 
+        <div class="french-cart-layout">
+        <section aria-label="Món trong giỏ">
         @if ($lines === [])
             <p class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-5">Giỏ hàng của bạn đang trống.</p>
         @else
@@ -24,6 +26,9 @@
                 @foreach ($lines as ['item' => $item, 'unitPrice' => $unitPrice, 'total' => $total])
                     @php($product = $item->size->product)
                     <li class="space-y-3 p-4 sm:p-5">
+                        <div class="flex items-start gap-4">
+                        <x-customer.product-image :$product class="french-cart-photo" />
+                        <div class="min-w-0 flex-1 space-y-3">
                         <div class="flex flex-wrap justify-between gap-x-5 gap-y-2">
                             <div class="min-w-0 space-y-1 wrap-anywhere">
                                 <h2 class="font-semibold">{{ $product->name }}</h2>
@@ -71,12 +76,18 @@
                                 <flux:button type="submit" :aria-label="'Xóa '.$product->name.' khỏi giỏ'">Xóa</flux:button>
                             </form>
                         </div>
+                        </div>
+                        </div>
                     </li>
                 @endforeach
             </ul>
         @endif
+        </section>
 
-        <div class="space-y-2 rounded-xl bg-coffee px-4 py-3 text-white">
+        <aside class="french-cart-summary space-y-5" aria-label="Tóm tắt giỏ hàng">
+        <p class="eyebrow">Votre commande</p>
+        <h2 class="terrasse-display text-3xl">Cuộc hẹn có gì?</h2>
+        <div class="space-y-2 border-y border-terrasse-ink/15 py-5">
             <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="font-medium">Tạm tính</span>
                 <strong class="text-lg tabular-nums">{{ number_format($subtotal, 0, ',', '.') }} ₫</strong>
@@ -86,11 +97,14 @@
             @endif
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-col items-start gap-4">
             <flux:link :href="route('cart.delivery')">Xem phí giao hàng và nhận tại quán</flux:link>
             @if ($lines !== [] && ! in_array(null, array_column($lines, 'total'), true))
                 <flux:button variant="primary" :href="route('checkout.create')">Tiến hành đặt hàng</flux:button>
             @endif
+        </div>
+        <p class="terrasse-muted text-sm">Phí giao hàng và mã giảm giá được tính khi xác nhận đặt hàng.</p>
+        </aside>
         </div>
     </div>
 </x-layouts::customer>

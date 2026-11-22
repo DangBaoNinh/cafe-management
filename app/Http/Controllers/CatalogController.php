@@ -27,7 +27,7 @@ class CatalogController extends Controller
         $products = $this->pricedCatalog()
             ->orderBy('name')
             ->orderBy('id')
-            ->limit(3)
+            ->limit(8)
             ->get();
 
         $bestSellers = $rankings->topFive($this->pricedCatalog());

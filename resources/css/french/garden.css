@@ -1,0 +1,79 @@
+/* A living window around the page, with a clear center for content. */
+.botanical-frame{position:fixed;inset:0;pointer-events:none;z-index:35;overflow:hidden;contain:layout paint}
+.jardin-window-page{--garden-content-inset:clamp(88px,10vw,180px)}
+.botanical-wing{position:absolute;top:-56px;width:clamp(360px,38vw,580px);height:auto;aspect-ratio:2 / 3;pointer-events:none;mask-image:linear-gradient(#000 0%,#000 85%,transparent 100%)}
+.botanical-wing-left{left:-80px}
+.botanical-wing-right{right:-84px;top:-22px;transform:scaleX(-1)}
+.botanical-wing img{display:block;width:100%;height:auto;aspect-ratio:2 / 3;object-fit:contain;transform-origin:0 0;animation:jardin-leaf-sway 10s ease-in-out infinite alternate;filter:drop-shadow(3px 8px 5px #163d2420)}
+.botanical-wing-right img{animation-delay:-4s;animation-duration:12s}
+.botanical-frame.is-paused img{animation-play-state:paused}
+@keyframes jardin-leaf-sway{from{transform:rotate(-.65deg) translateX(-2px)}to{transform:rotate(1.5deg) translateX(3px)}}
+.jardin-window-page .jardin-header,.jardin-window-page>.site-header,.jardin-window-page #app>.site-header{position:relative;z-index:40;background:var(--paper)}
+.jardin-window-page .jardin-announcement{position:relative;z-index:41}
+.jardin-film-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-3;opacity:0;transition:opacity .7s}
+.jardin-hero.has-film .jardin-film-video{opacity:1}
+.jardin-hero.has-film .jardin-hero-photo{visibility:hidden}
+.jardin-hero .jardin-film-meta{display:block;font-family:var(--sans);font-size:.6875rem;letter-spacing:.14em;color:#f5dfcd;margin-bottom:8px}
+.jardin-film-control{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.jardin-film-control button{font-size:.8125rem;min-height:42px;padding:8px 15px;color:#fff9ef;border:1px solid #f9f4e775;background:#193e324d}
+.jardin-film-control button[hidden]{display:none}
+.jardin-film-control button:hover{background:#f8f0df;color:#193e32}
+.jardin-film-control a{font-size:.8125rem;color:inherit;border-bottom:1px solid #f9f4e780;padding:6px 0;margin-left:8px}
+.jardin-hero-bottom .jardin-film-note{text-align:right;max-width:420px}
+.jardin-hero-shade{background:linear-gradient(90deg,#102218ba 0%,#1022186e 34%,#10221803 68%),linear-gradient(0deg,#0e2017a6,transparent 38%)}
+.jardin-hero-photo{object-position:center}
+.jardin-page .jardin-visit{background:var(--j-paper);color:var(--j-forest);padding:64px 0 55px;overflow:visible}
+.jardin-page .jardin-visit:before,.jardin-page .jardin-visit:after{display:none}
+.jardin-page .jardin-visit-grid{width:min(94%,1550px);grid-template-columns:minmax(290px,.72fr) minmax(0,1.6fr);gap:2%;align-items:center}
+.jardin-page .jardin-visit-copy{padding-left:5%}
+.jardin-page .jardin-visit .jardin-kicker{color:#5e745b}
+.jardin-page .jardin-visit h2 em{color:var(--j-rose)}
+.jardin-page .jardin-visit-copy>p:not(.jardin-kicker){color:#526b5a}
+.jardin-page .jardin-visit-features svg{color:var(--j-rose)}
+.jardin-page .jardin-visit .jardin-button-light{background:var(--j-forest);color:#fff8e9;border-color:var(--j-forest)}
+.jardin-page .jardin-visit .jardin-button-light:hover{background:#315d4a}
+.jardin-page .jardin-visit-handwriting{color:var(--j-rose);margin-right:7%;margin-bottom:0;font-size:1.8rem}
+.jardin-page .jardin-visit-art{position:relative;aspect-ratio:auto;min-height:600px;width:100%;background:transparent;border:0;border-radius:0;outline:0;box-shadow:none}
+.jardin-page .jardin-visit-art .cafe3d{width:100%;color:var(--j-forest)}
+.jardin-page .jardin-visit-art .cafe3d-viewport{height:clamp(470px,45vw,680px);border:0;border-radius:0;background:transparent;overflow:visible}
+.jardin-page .jardin-visit-art .cafe3d-viewport canvas{background:transparent}
+.jardin-page .jardin-visit-art .cafe3d-poster{object-fit:contain;visibility:hidden}
+.jardin-page .jardin-visit-art .cafe3d-fallback .cafe3d-poster{visibility:visible}
+.jardin-page .jardin-visit-art .cafe3d-views{top:18px;left:50%;z-index:2;justify-content:center}
+.jardin-page .jardin-visit-art .cafe3d-views button{background:#fcfaf6d9;border-color:#bccab4;border-radius:3px;font-size:.8125rem;padding:9px 16px;backdrop-filter:blur(8px)}
+.jardin-page .jardin-visit-art .cafe3d-views button[aria-pressed=true]{background:var(--j-forest);color:#fff9ec}
+.jardin-page .jardin-visit-art .cafe3d-toolbar{position:relative;bottom:auto;left:auto;right:auto;gap:8px;margin:0 0 10px;flex-wrap:wrap}
+.jardin-page .jardin-visit-art .cafe3d-toolbar button{font-size:.8125rem;min-height:42px;padding:9px 15px;border-radius:3px;background:transparent;border-color:#bccab4}
+.jardin-page .jardin-visit-art .cafe3d-toolbar button[aria-pressed=true]{color:#fff9ee;background:var(--j-forest)}
+.jardin-page .jardin-visit-art .cafe3d-status{position:relative;bottom:auto;background:none;padding:0;border-radius:0;font-size:.8125rem;margin:0 20px;min-height:24px;color:#536950}
+.jardin-page .jardin-visit-caption{color:#69765d;font-size:1.125rem;margin:15px 0 0}
+.jardin-scene-loading{min-height:570px;display:grid;place-items:center;color:#657454;font-family:var(--serif);font-size:1.6rem;font-style:italic}
+.story-garden-hero{position:relative;isolation:isolate;min-height:680px;height:calc(100svh - 120px);max-height:960px;margin:0 20px;color:#fff8e9;overflow:hidden;display:flex;align-items:center}
+.story-garden-hero>img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center}
+.story-garden-hero:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#142e24cf,#142e243d 70%),linear-gradient(0deg,#12251d75,transparent 40%);z-index:-1}
+.story-garden-copy{padding:65px 5%;max-width:950px}
+.story-garden-copy .eyebrow{color:#e8d5bb;margin-bottom:30px}
+.story-garden-copy h1{font-size:clamp(4.3rem,6.9vw,7rem);line-height:1.03;font-weight:400;margin-bottom:30px;letter-spacing:-.035em}
+.story-garden-copy h1 em{color:#ecc1cd}
+.story-garden-copy>p:last-child{max-width:420px;font-size:1rem;line-height:1.85;color:#f7eede}
+.story-garden-note{position:absolute;right:5%;bottom:35px;font-family:var(--serif);font-style:italic;font-size:1.4rem;letter-spacing:.01em;margin:0}
+.jardin-story-page .story-prose{padding-top:95px}
+@media(max-width:1000px){.jardin-page .jardin-visit-grid{grid-template-columns:minmax(260px,.85fr) minmax(0,1.35fr)}.jardin-page .jardin-visit-copy{padding-left:3%}.jardin-page .jardin-visit-art{min-height:520px}.jardin-page .jardin-visit-art .cafe3d-viewport{height:470px}.jardin-page .jardin-visit h2{font-size:3.8rem}.botanical-wing{width:clamp(330px,38vw,420px)}.botanical-wing-left{left:-78px}.botanical-wing-right{right:-82px}}
+@media(max-width:700px){.botanical-wing{top:-38px;width:clamp(220px,43vw,300px);height:auto;opacity:.94}.botanical-wing-left{left:-78px}.botanical-wing-right{right:-82px;top:-10px}.jardin-hero-bottom .jardin-film-note{text-align:left;margin-top:15px;max-width:none}.jardin-hero .jardin-film-meta{font-size:.625rem;margin-bottom:7px}.jardin-film-control{gap:8px}.jardin-film-control button{font-size:.75rem;padding:8px 10px}.jardin-film-control a{font-size:.75rem;margin-left:3px}.jardin-hero-bottom{display:block}.jardin-page .jardin-visit-grid{width:100%;grid-template-columns:1fr;gap:30px}.jardin-page .jardin-visit-copy{padding:0 7%}.jardin-page .jardin-visit-art{min-height:420px}.jardin-page .jardin-visit-art .cafe3d-viewport{height:420px}.jardin-page .jardin-visit-handwriting{font-size:1.65rem;margin-right:9%;margin-bottom:0}.jardin-page .jardin-visit-caption{padding:0 7%;margin-top:15px}.jardin-page .jardin-visit-art .cafe3d-toolbar{gap:5px}.jardin-page .jardin-visit-art .cafe3d-toolbar button{font-size:.75rem;padding:9px 10px}.jardin-page .jardin-visit-art .cafe3d-views{top:8px}.jardin-page .jardin-visit-art .cafe3d-views button{font-size:.75rem;padding:8px 13px}.jardin-page .jardin-visit-art .cafe3d-status{font-size:.75rem}.story-garden-hero{margin:0 8px;min-height:660px;height:calc(100svh - 100px)}.story-garden-copy{padding:45px 7% 95px}.story-garden-copy h1{font-size:clamp(3rem,10.2vw,4.6rem);line-height:1.09}.story-garden-copy .eyebrow{font-size:.75rem;margin-bottom:25px}.story-garden-note{font-size:1.125rem;left:7%;right:7%;bottom:30px}.story-garden-hero>img{object-position:64% center}}
+@media(prefers-reduced-motion:reduce){.botanical-wing img{animation:none!important}.jardin-film-video{transition:none}}
+
+.story-foliage-control{position:absolute;bottom:30px;left:5%;border:1px solid #f9f4e775;color:#fff9ef;background:#193e324d;padding:10px 15px;min-height:42px;font-size:.8125rem}
+.story-foliage-control[hidden]{display:none}
+.jardin-story-page .toan-maid .maid-caption{display:none}
+.jardin-story-page .toan-maid .maid-portrait{width:93px;height:93px}
+.jardin-story-page .toan-maid .maid-mini{width:50px;height:50px}
+.jardin-story-page .toan-maid .maid-motion{display:none}
+@media(max-width:700px){.story-foliage-control{left:7%;bottom:80px;font-size:.75rem}.story-garden-note{font-size:1rem;line-height:1.5}.jardin-story-page .toan-maid .maid-portrait{width:76px;height:76px}}
+
+/* Keep a natural, proportional canopy around a readable central opening. */
+@media(min-width:701px){
+  .jardin-window-page .jardin-container{width:min(calc(100% - 2 * var(--garden-content-inset)),1360px)}
+  .jardin-window-page .jardin-hero-content{padding-left:var(--garden-content-inset)}
+  .jardin-window-page .story-garden-copy{padding-left:var(--garden-content-inset)}
+  .jardin-story-page .container:not(.site-header){width:min(calc(100% - 2 * var(--garden-content-inset)),1440px)}
+}

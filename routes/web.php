@@ -24,6 +24,7 @@ use App\Http\Controllers\ManualPaymentController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Controllers\PublicSeatingController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationOperationsController;
 use App\Http\Controllers\ScheduledPickupController;
@@ -36,6 +37,9 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CatalogController::class, 'home'])->name('home');
+Route::view('cau-chuyen', 'customer.story')->name('story');
+Route::view('khong-gian', 'customer.spaces')->name('spaces');
+Route::get('khong-gian/snapshot', PublicSeatingController::class)->middleware('throttle:60,1')->name('spaces.snapshot');
 Route::get('menu', [CatalogController::class, 'index'])->name('menu.index');
 Route::get('menu/{slug}', [CatalogController::class, 'show'])->name('menu.show');
 Route::post('tro-chuyen', StorefrontChatController::class)

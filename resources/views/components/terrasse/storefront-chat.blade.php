@@ -2,7 +2,7 @@
     data-cart-url="@can('manage-cart'){{ route('cart.add-from-chat', absolute: false) }}@endcan">
     <section id="storefront-chat-panel" class="terrasse-chat-panel terrasse-panel shadow-xl" aria-labelledby="storefront-chat-title" hidden>
         <header class="terrasse-chat-header flex items-center justify-between gap-4 px-4 py-3">
-            <h2 id="storefront-chat-title" class="terrasse-display text-2xl font-semibold">Trợ lý Coffee Shop</h2>
+            <h2 id="storefront-chat-title" class="terrasse-display text-2xl font-semibold">Trợ lý Toàn</h2>
             <button type="button" data-chat-close aria-label="Đóng trò chuyện" class="grid size-9 cursor-pointer place-items-center rounded-full hover:bg-white/15">
                 <flux:icon.x-mark class="size-5" aria-hidden="true" />
             </button>
@@ -35,7 +35,8 @@
 
     <button class="terrasse-chat-launch grid size-14 cursor-pointer place-items-center rounded-full shadow-lg" type="button"
         data-chat-toggle aria-label="Mở trò chuyện" aria-controls="storefront-chat-panel" aria-expanded="false">
-        <flux:icon.chat-bubble-left-right aria-hidden="true" class="size-6" />
+        <span class="french-maid-sprite" aria-hidden="true"></span>
+        <span class="french-maid-label" aria-hidden="true">Toàn ở đây!</span>
     </button>
 
     <template data-chat-product>

@@ -5,6 +5,11 @@
 @import '@fontsource/be-vietnam-pro/600.css';
 @import './terrasse-fonts.css';
 @import './terrasse.css';
+@import './french/base.css' layer(components);
+@import './french/home.css' layer(components);
+@import './french/garden.css' layer(components);
+@import './french/cafe3d.css' layer(components);
+@import './french/integration.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
