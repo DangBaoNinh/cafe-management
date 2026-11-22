@@ -81,6 +81,34 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($admin);
     }
 
+    public function test_staff_login_defaults_to_order_operations(): void
+    {
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+
+        $this->post(route('login.store'), ['email' => $staff->email, 'password' => 'password'])
+            ->assertRedirectToRoute('operations.orders.index');
+        $this->assertAuthenticatedAs($staff);
+        $this->get(route('operations.orders.index'))->assertOk();
+    }
+
+    public function test_staff_login_returns_to_the_requested_operations_page(): void
+    {
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+        $this->get(route('operations.preparation.index'))->assertRedirectToRoute('login');
+
+        $this->post(route('login.store'), ['email' => $staff->email, 'password' => 'password'])
+            ->assertRedirectToRoute('operations.preparation.index');
+    }
+
+    public function test_staff_json_login_preserves_the_fortify_response(): void
+    {
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+
+        $this->postJson(route('login.store'), ['email' => $staff->email, 'password' => 'password'])
+            ->assertOk()->assertExactJson(['two_factor' => false]);
+        $this->assertAuthenticatedAs($staff);
+    }
+
     public function test_login_rate_limit_uses_the_same_bucket_for_email_case_variants(): void
     {
         $user = User::factory()->create();

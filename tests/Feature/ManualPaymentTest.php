@@ -46,7 +46,8 @@ class ManualPaymentTest extends TestCase
         }
 
         $staff = User::factory()->create(['role' => UserRole::Staff]);
-        $this->actingAs($staff)->get(route('dashboard'))->assertSee($index);
+        $this->actingAs($staff)->get(route('dashboard'))->assertRedirectToRoute('operations.orders.index');
+        $this->get(route('operations.orders.index'))->assertOk()->assertSee($index);
         $this->get($index)->assertOk()->assertSee($transfer->order_number)->assertSee($refund->order_number)
             ->assertDontSee($cod->order_number)->assertDontSee($closed->order_number);
         $this->get(route('operations.orders.show', $transfer->order_number))->assertSee($detail);

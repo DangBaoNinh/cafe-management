@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CollectionMethod;
 use App\Enums\FulfillmentType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
@@ -23,10 +24,11 @@ class OrderHandoff
         FulfillmentType $fulfillment,
         PaymentMethod $method,
         ?int $collectedAmount,
+        ?CollectionMethod $collectionMethod = null,
     ): void {
         Gate::forUser($actor)->authorize('operate-orders');
 
-        DB::transaction(function () use ($actor, $number, $expected, $target, $fulfillment, $method, $collectedAmount): void {
+        DB::transaction(function () use ($actor, $number, $expected, $target, $fulfillment, $method, $collectedAmount, $collectionMethod): void {
             $order = Order::query()->where('order_number', $number)->lockForUpdate()->firstOrFail();
             if ($order->scheduledPickup()->exists()) {
                 throw $this->invalid($number, 'expected_status', 'Đơn hẹn phải bàn giao từ màn hình tra mã phiếu nhận.', 409);
@@ -45,12 +47,12 @@ class OrderHandoff
             if ($payment?->method !== $method) {
                 throw $this->invalid($number, 'method', 'Thông tin thanh toán không khớp. Vui lòng tải lại trang.', 409);
             }
-            $this->advanceLocked($order, $payment, $target, $collectedAmount, $actor);
+            $this->advanceLocked($order, $payment, $target, $collectedAmount, $actor, collectionMethod: $collectionMethod);
         }, 5);
     }
 
     /** Called after locking the order and its payment in the same transaction. */
-    public function advanceLocked(Order $order, Payment $payment, OrderStatus $target, ?int $collectedAmount, ?User $actor, ?string $reason = null): void
+    public function advanceLocked(Order $order, Payment $payment, OrderStatus $target, ?int $collectedAmount, ?User $actor, ?string $reason = null, ?CollectionMethod $collectionMethod = null): void
     {
         $number = $order->order_number;
         $previous = $order->status;
@@ -67,13 +69,14 @@ class OrderHandoff
                 throw $this->invalid($number, 'cod_amount_vnd', 'Số tiền COD đã thu phải khớp với tổng tiền của đơn.');
             }
             $payment->status = PaymentStatus::Paid;
+            $payment->collection_method = $collectionMethod ?? CollectionMethod::Cash;
             $payment->paid_at = $completedAt;
             $payment->save();
             $payment->statusHistories()->create([
                 'actor_id' => $actor?->id,
                 'from_status' => PaymentStatus::Pending->value,
                 'to_status' => PaymentStatus::Paid->value,
-                'reason' => $reason,
+                'reason' => $reason ?? 'Đã thu đủ tiền khi bàn giao bằng '.$payment->collection_method->label().'.',
             ]);
         } elseif ($collectedAmount !== null) {
             throw $this->invalid($number, 'cod_amount_vnd', 'Chỉ nhập số tiền COD khi hoàn tất đơn thanh toán khi nhận.');

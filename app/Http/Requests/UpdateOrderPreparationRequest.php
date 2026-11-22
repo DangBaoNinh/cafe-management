@@ -14,6 +14,7 @@ class UpdateOrderPreparationRequest extends FormRequest
         return [
             'expected_status' => ['required', Rule::in([OrderStatus::Confirmed->value, OrderStatus::Preparing->value])],
             'target_status' => ['required', Rule::in([OrderStatus::Preparing->value, OrderStatus::Ready->value])],
+            'return_to' => ['nullable', Rule::in(['preparation'])],
         ];
     }
 

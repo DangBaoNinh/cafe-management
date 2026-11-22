@@ -4,6 +4,7 @@
             <flux:link :href="route('operations.payments.index')">Về đối chiếu thanh toán</flux:link>
             <h1 class="text-2xl font-semibold wrap-anywhere sm:text-3xl">Thanh toán đơn {{ $payment->order->order_number }}</h1>
             <flux:link :href="route('operations.orders.show', $payment->order->order_number)">Xem chi tiết đơn</flux:link>
+            <flux:link :href="route('operations.invoices.orders.show', $payment->order->order_number)">Xem / in hóa đơn</flux:link>
         </header>
 
         @if (session('status'))
@@ -29,6 +30,9 @@
                 <dd class="font-semibold">{{ $payment->status->label() }}</dd>
             </div>
             @if ($payment->paid_at !== null)
+                @if ($payment->collection_method !== null)
+                    <div><dt class="text-sm">Hình thức thực thu</dt><dd>{{ $payment->collection_method->label() }}</dd></div>
+                @endif
                 <div>
                     <dt class="text-sm">Xác nhận thanh toán lúc</dt>
                     <dd><x-customer.order-time :date="$payment->paid_at" /></dd>

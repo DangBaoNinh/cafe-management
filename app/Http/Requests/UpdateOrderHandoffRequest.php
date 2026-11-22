@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\CollectionMethod;
 use App\Enums\FulfillmentType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
@@ -23,6 +24,7 @@ class UpdateOrderHandoffRequest extends FormRequest
             'method' => ['required', Rule::enum(PaymentMethod::class)],
             'confirmed' => ['accepted'],
             'cod_amount_vnd' => [Rule::requiredIf($collectCod), Rule::prohibitedIf(! $collectCod), 'nullable', 'integer', 'min:0'],
+            'collection_method' => [Rule::requiredIf($collectCod), 'nullable', Rule::enum(CollectionMethod::class)],
         ];
     }
 
@@ -34,6 +36,7 @@ class UpdateOrderHandoffRequest extends FormRequest
             'target_status' => 'mốc bàn giao',
             'fulfillment_type' => 'cách nhận',
             'method' => 'phương thức thanh toán',
+            'collection_method' => 'hình thức thực thu',
             'cod_amount_vnd' => 'số tiền COD đã thu (VND)',
         ];
     }

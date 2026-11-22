@@ -20,6 +20,7 @@ async function initializeFrenchTheme() {
         if (current === generation) disposers.push(dispose);
         else dispose();
     };
+    document.querySelectorAll('[data-print-invoice]').forEach(button => listen(button, 'click', () => window.print()));
 
     const menuButton = document.querySelector('[data-public-nav]');
     const publicNav = document.querySelector('#public-nav');

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\OrderPreparation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\ValidationException;
 
 class OrderPreparationController extends Controller
 {
@@ -23,6 +24,7 @@ class OrderPreparationController extends Controller
             'orders' => $orders,
             'title' => 'Pha chế',
             'emptyMessage' => 'Chưa có đơn cần pha chế.',
+            'preparationQueue' => true,
         ]);
     }
 
@@ -31,9 +33,15 @@ class OrderPreparationController extends Controller
         /** @var User $actor */
         $actor = $request->user();
         $target = OrderStatus::from($request->validated('target_status'));
-        $preparation->advance($actor, $number, OrderStatus::from($request->validated('expected_status')), $target);
+        $quick = $request->validated('return_to') === 'preparation';
+        try {
+            $preparation->advance($actor, $number, OrderStatus::from($request->validated('expected_status')), $target);
+        } catch (ValidationException $exception) {
+            throw $quick ? $exception->redirectTo(route('operations.preparation.index')) : $exception;
+        }
         $message = $target === OrderStatus::Preparing ? 'Đã bắt đầu pha chế.' : 'Đã đánh dấu đơn sẵn sàng.';
 
-        return to_route('operations.orders.show', $number, 303)->with('status', $message);
+        return ($quick ? to_route('operations.preparation.index', status: 303) : to_route('operations.orders.show', $number, 303))
+            ->with('status', $message);
     }
 }

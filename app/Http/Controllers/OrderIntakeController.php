@@ -6,7 +6,9 @@ use App\Enums\OrderStatus;
 use App\Http\Requests\OrderIntakeRequest;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\Checkout;
 use App\Services\OrderIntake;
+use App\Services\PickupFees;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +30,7 @@ class OrderIntakeController extends Controller
         ]);
     }
 
-    public function show(string $number): View
+    public function show(string $number, PickupFees $fees, Checkout $checkout): View
     {
         $order = Order::query()
             ->where('order_number', $number)
@@ -37,9 +39,14 @@ class OrderIntakeController extends Controller
                 'items.toppings' => fn (HasMany $toppings) => $toppings->orderBy('id'),
                 'payment:id,order_id,method,status',
                 'demoShipment',
+                'scheduledPickup.fees',
             ])->firstOrFail();
 
-        return view('operations.orders.show', ['order' => $order]);
+        return view('operations.orders.show', [
+            'order' => $order,
+            'invoice' => $order->scheduledPickup ? $fees->invoice($order, $order->scheduledPickup) : null,
+            'bankAvailable' => $checkout->bankDetails() !== null,
+        ]);
     }
 
     public function decide(OrderIntakeRequest $request, string $number, OrderIntake $intake): RedirectResponse

@@ -113,7 +113,7 @@ class ScheduledPickupTest extends TestCase
         $this->actingAs($staff)->post(route('operations.pickups.lookup'), ['code' => strtolower($pickup->code)])
             ->assertRedirectToRoute('operations.pickups.show', $pickup->code);
         $this->post(route('operations.pickups.arrive', $pickup->code), ['channel' => 'counter'])->assertStatus(303);
-        $this->postJson($handoff, ['collected_vnd' => 40000 + $fee])->assertJsonValidationErrors('pickup_time');
+        $this->postJson($handoff, ['confirmed' => '1', 'collection_method' => 'cash', 'collected_vnd' => 40000 + $fee])->assertJsonValidationErrors('pickup_time');
         $this->at('23:15');
         $this->artisan('pickups:expire')->assertSuccessful();
         $this->post(route('operations.pickups.arrive', $pickup->code), ['channel' => 'counter'])->assertStatus(303);
@@ -122,13 +122,13 @@ class ScheduledPickupTest extends TestCase
             ->assertStatus(303);
         $this->postJson(route('operations.orders.handoff', $order->order_number), [
             'expected_status' => 'ready', 'target_status' => 'completed', 'fulfillment_type' => 'pickup',
-            'method' => 'cod', 'confirmed' => '1', 'cod_amount_vnd' => '40000',
+            'method' => 'cod', 'confirmed' => '1', 'cod_amount_vnd' => '40000', 'collection_method' => 'cash',
         ])->assertConflict();
-        $this->postJson($handoff, ['collected_vnd' => 41000 + $fee])->assertJsonValidationErrors('pickup_time');
+        $this->postJson($handoff, ['confirmed' => '1', 'collection_method' => 'cash', 'collected_vnd' => 41000 + $fee])->assertJsonValidationErrors('pickup_time');
         $this->get(route('operations.pickups.show', $pickup->code))->assertOk()
             ->assertViewHas('invoice', fn ($invoice) => $invoice['total'] === 40000 + $fee);
-        $this->post($handoff, ['collected_vnd' => 40000 + $fee])->assertStatus(303);
-        $this->postJson($handoff, ['collected_vnd' => 40000 + $fee])->assertJsonValidationErrors('pickup_time');
+        $this->post($handoff, ['confirmed' => '1', 'collection_method' => 'cash', 'collected_vnd' => 40000 + $fee])->assertStatus(303);
+        $this->postJson($handoff, ['confirmed' => '1', 'collection_method' => 'cash', 'collected_vnd' => 40000 + $fee])->assertJsonValidationErrors('pickup_time');
         $this->assertNotNull($pickup->refresh()->used_at);
         $this->assertSame('completed', $order->refresh()->status->value);
         $this->assertSame(1, $order->statusHistories()->where('to_status', 'completed')->count());
@@ -153,7 +153,7 @@ class ScheduledPickupTest extends TestCase
         $resolve = route('operations.pickups.resolve', [$pickup->code, $fee->id]);
         $counter = route('operations.pickups.counter', [$pickup->code, $late->id]);
         $handoff = route('operations.pickups.handoff', $pickup->code);
-        $this->postJson($handoff, ['collected_vnd' => 40000])->assertJsonValidationErrors('pickup_time');
+        $this->postJson($handoff, ['confirmed' => '1', 'collection_method' => 'cash', 'collected_vnd' => 40000])->assertJsonValidationErrors('pickup_time');
         $this->postJson($counter)->assertJsonValidationErrors('fee');
         $transfer = ['result' => 'paid', 'amount_vnd' => 10000, 'memo' => $fee->transfer_code, 'reference' => 'BANK-001'];
         $this->postJson($resolve, [...$transfer, 'memo' => 'sai'])->assertJsonValidationErrors('fee');
@@ -166,7 +166,7 @@ class ScheduledPickupTest extends TestCase
         $this->get(route('operations.pickups.show', $pickup->code))->assertOk()
             ->assertSee('Phí đổi lịch')->assertSee('Phí đến trễ')->assertSee('Qua ứng dụng')->assertSee('Đã thanh toán')->assertSee('Tại quầy')
             ->assertViewHas('invoice', fn ($invoice) => $invoice['total'] === 44000);
-        $this->post($handoff, ['collected_vnd' => 44000])->assertStatus(303);
+        $this->post($handoff, ['confirmed' => '1', 'collection_method' => 'cash', 'collected_vnd' => 44000])->assertStatus(303);
         $this->assertSame('BANK-001', $fee->refresh()->bank_reference);
         $this->assertSame('expired', $late->refresh()->transfer_result);
         $this->assertSame('paid', $late->status);
@@ -289,6 +289,32 @@ class ScheduledPickupTest extends TestCase
         $this->at('23:00');
         $this->artisan('pickups:expire')->expectsOutput('Số đơn hẹn đã hủy do không đến: 0')->assertSuccessful();
         $this->assertSame(0, $customer->refresh()->booking_no_shows);
+    }
+
+    public function test_scheduled_order_has_inline_arrival_and_completion_and_issues_a_paid_invoice(): void
+    {
+        $this->at('22:30');
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]));
+        foreach (['cash', 'bank_transfer'] as $method) {
+            [, $order, $pickup] = $this->scheduled('22:30', 'ready');
+            $show = route('operations.orders.show', $order->order_number);
+            $handoff = route('operations.pickups.handoff', $pickup->code);
+            $input = ['confirmed' => '1', 'collection_method' => $method, 'collected_vnd' => 40000];
+            $this->get($show)->assertOk()->assertSee('Ghi nhận khách đến')->assertSee('Hoàn tất bàn giao và xuất hóa đơn');
+            $this->postJson($handoff, $input)->assertJsonValidationErrors('pickup_time');
+            $this->post(route('operations.pickups.arrive', $pickup->code), ['channel' => 'counter', 'return_to' => 'order'])->assertRedirect($show);
+            $this->get($show)->assertOk()->assertSee($handoff)->assertSee('Hình thức thanh toán khi nhận');
+            $this->postJson($handoff, [...$input, 'collection_method' => null])->assertJsonValidationErrors('collection_method');
+            $this->postJson($handoff, [...$input, 'confirmed' => '0'])->assertJsonValidationErrors('confirmed');
+            $this->postJson($handoff, [...$input, 'collected_vnd' => 39999])->assertJsonValidationErrors('pickup_time');
+            $this->assertSame('pending', $order->payment()->sole()->status->value);
+            $this->post($handoff, $input)->assertRedirectToRoute('operations.invoices.orders.show', $order->order_number);
+            $this->assertSame('completed', $order->refresh()->status->value);
+            $this->assertSame('paid', $order->payment()->sole()->status->value);
+            $this->assertSame($method, $order->payment()->sole()->collection_method->value);
+            $this->assertNotNull($pickup->refresh()->used_at);
+            $this->postJson($handoff, $input)->assertJsonValidationErrors('pickup_time');
+        }
     }
 
     private function at(string $time): void

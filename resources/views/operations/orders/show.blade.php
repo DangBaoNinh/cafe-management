@@ -4,6 +4,7 @@
             <flux:link :href="route('operations.orders.index')">Về hàng đợi</flux:link>
             <h1 class="text-2xl font-semibold wrap-anywhere sm:text-3xl">Đơn {{ $order->order_number }}</h1>
             <p class="text-sm">Đặt lúc <x-customer.order-time :date="$order->created_at" /></p>
+            <flux:link :href="route('operations.invoices.orders.show', $order->order_number)">Xem / in hóa đơn</flux:link>
             @if ($order->completed_at !== null)
                 <p class="text-sm">Hoàn tất lúc <x-customer.order-time :date="$order->completed_at" /></p>
             @endif
@@ -12,7 +13,7 @@
         @if (session('status'))
             <p role="status" class="rounded-lg border border-terrasse-ink/15 bg-terrasse-paper p-4 text-sm">{{ session('status') }}</p>
         @endif
-        @foreach (['expected_status', 'decision', 'target_status', 'payment', 'inventory', 'fulfillment_type', 'method', 'shipment', 'event'] as $field)
+        @foreach (['expected_status', 'decision', 'target_status', 'payment', 'inventory', 'fulfillment_type', 'method', 'shipment', 'event', 'pickup_time', 'fee', 'channel', 'return_to'] as $field)
             @error($field)
                 <p role="alert" class="rounded-lg border border-terrasse-danger/30 bg-terrasse-danger-surface p-4 text-sm text-terrasse-danger">{{ $message }}</p>
             @enderror
@@ -70,6 +71,8 @@
             </section>
         @elseif (in_array($order->status, [\App\Enums\OrderStatus::Confirmed, \App\Enums\OrderStatus::Preparing], true))
             @include('operations.orders.preparation-actions')
+        @elseif ($pickup !== null && $order->status === \App\Enums\OrderStatus::Ready)
+            @include('operations.pickups.fulfillment', ['fromOrder' => true])
         @elseif ($pickup === null && $order->demoShipment === null && ($handoffTarget = $order->nextHandoffStatus()) !== null)
             @include('operations.orders.handoff-actions', ['target' => $handoffTarget])
         @endif

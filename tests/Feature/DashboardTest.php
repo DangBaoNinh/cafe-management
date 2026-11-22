@@ -33,6 +33,11 @@ class DashboardTest extends TestCase
 
         foreach (UserRole::cases() as $role) {
             $user = User::factory()->create(['role' => $role]);
+            if ($role === UserRole::Staff) {
+                $this->actingAs($user)->get(route('dashboard'))->assertRedirectToRoute('operations.orders.index');
+
+                continue;
+            }
             $page = $this->actingAs($user)->get(route('dashboard'))->assertOk()
                 ->assertSeeText($user->name)->assertSeeText($user->email)->assertSeeText($role->label())
                 ->assertSee(route('profile.edit'));
@@ -51,6 +56,18 @@ class DashboardTest extends TestCase
                 }
             }
         }
+    }
+
+    public function test_staff_dashboard_opens_the_operations_workspace(): void
+    {
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+        $page = $this->actingAs($staff)->followingRedirects()->get(route('dashboard'))->assertOk()
+            ->assertDontSeeText('Tài khoản của bạn');
+
+        foreach (['operations.orders.index', 'operations.preparation.index', 'operations.handoff.index', 'operations.payments.index'] as $route) {
+            $page->assertSee(route($route));
+        }
+        $page->assertDontSee(route('admin.dashboard'))->assertDontSee(route('cart.index'));
     }
 
     public function test_guests_are_redirected_from_the_admin_dashboard(): void

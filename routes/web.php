@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\DeliveryFeeController;
 use App\Http\Controllers\DemoDeliveryController;
 use App\Http\Controllers\DemoPaymentController;
 use App\Http\Controllers\ManualPaymentController;
+use App\Http\Controllers\OperationsInvoiceController;
 use App\Http\Controllers\OrderHandoffController;
 use App\Http\Controllers\OrderIntakeController;
 use App\Http\Controllers\OrderPreparationController;
@@ -52,7 +54,7 @@ Route::prefix('goi-mon/{reservationSeat:code}')->name('table-orders.')->group(fu
     Route::post('checkout', [TableOrderController::class, 'checkout'])->name('checkout');
 });
 
-Route::view('dashboard', 'customer.account')->middleware('auth')->name('dashboard');
+Route::get('dashboard', AccountDashboardController::class)->middleware('auth')->name('dashboard');
 
 Route::prefix('cart')->name('cart.')->middleware(['auth', 'can:manage-cart'])->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
@@ -132,6 +134,13 @@ Route::prefix('operations/payments')->name('operations.payments.')->middleware([
     Route::post('{number}/refund', [ManualPaymentController::class, 'refund'])->middleware('can:access-admin')->name('refund');
     Route::post('{number}/demo-reconcile', [DemoPaymentController::class, 'reconcile'])
         ->middleware([EnsureDemoPaymentEnabled::class, 'can:access-admin'])->name('demo-reconcile');
+});
+
+Route::prefix('operations/invoices')->name('operations.invoices.')->middleware(['auth', 'can:operate-orders'])->group(function () {
+    Route::get('/', [OperationsInvoiceController::class, 'index'])->name('index');
+    Route::get('history', [OperationsInvoiceController::class, 'index'])->name('history');
+    Route::get('orders/{number}', [OperationsInvoiceController::class, 'order'])->name('orders.show');
+    Route::get('tables/{tableSession}', [OperationsInvoiceController::class, 'table'])->whereUuid('tableSession')->name('tables.show');
 });
 
 Route::prefix('operations/table-sessions')->name('operations.table-sessions.')->middleware(['auth', 'can:operate-orders'])->group(function () {

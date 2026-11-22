@@ -9,11 +9,15 @@ use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\DeliverySetting;
+use App\Models\Order;
+use App\Models\OrderNumberSequence;
 use App\Models\Topping;
 use App\Models\User;
 use App\Models\UserAddress;
+use App\Services\OrderNumbers;
 use App\Services\ShoppingCart;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\TestCase;
@@ -54,6 +58,7 @@ class CheckoutTest extends TestCase
         }
         $response = $this->post(route('checkout.store'), $submission);
         $order = $user->orders()->sole();
+        $this->assertSame('HD0000001', $order->order_number);
         $response->assertStatus(303)->assertRedirectToRoute('checkout.confirmation', $order->order_number);
         $this->assertSame(OrderStatus::Pending, $order->status);
         $this->assertSame($fulfillment, $order->fulfillment_type->value);
@@ -120,6 +125,7 @@ class CheckoutTest extends TestCase
         $this->postJson(route('checkout.store'), [...$submission, 'recipient_name' => 'Nội dung khác'])
             ->assertConflict()->assertJsonValidationErrors('checkout_key');
         $this->assertDatabaseCount('orders', 1);
+        $this->assertSame(1, OrderNumberSequence::query()->findOrFail(1)->last_number);
         $this->assertSame(2, $cart->refresh()->version);
     }
 
@@ -222,6 +228,7 @@ class CheckoutTest extends TestCase
         $this->assertSame(1, $cart->version);
         $this->assertSame(2, $cart->items()->sole()->quantity);
         $this->assertDatabaseCount('cart_item_toppings', 1);
+        $this->assertSame(0, OrderNumberSequence::query()->findOrFail(1)->last_number);
     }
 
     public function test_coupon_usage_counts_only_orders_that_still_consume_a_redemption(): void
@@ -287,6 +294,35 @@ class CheckoutTest extends TestCase
             'accepted_total_vnd' => $review->viewData('quote')['order']['total_vnd'],
             'quote_hash' => $review->viewData('quote')['hash'],
         ], static fn ($value) => $value !== null);
+    }
+
+    public function test_order_numbers_increase_across_customers_and_are_not_reused_after_cancellation(): void
+    {
+        [$first] = $this->basket();
+        [$second] = $this->basket();
+        $submission = $this->review($first);
+        $this->post(route('checkout.store'), $submission)->assertRedirectToRoute('checkout.confirmation', 'HD0000001');
+        $this->post(route('checkout.store'), $submission)->assertRedirectToRoute('checkout.confirmation', 'HD0000001');
+        $this->post(route('orders.cancel', 'HD0000001'), ['expected_status' => 'pending', 'confirm' => '1'])->assertStatus(303);
+        $next = $this->review($second);
+        $this->post(route('checkout.store'), $next)->assertRedirectToRoute('checkout.confirmation', 'HD0000002');
+        $this->assertSame(['HD0000001', 'HD0000002'], Order::query()->orderBy('id')->pluck('order_number')->all());
+        $this->get(route('orders.show', 'HD0000002'))->assertOk()->assertSee('HD0000002');
+        $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
+            ->get(route('operations.invoices.orders.show', 'HD0000002'))->assertOk()->assertSee('Hóa đơn HD0000002');
+    }
+
+    public function test_order_number_rolls_over_decimal_digits_and_stops_at_seven_digits(): void
+    {
+        $sequence = OrderNumberSequence::query()->findOrFail(1);
+        $sequence->last_number = 9;
+        $sequence->save();
+        $this->assertSame('HD0000010', app(OrderNumbers::class)->next());
+        $sequence->last_number = 9999998;
+        $sequence->save();
+        $this->assertSame('HD9999999', app(OrderNumbers::class)->next());
+        $this->expectException(ValidationException::class);
+        app(OrderNumbers::class)->next();
     }
 
     private function details(array $overrides = []): array
