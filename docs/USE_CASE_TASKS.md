@@ -1,6 +1,6 @@
 # Danh sách Use Case và nhiệm vụ kỹ thuật
 
-Danh sách dưới đây quản lý nhánh, phụ thuộc và trạng thái. Có **27 UC**, gồm **23 UC MVP** và **4 UC mở rộng**, cùng **3 nhiệm vụ kỹ thuật**. Mỗi mã giữ nguyên khi thêm việc mới. Các UC được sắp theo thứ tự phụ thuộc, nên UC20 xuất hiện trước UC18 và UC19.
+Danh sách dưới đây quản lý nhánh, phụ thuộc và trạng thái. Có **28 UC**, gồm **23 UC MVP** và **5 UC mở rộng**, cùng **3 nhiệm vụ kỹ thuật**. Mỗi mã giữ nguyên khi thêm việc mới. Các UC được sắp theo thứ tự phụ thuộc, nên UC20 xuất hiện trước UC18 và UC19.
 
 ## Trạng thái và cách dùng
 
@@ -54,3 +54,4 @@ P0 là luồng lõi hoặc điều kiện bắt buộc. P1 là nghiệp vụ MVP
 | UC25 | Điều phối qua đối tác vận chuyển | Nhân viên, quản trị viên, đối tác mô phỏng | Mở rộng | Trình diễn vận đơn và sự kiện giao hàng đã xác thực | P2 | UC19 | [UC25.md](use-cases/UC25.md) | `feature/delivery-provider` | ACCEPTED | Không tạo trùng vận đơn khi thử lại; cập nhật đúng thứ tự; pickup giữ nguyên; quy tắc thu COD vẫn áp dụng. |
 | UC26 | Đặt đồ uống hẹn giờ nhận tại quán | Khách hàng, nhân viên, quản trị viên | Mở rộng | Chọn giờ nhận và trình phiếu điện tử để nhân viên đối chiếu | P2 | UC14, UC15, UC16, UC17, UC18, UC19, UC21, TECH03 | [UC26.md](use-cases/UC26.md) | `feature/scheduled-pickup` | ACCEPTED | Đặt trước đúng hạn và không giới hạn đơn theo giờ; phiếu dùng một lần; áp dụng đúng phí và chính sách không đến. |
 | UC27 | Đặt bàn hoặc phòng họp tại quán | Khách hàng, nhân viên, quản trị viên | Mở rộng | Giữ bàn hoặc phòng phù hợp trên hai tầng và check-in bằng mã đặt chỗ | P2 | UC01, UC04, TECH01, TECH03 | [UC27.md](use-cases/UC27.md) | `feature/table-reservations` | ACCEPTED | Sơ đồ hiển thị đúng tình trạng bàn/phòng; chỗ đang sử dụng không đặt được; nhân viên trả chỗ khi khách rời đi. |
+| UC28 | Hiển thị món bán chạy | Khách vãng lai, khách hàng | Mở rộng | Xếp hạng món trên trang chủ theo số ly bán | P2 | UC08, UC23 | [UC28.md](use-cases/UC28.md) | `feature/best-selling-products` | VERIFIED | Cộng đúng theo món, lọc đơn và catalog theo tiêu chí, giữ thứ tự ổn định khi bằng số ly. |

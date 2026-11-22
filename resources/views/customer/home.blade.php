@@ -10,6 +10,19 @@
         </div>
     </section>
 
+    @if ($bestSellers->isNotEmpty())
+        <section class="terrasse-frame py-9 sm:py-14" aria-labelledby="home-best-sellers-heading">
+            <h2 id="home-best-sellers-heading" class="terrasse-display mb-5 text-4xl font-semibold sm:text-6xl">Món bán chạy</h2>
+            <ol class="grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                @foreach ($bestSellers as $product)
+                    <li class="min-w-0">
+                        <x-customer.product-card :$product heading="h3" />
+                    </li>
+                @endforeach
+            </ol>
+        </section>
+    @endif
+
     @if ($products->isNotEmpty())
         <section class="terrasse-frame py-9 sm:py-14" aria-labelledby="home-menu-heading">
             <header class="mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">

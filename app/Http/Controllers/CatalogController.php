@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\BestSellingProducts;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,7 +22,7 @@ class CatalogController extends Controller
         'price_desc' => 'Giá cao đến thấp',
     ];
 
-    public function home(): View
+    public function home(BestSellingProducts $rankings): View
     {
         $products = $this->pricedCatalog()
             ->orderBy('name')
@@ -29,7 +30,9 @@ class CatalogController extends Controller
             ->limit(3)
             ->get();
 
-        return view('customer.home', compact('products'));
+        $bestSellers = $rankings->topFive($this->pricedCatalog());
+
+        return view('customer.home', compact('products', 'bestSellers'));
     }
 
     public function index(Request $request): View|Response
@@ -125,6 +128,7 @@ class CatalogController extends Controller
     private function pricedCatalog(): Builder
     {
         return Product::visibleInCatalog()
+            ->select('products.*')
             ->with('category')
             ->withMin('activeSizes as starting_price_vnd', 'price_vnd');
     }

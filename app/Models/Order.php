@@ -4,8 +4,11 @@ namespace App\Models;
 
 use App\Enums\FulfillmentType;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -23,6 +26,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 ])]
 class Order extends Model
 {
+    /** @param Builder<Order> $query */
+    #[Scope]
+    protected function paidCompletionsBetween(Builder $query, CarbonImmutable $start, CarbonImmutable $end): void
+    {
+        $query->where('status', OrderStatus::Completed)
+            ->where('completed_at', '>=', $start)->where('completed_at', '<', $end)
+            ->whereHas('payment', fn (Builder $payment) => $payment->where('status', PaymentStatus::Paid));
+    }
+
     public function nextHandoffStatus(): ?OrderStatus
     {
         return match ($this->status) {
