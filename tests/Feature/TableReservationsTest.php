@@ -71,18 +71,74 @@ class TableReservationsTest extends TestCase
         $this->travel(1)->minutes();
         $this->post(route('reservations.store'), $input)->assertRedirectToRoute('reservations.show', $book->code);
         $this->postJson(route('reservations.store'), [...$input, 'party_size' => 9])->assertConflict();
-        $this->get(route('reservations.show', $book->code))->assertOk()->assertSee($book->code)->assertSee('10 khách');
+        $this->get(route('reservations.show', $book->code))->assertOk()->assertSee($book->code)->assertSee('10 khách')
+            ->assertSeeHtml('<input type="checkbox" name="confirm" value="1" required>');
         $this->get(route('reservations.index'))->assertOk()->assertSee('T2-PH');
         $this->actingAs($second)->get(route('reservations.show', $book->code))->assertNotFound();
         $this->postJson(route('reservations.cancel', $book->code), ['confirm' => true])->assertNotFound();
         $this->postJson(route('operations.reservations.check-in', $book->code))->assertForbidden();
-        $this->actingAs($owner)->post(route('reservations.cancel', $book->code), ['confirm' => '1'])->assertStatus(303);
+        $this->actingAs($owner)->postJson(route('reservations.cancel', $book->code))
+            ->assertJsonValidationErrors(['confirm' => 'Bạn cần xác nhận hủy lịch.']);
+        $this->assertSame(ReservationStatus::Confirmed, $book->refresh()->status);
+        $this->post(route('reservations.cancel', $book->code), ['confirm' => '1'])->assertStatus(303);
         $this->assertSame(ReservationStatus::Cancelled, $book->refresh()->status);
         $this->assertNull($book->active_seat_id);
         $this->at('21:30');
         $replacement = $this->book($second, 'T2-PH', '22:30');
         $this->assertNotSame($book->code, $replacement->code);
         $this->assertCount(2, $book->events);
+    }
+
+    public function test_preferred_room_survives_login_and_search_but_is_not_selected_if_held(): void
+    {
+        $this->at('10:00');
+        $owner = User::factory()->create();
+        $room = $this->seat('T2-PH');
+        $preferences = ['party_size' => 6, 'seat_id' => $room->id];
+        $destination = route('reservations.create', $preferences);
+        $this->get($destination)->assertRedirect(route('login'));
+        $this->post(route('login'), ['email' => $owner->email, 'password' => 'password'])->assertRedirect($destination);
+        $this->get($destination)->assertOk()->assertSee('T2-PH')->assertDontSee('T1-PH')
+            ->assertSeeHtml('name="seat_id" value="'.$room->id.'"')
+            ->assertViewHas('filters', ['pickup_date' => '2026-11-21', 'pickup_clock' => null, 'kind' => 'room', 'party_size' => 6, 'floor' => 2]);
+        $search = route('reservations.create', [...$preferences, 'kind' => 'room', 'floor' => 2,
+            'pickup_date' => '2026-11-21', 'pickup_clock' => '14:00']);
+        $radio = 'type="radio" name="seat_id" value="'.$room->id.'" required checked';
+        $this->get($search)->assertOk()->assertSeeHtml($radio);
+        $this->book(User::factory()->create(), 'T2-PH', '13:00');
+        $this->actingAs($owner)->get($search)->assertOk()->assertSee('T2-PH')->assertSee('Đã giữ.')
+            ->assertDontSeeHtml('type="radio" name="seat_id"')->assertDontSee('Xác nhận đặt chỗ');
+    }
+
+    public function test_public_appointment_reflects_reschedule_cancellation_and_check_in(): void
+    {
+        $this->at('10:00');
+        $owner = User::factory()->create();
+        $booking = $this->book($owner, 'T2-PH', '14:00');
+        $snapshotRoom = fn (): array => collect($this->getJson(route('spaces.snapshot'))->assertOk()->json('tables'))
+            ->firstWhere('code', 'T2-PH');
+        $this->assertSame('2026-11-21T14:00+07:00', $snapshotRoom()['scheduled_at']);
+
+        $this->post(route('reservations.reschedule', $booking->code), ['pickup_date' => '2026-11-21', 'pickup_clock' => '14:30', 'revision' => 0])
+            ->assertStatus(303);
+        $this->assertSame('2026-11-21T14:30+07:00', $snapshotRoom()['scheduled_at']);
+
+        $this->post(route('reservations.cancel', $booking->code), ['confirm' => '1'])->assertStatus(303);
+        $room = $snapshotRoom();
+        $this->assertSame('available', $room['status']);
+        $this->assertNull($room['scheduled_at']);
+
+        $replacement = $this->book($owner, 'T2-PH', '14:30');
+        $this->at('14:30');
+        $room = $snapshotRoom();
+        $this->assertSame('reserved', $room['status']);
+        $this->assertNull($room['scheduled_at']);
+
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+        $this->actingAs($staff)->post(route('operations.reservations.check-in', $replacement->code))->assertStatus(303);
+        $room = $snapshotRoom();
+        $this->assertSame('occupied', $room['status']);
+        $this->assertNull($room['scheduled_at']);
     }
 
     public function test_admin_hours_are_bounded_and_existing_booking_keeps_its_check_in_window(): void

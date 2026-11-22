@@ -37,7 +37,7 @@ Các trang đặc thù như kho nguyên liệu, đối chiếu thanh toán và g
 
 - `observed_at`: thời điểm tính snapshot.
 - `areas`: `id`, `name` của tầng.
-- `tables`: `id`, `code`, `area_id`, `capacity`, `status`.
+- `tables`: `id`, `code`, `area_id`, `capacity`, `status`, `scheduled_at`. `scheduled_at` chỉ chứa ngày và giờ hẹn sắp tới theo giờ Việt Nam của chỗ đã giữ. Các trạng thái còn lại trả `null`.
 
 Trạng thái được ánh xạ từ `ReservationSeat::availability()` và phiên gọi món đang hoạt động. Không xuất tên khách, điện thoại, email, mã đặt chỗ, mã phiên, đơn hoặc thanh toán. GET không đổi tình trạng chỗ. Mất kết nối hoặc snapshot cũ khiến giao diện chuyển sang chưa xác minh; backend đặt chỗ vẫn quyết định khả năng giữ chỗ trong giao dịch hiện có.
 

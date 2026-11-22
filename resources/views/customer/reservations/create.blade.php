@@ -4,6 +4,13 @@
         <header class="french-booking-hero"><div><p class="eyebrow">Une place pour vous</p><h1>Đặt chỗ tại quán</h1><p class="terrasse-muted mt-4">Một chiếc bàn nhỏ, một cuộc hẹn thật đẹp. Chọn ngày, giờ và góc ngồi phù hợp với bạn.</p></div><img src="{{ asset('french-theme/assets/interior.webp') }}" alt="Không gian bên khung cửa xanh của Toàn" width="1122" height="1402"></header>
         @include('reservations.feedback')
         <form method="GET" action="{{ route('reservations.create') }}" class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-5">
+            @if ($preferredSeat)
+                <input type="hidden" name="seat_id" value="{{ $preferredSeat->id }}">
+                <p>Chỗ đã chọn <strong>{{ $preferredSeat->code }}</strong> · Tầng {{ $preferredSeat->floor }} · {{ \App\Models\ReservationSeat::KINDS[$preferredSeat->kind] }}</p>
+                @if ($preferredSeat->availability() !== 'free')
+                    <p role="status">{{ $preferredSeat->availabilityLabel() }}. Bạn có thể chọn chỗ trống khác.</p>
+                @endif
+            @endif
             <x-customer.pickup-slot :date="$filters['pickup_date']" :time="$filters['pickup_clock']" :$slots day-label="Ngày đến" time-label="Giờ đến (giờ Việt Nam)" />
             <div class="grid gap-3 sm:grid-cols-3">
                 <flux:select name="kind" label="Loại chỗ" required>
@@ -38,7 +45,7 @@
                 <input type="hidden" name="booking_key" value="{{ $bookingKey }}">
             @endif
             @foreach ($visibleFloors as $floor => $floorSeats)
-                <x-reservations.floor :$floor :seats="$floorSeats" :selectable="$available" :kind="$filters['kind']" :party-size="$filters['party_size']" />
+                <x-reservations.floor :$floor :seats="$floorSeats" :selectable="$available" :kind="$filters['kind']" :party-size="$filters['party_size']" :preferred-seat-id="$preferredSeat?->id" />
             @endforeach
             @if ($available)
                 <section class="space-y-4 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4 sm:p-5">

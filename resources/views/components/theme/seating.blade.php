@@ -40,7 +40,7 @@
 </i>Còn chỗ</span>
 <span>
 <i class="occupied">
-</i>Có khách</span>
+</i>Đang sử dụng</span>
 <span>
 <i class="reserved">
 </i>Đã giữ chỗ</span>
@@ -67,5 +67,5 @@
 </div>
 </aside>
 </div>
-<p class="seat-privacy-note">Nhân vật là mô hình 3D minh họa mức sử dụng bàn, không phải hình ảnh khách thực tế. Tình trạng hiện tại giúp bạn tham khảo; chỗ ngồi sẽ được xác nhận theo thời gian yêu cầu.</p>
+<p class="seat-privacy-note">Nhân vật 3D minh họa tình trạng sử dụng. Sơ đồ cập nhật định kỳ và hệ thống kiểm tra lại chỗ trống khi bạn xác nhận đặt chỗ.</p>
 </section>

@@ -34,11 +34,14 @@
                     <flux:button type="submit" variant="primary">Xác nhận đổi giờ</flux:button>
                 </form>
             </details>
-            <details class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">
+            <details class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4" @if ($errors->has('confirm')) open @endif>
                 <summary class="cursor-pointer font-semibold">Hủy lịch</summary>
                 <form method="POST" action="{{ route('reservations.cancel', $reservation->code) }}" class="mt-4 space-y-3">
                     @csrf
-                    <flux:checkbox name="confirm" label="Tôi xác nhận hủy lịch và trả chỗ" required />
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="confirm" value="1" required>
+                        Tôi xác nhận hủy lịch và trả chỗ
+                    </label>
                     <flux:button type="submit" variant="danger">Xác nhận hủy</flux:button>
                 </form>
             </details>

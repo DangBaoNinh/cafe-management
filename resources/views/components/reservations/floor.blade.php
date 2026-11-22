@@ -1,4 +1,4 @@
-@props(['floor', 'seats', 'selectable' => false, 'kind' => null, 'partySize' => null, 'operational' => false])
+@props(['floor', 'seats', 'selectable' => false, 'kind' => null, 'partySize' => null, 'operational' => false, 'preferredSeatId' => null])
 
 <section class="space-y-3 rounded-2xl border border-terrasse-ink/20 bg-terrasse-paper p-3 sm:p-5" aria-labelledby="floor-{{ $floor }}">
     <h2 id="floor-{{ $floor }}" class="terrasse-display text-2xl font-semibold">Tầng {{ $floor }}</h2>
@@ -22,7 +22,7 @@
                         ]) data-seat="{{ $seat->code }}" data-availability="{{ $availability }}">
                             @if ($eligible)
                                 <label class="flex cursor-pointer items-center gap-2 font-semibold">
-                                    <input type="radio" name="seat_id" value="{{ $seat->id }}" required @checked((string) $seat->id === old('seat_id'))>
+                                    <input type="radio" name="seat_id" value="{{ $seat->id }}" required @checked(in_array(old('seat_id', $preferredSeatId), [$seat->id, (string) $seat->id], true))>
                                     {{ $seat->code }}
                                 </label>
                             @else
