@@ -56,3 +56,4 @@ Các quy tắc dưới đây áp dụng cho hai UC mới. Thông số vận hàn
 | Mã | Quy tắc |
 | --- | --- |
 | BR30 | Trang chủ hiển thị tối đa 5 món còn bán có số ly cao nhất trong ngày hiện tại và 29 ngày trước theo giờ Việt Nam. Chỉ tính món từ giao dịch đã hoàn tất và thanh toán. Gộp size và topping theo món. Đồng hạng xếp theo ID món tăng dần. |
+| BR31 | Dùng định lượng đã lưu lúc tạo đơn hoặc lượt gọi. Trừ tồn đúng một lần khi bắt đầu pha chế, cùng giao dịch với cập nhật trạng thái. Thiếu định lượng hoặc tồn thì giữ nguyên cả hai. Hủy sau pha chế không tự hoàn kho. Điều chỉnh theo lượng thực tế có lý do và người ghi. |

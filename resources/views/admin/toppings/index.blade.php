@@ -24,6 +24,9 @@
                             <td class="p-4">{{ number_format($topping->price_vnd, 0, ',', '.') }}</td>
                             <td class="p-4">{{ $topping->is_active ? 'Đang bán' : 'Ngừng bán' }}</td>
                             <td class="p-4 text-right">
+                                <flux:button size="sm" :href="route('admin.inventory.recipes.show', ['topping', $topping])">
+                                    Công thức<span class="sr-only"> {{ $topping->name }}</span>
+                                </flux:button>
                                 <flux:button size="sm" :href="route('admin.toppings.edit', $topping)">
                                     Chỉnh sửa<span class="sr-only"> {{ $topping->name }}</span>
                                 </flux:button>

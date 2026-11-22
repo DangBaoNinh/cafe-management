@@ -30,6 +30,8 @@ class Checkout
         private ShoppingCart $shoppingCart,
         private DeliveryFees $fees,
         private VietnamAddressCatalog $catalog,
+        private InventoryControl $inventory,
+        private InventoryRecipes $recipes,
     ) {}
 
     /** @return Quote */
@@ -50,6 +52,7 @@ class Checkout
         $requestHash = $this->fingerprint([$details->fields(), $acceptedTotal, $quoteHash]);
 
         return DB::transaction(function () use ($user, $details, $key, $acceptedTotal, $quoteHash, $requestHash): Order {
+            $this->inventory->lockForOperation();
             // The user row serializes retries and follows the cart's first-add lock order.
             $customer = User::query()->lockForUpdate()->findOrFail($user->id);
             Gate::forUser($customer)->authorize('manage-cart');
@@ -261,6 +264,9 @@ class Checkout
             $item = $order->items()->create($quotedItem['line']);
             $item->toppings()->createMany($quotedItem['toppings']);
         }
+
+        $order->inventory_snapshot = $this->recipes->snapshot($order);
+        $order->save();
 
         $payment = $order->payment()->create([
             'method' => $details->method,

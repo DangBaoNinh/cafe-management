@@ -329,6 +329,13 @@
 - `composer ci:check` đạt Pint, PHPStan và 202 bài SQLite với 3.101 assertion. Bộ MySQL đạt 27 bài với 463 assertion. `npm run build` thành công. Đã kiểm tra HTTP 200 trên trang chủ với MySQL local.
 - AC-04 sẽ được kiểm thử khi UC30 có dữ liệu hóa đơn bàn đã thanh toán.
 
+### UC29 đã kiểm thử, chờ nghiệm thu
+
+- Quản trị viên quản lý danh mục nguyên liệu, ngưỡng tồn thấp và công thức theo size hoặc phần topping. Mỗi lần nhập kho, kiểm kê và điều chỉnh có người ghi, lý do và số dư sau biến động. Lượng theo đơn vị cơ sở dùng độ chính xác ba chữ số thập phân.
+- Checkout chốt định lượng theo số ly, size và topping. Khi kiểm soát tồn đã bật, thao tác bắt đầu pha chế khóa đơn và nguyên liệu theo thứ tự ID, trừ tồn, ghi sổ và cập nhật đơn trong cùng giao dịch. Đơn thiếu định lượng hoặc thiếu tồn giữ nguyên trạng thái. Hủy trước pha không tiêu hao, còn hủy sau pha giữ lịch sử tiêu hao.
+- `composer ci:check` đạt Pint, PHPStan và 207 bài trên SQLite với 3.250 assertion. Bộ MySQL đạt 28 bài với 494 assertion, gồm kiểm tra khóa giữa hai kết nối, gửi lặp và đơn tranh phần tồn cuối. `npm run build` thành công.
+- Migration đã chạy trên MySQL local. Kiểm soát tồn đang tắt và chỉ bật sau khi xử lý đơn cũ, hoàn thiện công thức và chốt tồn đầu kỳ theo [hướng dẫn vận hành](../README.md#kho-nguyên-liệu-theo-công-thức). Tiêu hao cho lượt gọi tại bàn thuộc UC30.
+
 ## Việc còn lại
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

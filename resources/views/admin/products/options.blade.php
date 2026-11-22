@@ -17,9 +17,14 @@
                             <div class="font-medium">{{ $size->label }} ({{ $size->code }})</div>
                             <div class="text-sm">{{ number_format($size->price_vnd, 0, ',', '.') }} ₫ · {{ $size->is_active ? 'Đang bán' : 'Ngừng bán' }}</div>
                         </div>
-                        <flux:button size="sm" :href="route('admin.products.sizes.edit', [$product, $size])">
-                            Chỉnh sửa<span class="sr-only"> size {{ $size->label }}</span>
-                        </flux:button>
+                        <div class="flex flex-wrap gap-2">
+                            <flux:button size="sm" :href="route('admin.inventory.recipes.show', ['size', $size])">
+                                Công thức<span class="sr-only"> size {{ $size->label }}</span>
+                            </flux:button>
+                            <flux:button size="sm" :href="route('admin.products.sizes.edit', [$product, $size])">
+                                Chỉnh sửa<span class="sr-only"> size {{ $size->label }}</span>
+                            </flux:button>
+                        </div>
                     </li>
                 @empty
                     <li class="p-4 text-sm">Sản phẩm chưa có size.</li>

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable(['code', 'label', 'price_vnd', 'is_active'])]
 class ProductSize extends Model
@@ -17,6 +18,12 @@ class ProductSize extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /** @return BelongsToMany<Ingredient, $this> */
+    public function recipeIngredients(): BelongsToMany
+    {
+        return $this->belongsToMany(Ingredient::class)->withPivot('quantity');
     }
 
     /** @param Builder<ProductSize> $query */
