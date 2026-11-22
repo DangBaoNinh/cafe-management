@@ -355,6 +355,11 @@
 - Chromium headless với SQLite riêng kiểm tra trang chủ/thực đơn tại 320, 390 và 1.440 px; đăng nhập, tùy chỉnh món và thêm giỏ bằng Livewire, checkout, đặt chỗ, quản trị/sơ đồ vận hành, sidebar và Escape, chuyển trang cài đặt bằng Livewire và chế độ tối. Các màn hình đã đo không tràn ngang toàn trang; không có lỗi JavaScript trong các kịch bản đã chạy. Mô hình quán có một canvas, đổi góc nhìn thực sự thay đổi hình; snapshot lỗi không giữ số chỗ khả dụng cũ.
 - Chưa kiểm chứng WebGL trên GPU/thiết bị thật; trình duyệt kiểm tra dùng renderer tương thích. Chưa chạy bộ tích hợp MySQL do chưa có cấu hình database thử riêng trong checkout hiện tại. Gói chưa chứa MP4 13 giây nên banner dùng poster đã gửi. Không chạy migration hoặc ghi dữ liệu thử vào MySQL cửa hàng. [Đối chiếu và hướng dẫn tích hợp](ui-preview/FRENCH_THEME_INTEGRATION.md).
 
+### Bố cục banner và menu mobile — đã nghiệm thu
+
+- Đã nghiệm thu bản sửa `1fe2ea4` và tích hợp vào `develop` tại `46fd7f6`. Hai nhóm nút trên banner nằm ở hai hàng và tự giãn theo nội dung. Menu mobile hiện một mục đăng ký hoặc đăng xuất đúng theo trạng thái đăng nhập.
+- Đã kiểm tra trên trình duyệt ở 9 kích thước từ 320 đến 1.440 px. Sau tích hợp, build, Pint, PHPStan, 216 bài SQLite với 3.471 assertion và 29 bài MySQL với 526 assertion đều đạt.
+
 ### Video banner trang chủ — đã tích hợp, chờ nghiệm thu
 
 - Đã tích hợp video PixVerse người dùng gửi vào banner Toàn. Giữ nguyên file, dài khoảng 8,04 giây và kích thước 1024 × 688; tự phát tắt tiếng, lặp, có nút phát/tạm dừng và poster khi tải lỗi. Tôn trọng reduced motion/tiết kiệm dữ liệu, tạm dừng khi banner ra ngoài viewport hoặc tab bị ẩn, giải phóng media theo lifecycle Livewire.
