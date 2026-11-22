@@ -327,7 +327,7 @@
 
 - Trang chủ hiển thị tối đa 5 món còn bán theo số ly từ các đơn hoàn tất và đã thanh toán trong ngày hiện tại và 29 ngày trước theo giờ Việt Nam. Hệ thống gộp các size theo món và xếp ID tăng dần khi đồng hạng. Khu vực tự ẩn nếu không có dữ liệu đủ điều kiện.
 - `composer ci:check` đạt Pint, PHPStan và 202 bài SQLite với 3.101 assertion. Bộ MySQL đạt 27 bài với 463 assertion. `npm run build` thành công. Đã kiểm tra HTTP 200 trên trang chủ với MySQL local.
-- AC-04 đã được kiểm chứng trên nhánh UC30. Bảng xếp hạng tính lượt đã phục vụ thuộc phiên đã thanh toán, kể cả sau khi trả chỗ. Lượt hủy và phiên chưa thanh toán bị loại.
+- AC-04 đã được kiểm chứng và tích hợp cùng UC30 vào `develop`. Bảng xếp hạng tính lượt đã phục vụ thuộc phiên đã thanh toán, kể cả sau khi trả chỗ. Lượt hủy và phiên chưa thanh toán bị loại.
 
 ### UC29 đã nghiệm thu
 
@@ -338,7 +338,9 @@
 - `composer ci:check` đạt Pint, PHPStan và 207 bài trên SQLite với 3.250 assertion. Bộ MySQL đạt 28 bài với 494 assertion, gồm kiểm tra khóa giữa hai kết nối, gửi lặp và đơn tranh phần tồn cuối. `npm run build` thành công.
 - Migration đã chạy trên MySQL local. Kiểm soát tồn đang tắt và chỉ bật sau khi xử lý đơn cũ, hoàn thiện công thức và chốt tồn đầu kỳ theo [hướng dẫn vận hành](../README.md#kho-nguyên-liệu-theo-công-thức). UC30 dùng cùng sổ tiêu hao khi bắt đầu pha chế từng lượt.
 
-### UC30 đã kiểm thử, chờ nghiệm thu
+### UC30 đã nghiệm thu
+
+- Người dùng nghiệm thu UC30 tại `e957d07`. Đã tích hợp vào `develop` tại `a1b5107` sau khi chạy lại Pint, PHPStan, 212 bài SQLite, 29 bài MySQL và bản build.
 
 - Nhân viên mở phiên cho chỗ đã check-in hoặc khách ghé trực tiếp. Khách vào từ QR cố định bằng mã 8 số theo phiên và gọi nhiều lượt trên trình duyệt chưa đăng nhập. Nhân viên có thể nhập hộ, xem số lượt chờ theo bàn, xử lý từng lượt và tra phiên đã đóng.
 - Hệ thống chống gửi lặp, lưu giá và định lượng theo lượt, khóa cả hai kênh gọi thêm khi chốt. Hóa đơn cộng món đã phục vụ và khoản phụ phí chưa thu tại quầy. Thu đúng số tiền một lần và giữ chỗ đến khi nhân viên xác nhận khách rời đi.
