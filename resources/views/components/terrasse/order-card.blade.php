@@ -3,8 +3,8 @@
 <article class="terrasse-panel terrasse-work-card flex h-full min-w-0 flex-col gap-3 rounded-md p-4 sm:p-5">
     <header class="flex flex-wrap items-start justify-between gap-2">
         <div class="min-w-0">
-            <h2 class="terrasse-display text-3xl font-semibold wrap-anywhere">
-                <a href="{{ $href }}" class="terrasse-store-link">{{ $order->order_number }}</a>
+            <h2 class="text-base leading-snug font-semibold tracking-normal wrap-anywhere sm:text-lg">
+                <a href="{{ $href }}" class="terrasse-store-link font-mono slashed-zero">{{ $order->order_number }}</a>
             </h2>
             <p class="terrasse-muted mt-1 text-xs"><x-customer.order-time :date="$order->created_at" /></p>
         </div>
