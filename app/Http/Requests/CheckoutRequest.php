@@ -64,7 +64,7 @@ class CheckoutRequest extends FormRequest
                 'required', 'integer:strict', 'min:1',
             ],
             'coupon_code' => ['nullable', 'string', 'max:40', 'regex:/\A[A-Z0-9]+(?:[-_][A-Z0-9]+)*\z/'],
-            'pickup_time' => ['nullable', 'required_if:pickup_mode,scheduled', 'date_format:Y-m-d H:i'],
+            'pickup_time' => ['nullable', 'date_format:Y-m-d H:i'],
         ];
 
         if ($this->routeIs('checkout.store')) {

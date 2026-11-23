@@ -28,6 +28,12 @@ class ReservationDeposit extends Model
         return $this->belongsTo(TableInvoice::class, 'table_invoice_id');
     }
 
+    /** @return BelongsTo<User, $this> */
+    public function settledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'settled_by');
+    }
+
     public function statusLabel(): string
     {
         return match ($this->status) {

@@ -26,7 +26,7 @@ class ReservationSeat extends Model
         return $this->hasOne(Reservation::class, 'reservation_seat_id')->where(function ($q): void {
             $start = now(BookingRules::TIMEZONE)->startOfDay()->utc();
             $q->where('status', ReservationStatus::CheckedIn)->orWhere(function ($q) use ($start): void {
-                $q->where('status', ReservationStatus::Confirmed)->where('scheduled_at', '>=', $start)->where('scheduled_at', '<', $start->copy()->addDay());
+                $q->where('status', ReservationStatus::Confirmed)->where('arrival_deadline', '>', now())->where('scheduled_at', '>=', $start)->where('scheduled_at', '<', $start->copy()->addDay());
             });
         });
     }

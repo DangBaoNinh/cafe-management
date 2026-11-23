@@ -101,23 +101,10 @@ class Checkout
             if ($details->method === PaymentMethod::DemoGateway) {
                 CustomerRefunds::requireBank($user);
             }
-            if ($details->pickupTime === null) {
-                throw $this->invalid('pickup_time', 'Chọn giờ nhận ít nhất 15 phút sau khi đặt.');
-            }
-        } elseif ($details->pickupTime === null) {
             return null;
         }
-        if ($details->fulfillment !== FulfillmentType::Pickup) {
-            throw $this->invalid('pickup_time', 'Hẹn giờ chỉ áp dụng khi nhận tại quán.');
-        }
 
-        try {
-            BookingRules::authorizeBooking($user);
-
-            return BookingRules::slot($details->pickupTime, 15);
-        } catch (ValidationException $exception) {
-            throw $exception->redirectTo(route('checkout.create'));
-        }
+        return null;
     }
 
     /** @return BankDetails|null */
@@ -278,14 +265,18 @@ class Checkout
         $order->inventory_snapshot = $this->recipes->snapshot($order);
         $order->save();
 
+        $paid = DemoPaymentGateway::enabled() && $details->method !== PaymentMethod::Cod;
         $payment = $order->payment()->create([
             'method' => $details->method,
-            'status' => PaymentStatus::Pending,
+            'status' => $paid ? PaymentStatus::Paid : PaymentStatus::Pending,
             'amount_vnd' => $order->total_vnd,
             'transfer_details' => $quote['transferDetails'],
         ]);
+        if ($paid) {
+            $payment->forceFill(['paid_at' => now()])->save();
+        }
         $order->statusHistories()->create(['actor_id' => $user->id, 'to_status' => OrderStatus::Pending->value]);
-        $payment->statusHistories()->create(['actor_id' => $user->id, 'to_status' => PaymentStatus::Pending->value]);
+        $payment->statusHistories()->create(['actor_id' => $user->id, 'to_status' => $payment->status->value]);
 
         return $order;
     }

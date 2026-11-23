@@ -47,16 +47,7 @@
                 @endforeach
             </flux:select>
 
-            <fieldset class="space-y-3" data-pickup-mode>
-                <flux:select name="pickup_mode" label="Thời điểm nhận tại quán">
-
-                    <flux:select.option value="scheduled" :selected="$pickupMode === 'scheduled'">Nhận ít nhất 15 phút sau khi đặt</flux:select.option>
-                </flux:select>
-                <fieldset data-pickup-slot>
-                    <x-customer.pickup-slot :date="is_string($pickupTime) ? substr($pickupTime, 0, 10) : null"
-                        :time="is_string($pickupTime) ? substr($pickupTime, 11) : null" :required="false" />
-                </fieldset>
-            </fieldset>
+            <p class="text-sm">Nh?n t?i qu?n kh?ng gi?i h?n th?i gian l?y h?ng.</p>
 
             @if ($addresses->isEmpty())
                 <p class="text-sm">Để chọn giao tận nơi, hãy <flux:link :href="route('addresses.index')">thêm địa chỉ giao hàng</flux:link>.</p>

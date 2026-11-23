@@ -46,6 +46,9 @@ class TableManagement
                 $this->require(in_array($current, ['free', 'held'], true), 'Bàn đang ngừng phục vụ.');
                 $this->reservations->walkIn($actor, $seat->id, true);
             } elseif ($status === 'free') {
+                if ($current === 'held') {
+                    return; // The table is physically empty; retain its reservation and deposit.
+                }
                 if ($current === 'inactive') {
                     Gate::forUser($actor)->authorize('access-admin');
                     $this->reservations->setSeatActive($actor, $seat->id, true);

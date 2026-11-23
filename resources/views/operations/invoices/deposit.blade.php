@@ -1,6 +1,6 @@
 <x-layouts::admin :title="'Hóa đơn đặt cọc '.$deposit->number">
     <div class="receipt-page space-y-4">
-        <div data-no-print><flux:link :href="auth()->user()->can('access-admin') ? route('admin.invoices.index') : route('operations.invoices.index')">Về quản lý hóa đơn</flux:link> <flux:button type="button" data-print-invoice>In chứng từ đặt cọc</flux:button></div>
+        <div class="receipt-toolbar" data-no-print><flux:link :href="route('admin.deposits.index')">Về quản lý tiền cọc</flux:link> <flux:button type="button" data-print-invoice>In chứng từ đặt cọc</flux:button></div>
         <article class="invoice-sheet receipt-paper">
             <x-receipt.header title="Chứng từ đặt cọc" :number="$deposit->number" />
             <dl class="receipt-meta">

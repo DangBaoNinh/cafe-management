@@ -44,6 +44,20 @@ class CheckoutTest extends TestCase
         ];
     }
 
+    public function test_demo_pickup_without_time_is_paid_and_customer_cancellation_refunds_it(): void
+    {
+        [$user] = $this->basket();
+        $user->forceFill(['linked_bank' => ['bank_name' => 'Demo', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
+        $submission = $this->review($user, ['fulfillment_type' => 'pickup', 'method' => 'bank_transfer', 'pickup_time' => null]);
+        $this->post(route('checkout.store'), $submission)->assertStatus(303);
+        $order = $user->orders()->sole();
+        $this->assertSame(PaymentStatus::Paid, $order->payment->status);
+        $this->assertNotNull($order->payment->paid_at);
+        $this->assertNull($order->scheduledPickup);
+        $this->post(route('orders.cancel', $order->order_number), ['expected_status' => 'pending', 'confirm' => '1'])->assertStatus(303);
+        $this->assertSame(PaymentStatus::Refunded, $order->payment->fresh()->status);
+    }
+
     #[DataProvider('combinations')]
     public function test_checkout_saves_snapshots_pending_records_and_totals(string $fulfillment, string $method, int $fee): void
     {

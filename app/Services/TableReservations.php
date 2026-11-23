@@ -176,11 +176,11 @@ class TableReservations
         $this->finish($reservation, ReservationStatus::Completed, $reservation->completed_at, $staff);
     }
 
-    public function expire(int $id, CarbonImmutable $asOf): bool
+    public function expire(int $id, CarbonImmutable $asOf, ?User $actor = null): bool
     {
         $target = Reservation::query()->findOrFail($id);
 
-        return DB::transaction(function () use ($target, $asOf): bool {
+        return DB::transaction(function () use ($target, $asOf, $actor): bool {
             [$customer, , $reservation] = $this->lock($target);
             if ($reservation->status !== ReservationStatus::Confirmed || $reservation->arrival_deadline->gt($asOf)) {
                 return false;
