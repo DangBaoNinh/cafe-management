@@ -372,6 +372,11 @@
 - Chi tiết chỗ đã giữ công khai ngày giờ hẹn sắp tới theo giờ Việt Nam. Sơ đồ cập nhật theo lần lấy trạng thái kế tiếp sau khi đổi hoặc hủy. Chỗ đang sử dụng chỉ hiển thị trạng thái, không có giờ trống dự kiến.
 - Sau tích hợp, 218 bài SQLite với 3.511 assertion, 29 bài MySQL với 526 assertion, Pint, PHPStan, build và kiểm tra cú pháp JS đều đạt. Trình duyệt với SQLite riêng giữ đúng phòng T2-PH sau đăng nhập, chọn sẵn phòng, thấy giờ mới sau khi đổi và trả chỗ khi hủy qua form.
 
+### Font mã đơn ở khu vận hành — đã nghiệm thu
+
+- Ngày 23/11/2026, người dùng nghiệm thu bản sửa `805e2e8` trên `fix/order-code-font`. Đã tích hợp vào `develop` tại `3dd5916`. Mã đơn dùng font đơn cách với số 0 có gạch chéo ở hàng đợi, chi tiết đơn và màn hình đối chiếu thanh toán.
+- Build thành công và 34 bài hồi quy vận hành đạt với 650 assertion. Đã kiểm tra mã ngắn và mã dài trên Edge ở 390 và 1.440 px. Mã hiển thị đầy đủ, liên kết mở đúng đơn và các màn hình đã thử không tràn ngang.
+
 ## Việc còn lại
 
 ### Trải nghiệm khách hàng và liên hệ cửa hàng — đang chờ nghiệm thu
