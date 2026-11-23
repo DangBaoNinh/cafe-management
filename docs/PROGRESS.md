@@ -387,6 +387,7 @@
 - Đồng bộ kiểm thử với thanh toán demo tự ghi paid; các ca chuyển khoản thật chạy ở môi trường production mô phỏng và tiếp tục kiểm tra pending, snapshot, khóa coupon và hủy đơn. Khôi phục thông báo đơn tổng tiền 0 cho cả thanh toán đã ghi nhận.
 - PASS tại local: `composer ci:check` đạt Pint, PHPStan và 302 bài SQLite với 4.654 assertion; `npm run build` và `git diff --check` đạt. Kiểm thử trọng tâm checkout/lịch cũ đạt 28 bài với 560 assertion. MySQL của bản tích hợp sẽ được kiểm tra trên CI có schema thử riêng trước khi merge PR.
 - Bảo toàn file có sẵn `docs/NhomSix_LTMNM_ST3.docx`, không đưa vào commit. Không chạy migration hoặc kiểm thử trên database cửa hàng.
+- CI GitHub tại `3c39639` đạt build, Pint, PHPStan, 302 bài SQLite với 4.654 assertion và 29 bài MySQL với 534 assertion trên schema thử riêng. [Lượt chạy CI](https://github.com/DangBaoNinh/cafe-management/actions/runs/45105079804). Sau đồng bộ `develop`, 18 bài hồi quy vận hành tại local cũng đạt với 387 assertion. Đủ điều kiện tích hợp PR #7, giữ nhánh nguồn.
 
 ### Font mã đơn ở khu vận hành — đã nghiệm thu
 
