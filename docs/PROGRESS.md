@@ -388,6 +388,11 @@
 - PASS tại local: `composer ci:check` đạt Pint, PHPStan và 302 bài SQLite với 4.654 assertion; `npm run build` và `git diff --check` đạt. Kiểm thử trọng tâm checkout/lịch cũ đạt 28 bài với 560 assertion. MySQL của bản tích hợp sẽ được kiểm tra trên CI có schema thử riêng trước khi merge PR.
 - Bảo toàn file có sẵn `docs/NhomSix_LTMNM_ST3.docx`, không đưa vào commit. Không chạy migration hoặc kiểm thử trên database cửa hàng.
 
+### Font mã đơn ở khu vận hành — đã nghiệm thu
+
+- Ngày 23/11/2026, người dùng nghiệm thu bản sửa `805e2e8` trên `fix/order-code-font`. Đã tích hợp vào `develop` tại `3dd5916`. Mã đơn dùng font đơn cách với số 0 có gạch chéo ở hàng đợi, chi tiết đơn và màn hình đối chiếu thanh toán.
+- Build thành công và 34 bài hồi quy vận hành đạt với 650 assertion. Đã kiểm tra mã ngắn và mã dài trên Edge ở 390 và 1.440 px. Mã hiển thị đầy đủ, liên kết mở đúng đơn và các màn hình đã thử không tràn ngang.
+
 ## Việc còn lại
 
 ### Trải nghiệm khách hàng và liên hệ cửa hàng — đã nghiệm thu ngày 23/11/2026
