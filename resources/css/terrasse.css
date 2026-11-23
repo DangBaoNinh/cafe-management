@@ -1,0 +1,323 @@
+.terrasse {
+    --color-coffee: #432329;
+    --color-cream: #f6efe3;
+    --color-accent: #762d39;
+    --color-accent-content: #762d39;
+    --color-accent-foreground: #fff6e8;
+    --terrasse-ink: #341a1b;
+    --terrasse-muted: #705450;
+    --terrasse-line: #dcc9b6;
+    --terrasse-paper: #fffaf2;
+    --terrasse-highlight: #f2e3d8;
+    --terrasse-field: #fffdf8;
+    --terrasse-danger: #991b1b;
+    --terrasse-danger-surface: #fef2f2;
+    --terrasse-footer-base: #432329;
+    --terrasse-sidebar-hover: #60353d;
+    --terrasse-gold: #ffd6a0;
+    --terrasse-display: "EB Garamond", Georgia, serif;
+
+    background-color: var(--color-cream);
+    color: var(--terrasse-ink);
+    color-scheme: light;
+}
+
+.dark .terrasse {
+    --color-coffee: #321e24;
+    --color-cream: #26191b;
+    --color-accent: #f0bb92;
+    --color-accent-foreground: #351b21;
+    --color-accent-content: #f0bb92;
+    --terrasse-ink: #fff0de;
+    --terrasse-muted: #dfc4b5;
+    --terrasse-line: #735055;
+    --terrasse-paper: #322226;
+    --terrasse-highlight: #503036;
+    --terrasse-field: #281a1e;
+    --terrasse-danger: #ffb4ad;
+    --terrasse-danger-surface: #48232a;
+    --terrasse-footer-base: #321e24;
+    --terrasse-sidebar-hover: #503036;
+
+    color-scheme: dark;
+}
+
+.terrasse h1, .terrasse-display {
+    font-family: var(--terrasse-display);
+    letter-spacing: -.04em;
+    line-height: 1.04;
+}
+
+.terrasse h1 { font-size: clamp(2.5rem, 5vw, 4.25rem); }
+.terrasse .terrasse-auth h1 { font-size: clamp(2rem, 5vw, 2.65rem); }
+.terrasse :focus-visible { outline-offset: 4px; }
+.terrasse-frame { width: min(100% - 2rem, 76rem); margin-inline: auto; }
+.terrasse-panel { background: var(--terrasse-paper); border: 1px solid var(--terrasse-line); }
+.terrasse-muted { color: var(--terrasse-muted); }
+
+.terrasse-brand { display: inline-flex; align-items: center; gap: .75rem; min-width: 0; font: 650 clamp(1.45rem, 3vw, 2.1rem)/1 var(--terrasse-display); }
+.terrasse-brand-mark { display: grid; flex: 0 0 1.95rem; aspect-ratio: 1; place-items: center; border: 1px solid currentColor; outline: 1px solid currentColor; outline-offset: 2px; border-radius: 50%; color: var(--color-accent); font-style: italic; font-size: 1.25rem; }
+.terrasse-store-header { border-bottom: 1px solid var(--terrasse-line); background: var(--color-cream); }
+.terrasse-store-header nav { min-height: 5rem; }
+.terrasse-store-link:hover, .terrasse-store-link[aria-current] { text-decoration: underline; text-underline-offset: .35rem; }
+.terrasse-store-footer {
+    border-top: 2px solid #b58b64;
+    color: #fff2de;
+    background: linear-gradient(90deg, var(--terrasse-footer-base) 45%, color-mix(in srgb, var(--terrasse-footer-base) 72%, transparent)),
+        var(--terrasse-footer-base) url("../assets/terrasse/paris-terrasse.jpg") right 68% / cover no-repeat;
+}
+.terrasse-store-footer .terrasse-brand-mark { color: var(--terrasse-gold); }
+.terrasse-store-footer :focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-footer-muted { color: #ead1bc; }
+.terrasse-footer-link:hover { color: var(--terrasse-gold); text-decoration: underline; text-underline-offset: .3em; }
+.terrasse-footer-bottom { border-top: 1px solid #9d7269; }
+
+.terrasse-chat {
+    position: fixed;
+    z-index: 40;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: .65rem;
+}
+.terrasse-chat-panel {
+    width: min(26rem, calc(100vw - 2rem));
+    max-height: min(38rem, calc(100dvh - 6.5rem));
+    overflow: hidden;
+    border-radius: 1rem;
+}
+.terrasse-chat-panel:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+}
+.terrasse-chat-header, .terrasse-chat-launch {
+    background: #762d39;
+    color: #fff4df;
+}
+.terrasse-chat-log {
+    min-height: 0;
+    overflow-wrap: anywhere;
+    overscroll-behavior: contain;
+}
+.terrasse-chat-message {
+    align-self: flex-start;
+    max-width: 92%;
+    padding: .55rem .75rem;
+    border-radius: .75rem;
+    background: var(--terrasse-highlight);
+    font-size: .875rem;
+    white-space: pre-wrap;
+}
+.terrasse-chat-message[data-role="user"] {
+    align-self: flex-end;
+    background: var(--color-accent);
+    color: var(--color-accent-foreground);
+}
+.terrasse-chat-action {
+    border-radius: .5rem;
+    padding: .5rem .75rem;
+    background: var(--color-accent);
+    color: var(--color-accent-foreground);
+    cursor: pointer;
+    font-weight: 600;
+}
+.terrasse-chat-action:disabled { cursor: wait; opacity: .6; }
+
+.terrasse-hero {
+    display: grid;
+    align-items: center;
+    min-height: clamp(32rem, 44vw, 41rem);
+    background: linear-gradient(90deg, #261415ed, #2614158c 35%, transparent 70%),
+        #261415 url("../assets/terrasse/paris-terrasse.jpg") center 60% / cover no-repeat;
+    color: #fff4df;
+}
+.terrasse-hero-copy { padding-block: clamp(2rem, 6vw, 6rem); }
+.terrasse-hero-kicker { color: var(--terrasse-gold); font-size: .73rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.terrasse-hero h1 { margin-top: 1.15rem; font-size: clamp(4.5rem, 9vw, 9rem); font-weight: 500; line-height: .85; }
+.terrasse-hero h1 em { display: block; margin-top: .08em; color: var(--terrasse-gold); }
+.terrasse-hero-description { max-width: 24rem; margin-top: 1.65rem; color: #f1ded0; line-height: 1.7; }
+.terrasse-hero-cta { display: inline-flex; align-items: center; gap: 1.5rem; margin-top: 1.6rem; padding: .9rem 1.1rem; border: 1px solid transparent; background: var(--terrasse-gold); color: #261415; font-size: .9rem; font-weight: 600; }
+.terrasse-hero-cta:hover { background: #ffe3c0; }
+.terrasse-hero-cta:focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-product-card { display: flex; height: 100%; flex-direction: column; overflow: hidden; border-top: 3px solid var(--color-accent); }
+.terrasse-product-card:hover { border-color: var(--color-accent); }
+.terrasse-product-card h2, .terrasse-product-card h3 { font-family: var(--terrasse-display); font-weight: 650; font-size: 1.65rem; line-height: 1.08; }
+
+.terrasse-account-header {
+    padding: clamp(1.4rem, 5vw, 3.5rem);
+    border: 1px solid #432329;
+    background: linear-gradient(90deg, #432329 0%, #432329f5 42%, #4323295c 100%),
+        #432329 url("../assets/terrasse/paris-terrasse.jpg") right 58% / cover no-repeat;
+    color: #fff4df;
+}
+.terrasse-account-header > h1 { max-width: 16ch; }
+.terrasse-account-avatar {
+    display: grid;
+    flex: 0 0 3rem;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid #e5bd91;
+    border-radius: 50%;
+    color: var(--terrasse-gold);
+    font: 600 1.1rem/1 var(--terrasse-display);
+}
+.terrasse-account-role { padding: .15rem .5rem; border-radius: 1rem; background: #f2d5b3; color: var(--color-coffee); font-size: .72rem; font-weight: 600; }
+.terrasse-account-link { border-top: 2px solid var(--color-accent); }
+.terrasse-account-link:hover { background: var(--terrasse-highlight); border-color: var(--color-accent); }
+.terrasse-account-link:focus-visible { outline: 2px solid var(--color-accent); }
+.terrasse-account-icon { display: grid; flex: 0 0 2.5rem; aspect-ratio: 1; place-items: center; border-radius: 50%; background: var(--terrasse-highlight); color: var(--color-accent); }
+
+.terrasse-settings-header {
+    padding-block: clamp(1.4rem, 4vw, 2.65rem);
+    background-position: right 52%;
+}
+.terrasse-settings-header a { color: var(--terrasse-gold); }
+.terrasse-settings-header a:hover { text-decoration: underline; text-underline-offset: .25em; }
+.terrasse-settings-header a:focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-settings-nav a { border-inline-start: 2px solid transparent; }
+.terrasse-settings-nav a:hover, .terrasse-settings-nav a[aria-current] {
+    background: var(--terrasse-highlight);
+    color: var(--color-accent-content);
+}
+.terrasse-settings-nav a[aria-current] { border-inline-start-color: currentColor; font-weight: 600; }
+.terrasse-settings-panel { padding: clamp(1rem, 3vw, 2rem); }
+.terrasse-settings-panel-header { border-bottom: 1px solid var(--terrasse-line); padding-bottom: 1.15rem; }
+.terrasse :is(input:not([type="radio"], [type="checkbox"]), select, textarea):where([data-flux-control]) {
+    border-color: var(--terrasse-line);
+    background-color: var(--terrasse-field);
+}
+.terrasse :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--terrasse-danger); }
+.terrasse-settings-jump { color: var(--color-accent-content); }
+.terrasse-address-card { border: 1px solid var(--terrasse-line); background: var(--terrasse-field); }
+.terrasse-address-empty { border: 1px dashed var(--terrasse-line); }
+.terrasse-address-form { scroll-margin-top: 1rem; }
+
+.terrasse-theme-option {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--terrasse-line);
+    border-radius: .5rem;
+}
+.terrasse-theme-option:hover, .terrasse-theme-option:has(:checked) { border-color: var(--color-accent); }
+.terrasse-theme-option:has(:checked) { background: var(--terrasse-highlight); }
+.terrasse-theme-option:has(:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.terrasse-theme-option input { accent-color: var(--color-accent); }
+.terrasse-theme-preview {
+    display: grid;
+    align-items: end;
+    min-height: 5.25rem;
+    padding: .75rem;
+    background: linear-gradient(#762d39 0 24%, transparent 24%), #f6efe3;
+}
+.terrasse-theme-preview[data-theme="dark"] { background-color: #26191b; }
+.terrasse-theme-preview[data-theme="system"] {
+    background: linear-gradient(#762d39 0 24%, transparent 24%), linear-gradient(120deg, #f6efe3 50%, #26191b 50%);
+}
+.terrasse-theme-preview span {
+    display: block;
+    width: 72%;
+    height: 2.25rem;
+    border: 1px solid #b88b7f;
+    border-radius: .25rem;
+    background:
+        linear-gradient(#ac786b, #ac786b) .5rem .55rem / 42% 2px no-repeat,
+        linear-gradient(#ac786b, #ac786b) .5rem .95rem / 28% 2px no-repeat,
+        #fffaf2;
+}
+.terrasse-theme-preview[data-theme="dark"] span { background-color: #39272c; }
+.terrasse-theme-preview[data-theme="system"] span { background-color: #ead0ba; }
+
+.terrasse-workspace { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: 100vh; }
+.terrasse-sidebar { background: var(--color-coffee); color: #fcebd9; }
+.terrasse-sidebar .terrasse-brand-mark { color: var(--terrasse-gold); }
+.terrasse-sidebar :focus-visible { outline: 2px solid var(--terrasse-gold); }
+.terrasse-sidebar a[aria-current], .terrasse-sidebar a:hover, .terrasse-sidebar button:hover { background: var(--terrasse-sidebar-hover); }
+.terrasse-sidebar a[aria-current] { border-inline-start-color: var(--terrasse-gold); color: #fff1de; font-weight: 600; }
+.terrasse-sidebar-caption { color: #e8c4ae; font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.terrasse-revenue-total { color: #fff1d9; background: linear-gradient(95deg, #432329fc 25%, #432329b5), url("../assets/terrasse/paris-terrasse.jpg") right 61% / cover; }
+.terrasse-report-chart {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(2.6rem, 1fr);
+    min-width: max-content;
+    column-gap: .4rem;
+    background: repeating-linear-gradient(to top, var(--terrasse-line) 0 1px, transparent 1px 25%) top / 100% 10rem no-repeat;
+}
+.terrasse-report-chart li { position: relative; display: grid; grid-template-rows: 10rem auto; align-items: end; justify-items: center; }
+.terrasse-report-bar { display: block; width: min(78%, 3.25rem); height: var(--bar-height); background: #b2747f; border-radius: .25rem .25rem 0 0; }
+.terrasse-report-chart li:last-child .terrasse-report-bar { background: var(--color-accent); }
+
+.terrasse-status { --status-ink: #605350; --status-bg: #efe6df; }
+.terrasse-status[data-tone="amber"] { --status-ink: #784413; --status-bg: #f6e6c9; }
+.terrasse-status[data-tone="rose"] { --status-ink: #823447; --status-bg: #f2dce0; }
+.terrasse-status[data-tone="green"] { --status-ink: #365e48; --status-bg: #e4eddf; }
+.terrasse-status[data-tone="blue"] { --status-ink: #395d78; --status-bg: #e3ebf2; }
+.terrasse-pill { display: inline-flex; align-items: center; gap: .4rem; padding: .22rem .6rem; border-radius: 1rem; color: var(--status-ink); background: var(--status-bg); font-size: .75rem; font-weight: 600; }
+.terrasse-pill::before { flex: 0 0 .35rem; aspect-ratio: 1; border-radius: 50%; background: currentColor; content: ""; }
+.terrasse-work-card { border-top: 3px solid var(--color-accent); }
+
+/* Coupon UI: editorial French café details, shared by admin and checkout. */
+.coupon-summary { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .85rem; padding: 1.15rem; border: 1px solid var(--terrasse-line); border-top: 3px solid var(--color-accent); background: var(--terrasse-paper); }
+.coupon-summary__seal, .coupon-checkout-field__seal { display: grid; width: 2.45rem; height: 2.45rem; place-items: center; border: 1px solid #b58b64; border-radius: 50%; outline: 1px solid #b58b64; outline-offset: 3px; color: var(--color-accent-content); font: 600 1rem/1 var(--terrasse-display); }
+.coupon-summary__eyebrow { color: var(--color-accent-content); font-size: .69rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.coupon-summary__code { overflow-wrap: anywhere; font-family: var(--terrasse-display); font-size: 1.6rem; font-weight: 650; line-height: 1; letter-spacing: -.025em; }
+.coupon-summary__status { align-self: start; }
+.coupon-summary__offer { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .4rem 1rem; padding: .85rem 0; border-block: 1px solid var(--terrasse-line); }
+.coupon-summary__amount { font-family: var(--terrasse-display); font-size: 1.8rem; font-weight: 650; line-height: 1; letter-spacing: -.025em; }
+.coupon-summary__details { grid-column: 1 / -1; display: grid; gap: .75rem; font-size: .8rem; }
+.coupon-summary__details dt { color: var(--terrasse-muted); }
+.coupon-summary__details dd { margin-top: .15rem; font-weight: 600; overflow-wrap: anywhere; }
+.coupon-empty-state { display: grid; min-height: 16rem; align-content: center; gap: .7rem; border: 1px dashed var(--terrasse-line); padding: 1.5rem; background: var(--terrasse-paper); }
+.coupon-form-header { max-width: 44rem; border-inline-start: 3px solid var(--color-accent); padding-inline-start: 1rem; }
+.coupon-form-header h1 { margin-top: .35rem; font-size: clamp(2.2rem, 4vw, 3.5rem); }
+.coupon-form-header p:last-child { max-width: 42rem; margin-top: .65rem; color: var(--terrasse-muted); }
+.coupon-form-layout { display: grid; gap: 1.5rem; align-items: start; }
+.coupon-form-preview { display: grid; gap: 1rem; position: sticky; top: 1.5rem; padding: 1.25rem; border: 1px solid var(--terrasse-line); background: var(--terrasse-highlight); }
+.coupon-form-preview > h2 { font-family: var(--terrasse-display); font-size: 1.75rem; font-weight: 650; line-height: 1; }
+.coupon-form-preview__intro { color: var(--terrasse-muted); font-size: .85rem; line-height: 1.55; }
+.coupon-type-help { margin-top: -.45rem; color: var(--terrasse-muted); font-size: .8rem; line-height: 1.45; }
+.coupon-number-field { display: grid; gap: .45rem; align-content: start; }
+.coupon-number-field__label { font-size: .875rem; font-weight: 600; }
+.coupon-number-field__help { color: var(--terrasse-muted); font-size: .75rem; line-height: 1.4; }
+.coupon-number-control { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) auto 2.75rem; min-height: 2.75rem; overflow: hidden; border: 1px solid var(--terrasse-line); border-radius: .55rem; background: var(--terrasse-field); }
+.coupon-number-control:focus-within { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.coupon-number-control--invalid { border-color: var(--terrasse-danger); }
+.coupon-number-control input { min-width: 0; border: 0; padding: .65rem .25rem; background: transparent; color: var(--terrasse-ink); font-variant-numeric: tabular-nums; text-align: center; outline: none; }
+.coupon-number-control input::-webkit-inner-spin-button, .coupon-number-control input::-webkit-outer-spin-button { margin: 0; appearance: none; }
+.coupon-number-control > span { display: grid; place-items: center; padding-inline: .45rem; color: var(--terrasse-muted); font-size: .75rem; font-weight: 650; }
+.coupon-number-control button { display: grid; place-items: center; border-color: var(--terrasse-line); color: var(--terrasse-ink); font-size: 1.2rem; font-weight: 700; transition: background-color .15s ease, color .15s ease; }
+.coupon-number-control button:first-child { border-inline-end-width: 1px; }
+.coupon-number-control button:last-child { border-inline-start-width: 1px; }
+.coupon-number-control button:hover, .coupon-number-control button:focus-visible { background: var(--color-accent); color: var(--color-accent-foreground); outline: none; }
+.coupon-number-control button:disabled { cursor: not-allowed; opacity: .35; }
+.coupon-number-control button:disabled:hover { background: transparent; color: var(--terrasse-ink); }
+.coupon-time-warning { padding: .65rem .8rem; border-inline-start: 3px solid var(--terrasse-danger); color: var(--terrasse-danger); background: var(--terrasse-danger-surface); font-size: .8rem; font-weight: 600; }
+.coupon-advanced summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; cursor: pointer; font-weight: 650; }
+.coupon-advanced summary span { color: var(--terrasse-muted); font-size: .75rem; font-weight: 500; }
+.coupon-advanced summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: .35rem; }
+.coupon-checkout-field { display: grid; gap: 1rem; border: 1px solid var(--terrasse-line); border-inline-start: 3px solid var(--color-accent); padding: 1rem; background: var(--terrasse-highlight); }
+.coupon-checkout-field__seal { color: var(--terrasse-ink); background: var(--terrasse-paper); }
+@media (min-width: 40rem) { .coupon-summary__details { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 64rem) { .coupon-form-layout { grid-template-columns: minmax(0, 1.55fr) minmax(19rem, .8fr); } }
+
+@media (max-width: 63.999rem) {
+    .terrasse-workspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+}
+
+@media (max-width: 39.999rem) {
+    .terrasse-store-header nav { min-height: 0; }
+    .terrasse-account-header {
+        background-image: linear-gradient(90deg, #432329 12%, #432329df 100%), url("../assets/terrasse/paris-terrasse.jpg");
+    }
+    .terrasse-hero {
+        align-items: start;
+        min-height: 36rem;
+        background-image: linear-gradient(180deg, #261415 0%, #261415bc 37%, transparent 75%), url("../assets/terrasse/paris-terrasse.jpg");
+        background-position: center, 73% center;
+    }
+    .terrasse-hero h1 { font-size: clamp(3.7rem, 15vw, 5rem); }
+    .terrasse-hero-description { max-width: 22rem; margin-top: 1.2rem; }
+}

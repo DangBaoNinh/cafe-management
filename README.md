@@ -1,12 +1,14 @@
 # Coffee Shop
 
+Ngày 23/11/2026, đã xác nhận bỏ hẹn giờ nhận đồ uống cho đơn mới. Checkout không tạo phiếu hẹn; các lịch cũ tiếp tục được bảo toàn và xử lý. Xem [quyết định UC26](docs/use-cases/UC26.md) và [phụ lục Word](docs/reports/QUYET_DINH_UC26_2026-11-23.docx). Đặt bàn và phòng UC27 tiếp tục hoạt động.
+
 Coffee Shop là đồ án môn Mã nguồn mở về website đặt cà phê trực tuyến. Giai đoạn 01 cung cấp trang chủ, xác thực khách hàng, trang tài khoản và layout quản trị dành cho giai đoạn phân quyền.
 
 ## Công nghệ và môi trường
 
 - Laravel 13, Laravel Fortify, Blade, Livewire 4 và Flux UI từ bộ khởi tạo Livewire chính thức của Laravel.
 - Tailwind CSS 4, Vite qua Vite+, font Be Vietnam Pro, Composer 2, npm và Git.
-- MySQL cho ứng dụng. PHPUnit dùng SQLite trong bộ nhớ để kiểm thử.
+- MySQL cho ứng dụng. PHPUnit dùng SQLite trong bộ nhớ cho bộ mặc định và MySQL 8.4 cho kiểm thử tích hợp.
 - Môi trường đã dùng gồm Windows 11, Laragon 8.9, Apache 2.4, PHP 8.3.37, MySQL 8.4.3 và Node.js 22.23.5.
 - Cần PHP 8.3 trở lên với các extension Laravel, gồm `pdo_mysql` cho MySQL, `pdo_sqlite` cho PHPUnit và `zip` hoặc công cụ giải nén tương thích cho Composer. Khuyến nghị Node.js 22.18 trở lên trong dòng 22.
 
@@ -45,13 +47,77 @@ Coffee Shop là đồ án môn Mã nguồn mở về website đặt cà phê tr�
 - `/` là trang chủ. `/dashboard` là khu vực tài khoản, có liên kết tới hồ sơ Livewire tại `/settings/profile`.
 - `/register`, `/login` và `/forgot-password` cung cấp xác thực bằng email và mật khẩu. Phiên đăng nhập local được lưu trong MySQL.
 - `MAIL_MAILER=log` ghi liên kết đặt lại mật khẩu vào `storage/logs/laravel.log`. Cấu hình SMTP trong `.env` nếu cần gửi email thật.
-- `/admin` yêu cầu đăng nhập và kiểm tra quyền `access-admin`. Quyền này sẽ được cấp khi triển khai phân quyền.
+- `/admin` yêu cầu tài khoản admin đang hoạt động. Xem cách tạo admin đầu tiên trong [kiến trúc ứng dụng](docs/ARCHITECTURE.md#nền-tảng-phân-quyền-tech02).
 
 ```powershell
 php artisan migrate:status
 php artisan route:list
 php artisan test
 ```
+
+### Xem email local bằng Mailpit
+
+Khởi động Mailpit của Laragon. Nếu chạy từ terminal, dùng `mailpit --listen 127.0.0.1:8025 --smtp 127.0.0.1:1025`. Đặt các biến sau trong `.env` local và chạy `php artisan config:clear`.
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtp
+MAIL_HOST=127.0.0.1
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+```
+
+Yêu cầu đặt lại mật khẩu cho tài khoản thử rồi mở hộp thư Mailpit để xem email. Dùng `MAIL_MAILER=log` nếu chạy Laragon mà không bật Mailpit. [Hộp thư Mailpit](http://127.0.0.1:8025)
+
+### Kiểm thử tích hợp MySQL
+
+Tạo schema và tài khoản thử riêng trên MySQL 8.4. Với cấu hình MySQL mặc định, dùng dấu thoát cho ký tự gạch dưới để quyền chỉ áp dụng cho schema thử. Nếu `@@partial_revokes` đang bật, dùng tên `coffee_shop_test` trực tiếp trong `GRANT`. Thay giá trị mật khẩu mẫu bằng mật khẩu local của bạn. [Quyền trên schema MySQL](https://dev.mysql.com/doc/refman/8.4/en/grant.html)
+
+```sql
+CREATE DATABASE coffee_shop_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'coffee_test'@'127.0.0.1' IDENTIFIED BY 'thay-bang-mat-khau-local';
+GRANT ALL PRIVILEGES ON `coffee\_shop\_test`.* TO 'coffee_test'@'127.0.0.1';
+```
+
+Sao chép `.env.mysql-testing.example` thành `.env.mysql-testing` và điền mật khẩu thử. Git bỏ qua file local này. Có thể đặt các biến `MYSQL_TEST_*` trực tiếp trong môi trường chạy, như trong CI.
+
+```powershell
+php artisan test                  # Unit và Feature trên SQLite trong bộ nhớ
+php artisan test --testsuite=MySQL # Transaction và khóa hàng trên MySQL
+```
+
+Bộ MySQL tự chạy migration tiến trên `coffee_shop_test`. Các bản ghi kiểm tra rollback nằm trong transaction và bài kiểm tra khóa dùng một dòng migration có sẵn. Bộ mặc định dùng SQLite với mailer `array`. GitHub Actions chạy cả hai bộ với một MySQL service dùng riêng cho lần chạy CI.
+
+### Lịch nhận tại quán
+
+Chạy `php artisan schedule:work` cùng ứng dụng khi thử trên Laragon. Trên máy triển khai, cấu hình trình lập lịch gọi `php artisan schedule:run` mỗi phút. Tác vụ `bookings:expire` xử lý lịch nhận đồ uống và lịch đặt chỗ quá hạn theo thứ tự thời điểm vắng mặt.
+
+Kênh thu phụ phí qua ứng dụng dùng cấu hình chuyển khoản hiện có. Khách xem số tiền và nội dung chuyển khoản riêng của khoản phí trên phiếu. Nhân viên căn cứ vào sao kê để xác nhận tiền đã nhận hoặc ghi nhận kết quả cuối của giao dịch trước khi chuyển sang thu tại quầy.
+
+### Đặt bàn và phòng họp
+
+Khách mở **Đặt chỗ**, chọn giờ, loại chỗ và số người để xem sơ đồ hai tầng. Tại **Lịch đặt bàn và phòng**, nhân viên tra mã, check-in, đối chiếu phụ phí và ghi nhận khi khách rời đi. Sơ đồ vận hành hỗ trợ ghi khách trực tiếp và trả chỗ.
+
+Quản trị viên có thể bật hoặc ngừng phục vụ từng chỗ đang trống và thu hẹp giờ nhận đặt bàn, phòng trong khung 07:00–22:30. Điều chỉnh giờ áp dụng cho lịch tạo mới hoặc đổi giờ. Lịch đã xác nhận vẫn check-in theo giờ đã hẹn.
+
+### Kho nguyên liệu theo công thức
+
+Chạy `php artisan migrate` khi cập nhật UC29. Kho bắt đầu ở trạng thái tắt kiểm soát tồn khi pha chế. Quản trị viên mở **Kho nguyên liệu** tại `/admin/inventory` để khai báo nguyên liệu, chọn đơn vị cơ sở (g, ml, cái) và đặt ngưỡng cảnh báo. Mở **Công thức** cạnh từng size và topping để nhập định lượng cho một ly hoặc một phần topping. Số lượng hỗ trợ tối đa ba chữ số thập phân.
+
+1. Hoàn thiện công thức các size và topping đang bán. Xử lý các đơn đang chờ xác nhận hoặc chưa pha chế mà chưa có định lượng đầy đủ theo quy trình hiện tại.
+2. Tạm dừng pha chế trong lúc chuyển sang quy trình mới. Chọn **Kiểm kê** cho từng nguyên liệu, nhập số tồn thực tế và lý do tồn đầu kỳ. Lưu phiếu kể cả khi thực tế còn 0.
+3. Chọn **Bật kiểm soát tồn** rồi tiếp tục pha chế. Từ thời điểm đó, thao tác **Bắt đầu pha chế** trừ kho theo định lượng đã chốt lúc đặt hàng. Nhân viên thấy tên tùy chọn thiếu công thức hoặc số lượng nguyên liệu thiếu ngay trên đơn.
+4. Khi thiếu tồn, ghi nhận nguyên liệu bổ sung rồi thử bắt đầu pha chế lại. Với đơn đã đặt thiếu công thức, xử lý hủy theo quy trình đơn hàng rồi đặt lại sau khi bổ sung công thức. Đối chiếu các khoản hao hụt hoặc trả lại thực tế bằng **Điều chỉnh** có lý do.
+
+### Gọi món tại bàn hoặc phòng
+
+Chạy `composer install`, `php artisan migrate` và `npm run build` khi cập nhật UC30. PHP cần bật `xmlwriter` để tạo mã QR. Mở trang vận hành từ địa chỉ mà điện thoại của khách truy cập được khi lấy QR để in.
+
+1. Nhân viên mở **Vận hành → Gọi món tại bàn**. Chọn **Mở phiên** cho khách ghé trực tiếp hoặc cho lượt đặt trước đã check-in. Mở **Mã QR** để lấy mã cố định của chỗ. Gửi mã phiên 8 số trên màn hình cho khách.
+2. Khách quét QR và nhập mã phiên trên trình duyệt. Khách có thể gửi nhiều lượt hoặc nhờ nhân viên chọn **Nhập món thay khách**. Nhân viên xử lý lượt trong phiên theo thứ tự tiếp nhận, pha chế, sẵn sàng và phục vụ.
+3. Khi tính tiền, nhân viên chọn **Khóa gọi thêm**, xử lý các lượt còn dang dở rồi **Chốt hóa đơn**. Nếu còn khoản phí qua ứng dụng đang chờ, mở lượt đặt chỗ để đối chiếu. Khoản đã thu không cộng vào hóa đơn tại bàn.
+4. Nhập đúng số tiền thực thu trên hóa đơn. Chọn **Xác nhận khách rời đi và trả chỗ** khi bàn hoặc phòng đã trống. Phiên đã đóng và hóa đơn còn tra được trong danh sách vận hành.
 
 - [Kế hoạch triển khai](docs/IMPLEMENTATION_PLAN.md)
 - [Tiến độ và kết quả kiểm tra](docs/PROGRESS.md)

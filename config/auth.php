@@ -57,13 +57,13 @@ return [
     | providers to represent the model / table. These providers may then
     | be assigned to any extra authentication guards you have defined.
     |
-    | Supported: "database", "eloquent"
+    | Supported: "database", "eloquent", "active-eloquent"
     |
     */
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'active-eloquent',
             'model' => env('AUTH_MODEL', User::class),
         ],
 

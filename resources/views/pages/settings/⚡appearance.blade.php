@@ -1,22 +1,33 @@
 <?php
 
-use Livewire\Component;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Component;
 
-new #[Title('Appearance settings')] class extends Component {
+new #[Layout('layouts::settings')] #[Title('Cài đặt giao diện')] class extends Component {
     //
 }; ?>
 
-<section class="w-full">
-    @include('partials.settings-heading')
-
-    <flux:heading level="2" class="sr-only">{{ __('Appearance settings') }}</flux:heading>
-
-    <x-pages::settings.layout :heading="__('Appearance')" :subheading="__('Update the appearance settings for your account')">
-        <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
-            <flux:radio value="light" icon="sun">{{ __('Light') }}</flux:radio>
-            <flux:radio value="dark" icon="moon">{{ __('Dark') }}</flux:radio>
-            <flux:radio value="system" icon="computer-desktop">{{ __('System') }}</flux:radio>
-        </flux:radio.group>
+<div class="min-w-0">
+    <x-pages::settings.layout :heading="__('Appearance')" subheading="Chọn chế độ hiển thị cho toàn bộ Coffee Shop trên trình duyệt này.">
+        <fieldset x-data class="grid gap-3 sm:grid-cols-3">
+            <legend class="sr-only">Chế độ hiển thị</legend>
+            @foreach ([
+                ['light', 'sun', __('Light')],
+                ['dark', 'moon', __('Dark')],
+                ['system', 'computer-desktop', __('System')],
+            ] as [$mode, $icon, $label])
+                <label class="terrasse-theme-option">
+                    <span aria-hidden="true" class="terrasse-theme-preview" data-theme="{{ $mode }}">
+                        <span></span>
+                    </span>
+                    <span class="flex items-center gap-2 px-3 py-3 text-sm font-medium">
+                        <flux:icon :icon="$icon" class="size-4 shrink-0" aria-hidden="true" />
+                        <span class="me-auto">{{ $label }}</span>
+                        <input type="radio" name="appearance" value="{{ $mode }}" x-model="$flux.appearance">
+                    </span>
+                </label>
+            @endforeach
+        </fieldset>
     </x-pages::settings.layout>
-</section>
+</div>

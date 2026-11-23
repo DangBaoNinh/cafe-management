@@ -5,7 +5,10 @@ namespace App\Actions\Fortify;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\User;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
@@ -24,10 +27,21 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => $input['password'],
-        ]);
+        try {
+            return User::create([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'phone' => $input['phone'] ?? null,
+                'password' => Hash::make($input['password']),
+            ]);
+        } catch (UniqueConstraintViolationException $exception) {
+            if (! User::where('email', $input['email'])->exists()) {
+                throw $exception;
+            }
+
+            throw ValidationException::withMessages([
+                'email' => __('validation.unique', ['attribute' => __('validation.attributes.email')]),
+            ]);
+        }
     }
 }

@@ -2,11 +2,20 @@
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
+use App\Models\ReservationSeat;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -27,8 +36,41 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
 
-        // Enable access here when admin roles are implemented.
-        Gate::define('access-admin', fn (User $user): bool => false);
+        $this->configureAuthorization();
+        RateLimiter::for('storefront-chat', fn (Request $request) => [
+            Limit::perMinute(6)->by($request->ip() ?? 'unknown'),
+            Limit::perMinute(30)->by('storefront-chat'),
+        ]);
+        RateLimiter::for('table-order-access', function (Request $request): array {
+            $ip = $request->ip() ?? 'unknown';
+            $seat = $request->route('reservationSeat');
+            $code = $seat instanceof ReservationSeat ? $seat->code : strtoupper((string) $seat);
+
+            return [
+                Limit::perMinute(6)->by('seat-ip:'.$code.':'.$ip),
+                Limit::perMinute(24)->by('ip:'.$ip),
+                Limit::perMinute(60)->by('seat:'.$code),
+            ];
+        });
+    }
+
+    private function configureAuthorization(): void
+    {
+        Auth::provider('active-eloquent', function (Application $app, array $config): EloquentUserProvider {
+            return (new EloquentUserProvider($app->make('hash'), $config['model']))
+                ->withQuery(fn (Builder $query) => $query->where('is_active', true));
+        });
+
+        Gate::before(fn (User $user): ?bool => $user->is_active ? null : false);
+        Gate::define('manage-delivery-addresses', fn (User $user): bool => $user->role === UserRole::Customer);
+        Gate::define('manage-cart', fn (User $user): bool => $user->role === UserRole::Customer);
+        Gate::define('access-customer-orders', fn (User $user): bool => $user->role === UserRole::Customer);
+        Gate::define('access-admin', fn (User $user): bool => $user->role === UserRole::Admin);
+        Gate::define('operate-orders', fn (User $user): bool => in_array(
+            $user->role,
+            [UserRole::Staff, UserRole::Admin],
+            true,
+        ));
     }
 
     /**

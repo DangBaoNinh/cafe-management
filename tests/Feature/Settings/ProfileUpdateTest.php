@@ -2,125 +2,134 @@
 
 namespace Tests\Feature\Settings;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Password;
+use Livewire\Exceptions\PublicPropertyNotFoundException;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class ProfileUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_profile_page_is_displayed(): void
+    public function test_profile_page_is_displayed_without_self_deletion(): void
     {
-        $this->actingAs($user = User::factory()->create());
+        $this->get(route('profile.edit'))->assertRedirect(route('login'));
 
-        $this->get(route('profile.edit'))->assertOk();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route('profile.edit'))
+            ->assertOk()
+            ->assertSee($user->email)
+            ->assertDontSee(__('Delete account'));
     }
 
     public function test_profile_information_can_be_updated(): void
     {
         $user = User::factory()->create();
+        $oldEmail = $user->email;
+        Password::broker()->createToken($user);
 
         $this->actingAs($user);
-
-        $response = Livewire::test('pages::settings.profile')
-            ->set('name', 'Test User')
-            ->set('email', 'test@example.com')
-            ->call('updateProfileInformation');
-
-        $response->assertHasNoErrors();
-
-        $user->refresh();
-
-        $this->assertEquals('Test User', $user->name);
-        $this->assertEquals('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
-    }
-
-    public function test_email_is_stored_in_lowercase_so_the_user_can_still_log_in(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
         Livewire::test('pages::settings.profile')
-            ->set('name', 'Test User')
-            ->set('email', 'Test@Example.com')
+            ->set('name', '  Test User  ')
+            ->set('email', '  Test@Example.com  ')
+            ->set('phone', ' 0901234567 ')
             ->call('updateProfileInformation')
-            ->assertHasNoErrors();
+            ->assertHasNoErrors()
+            ->assertSet('name', 'Test User')
+            ->assertSet('email', 'test@example.com')
+            ->assertSet('phone', '0901234567');
 
-        $this->assertEquals('test@example.com', $user->refresh()->email);
+        $this->assertSame('Test User', $user->refresh()->name);
+        $this->assertSame('test@example.com', $user->email);
+        $this->assertSame('0901234567', $user->phone);
+        $this->assertNull($user->email_verified_at);
+        $this->assertSame(UserRole::Customer, $user->role);
+        $this->assertDatabaseMissing('password_reset_tokens', ['email' => $oldEmail]);
 
-        $this->post(route('logout'));
-
+        $this->post(route('logout'))->assertRedirect(route('home'));
         $this->post(route('login.store'), [
             'email' => 'Test@Example.com',
             'password' => 'password',
-        ]);
-
+        ])->assertRedirect(route('home'));
         $this->assertAuthenticatedAs($user);
     }
 
-    public function test_email_must_be_unique_regardless_of_case(): void
+    public function test_duplicate_email_keeps_the_original_profile_and_reset_token(): void
     {
         User::factory()->create(['email' => 'taken@example.com']);
+        $user = User::factory()->create();
+        $original = $user->fresh()->getAttributes();
+        $token = Password::broker()->createToken($user);
 
-        $this->actingAs(User::factory()->create());
-
+        $this->actingAs($user);
         Livewire::test('pages::settings.profile')
-            ->set('name', 'Test User')
-            ->set('email', 'Taken@Example.com')
+            ->set('name', 'Changed name')
+            ->set('email', ' Taken@Example.com ')
             ->call('updateProfileInformation')
-            ->assertHasErrors(['email']);
+            ->assertHasErrors(['email' => 'unique']);
+
+        $this->assertSame($original, $user->fresh()->getAttributes());
+        $this->assertTrue(Password::broker()->tokenExists($user, $token));
     }
 
     public function test_email_verification_status_is_unchanged_when_email_address_is_unchanged(): void
     {
         $user = User::factory()->create();
+        $verifiedAt = $user->email_verified_at;
 
         $this->actingAs($user);
-
-        $response = Livewire::test('pages::settings.profile')
+        Livewire::test('pages::settings.profile')
             ->set('name', 'Test User')
-            ->set('email', $user->email)
-            ->call('updateProfileInformation');
+            ->set('email', ' '.strtoupper($user->email).' ')
+            ->call('updateProfileInformation')
+            ->assertHasNoErrors();
 
-        $response->assertHasNoErrors();
-
-        $this->assertNotNull($user->refresh()->email_verified_at);
+        $this->assertEquals($verifiedAt, $user->refresh()->email_verified_at);
     }
 
-    public function test_user_can_delete_their_account(): void
+    public static function extraProperties(): array
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
-        $response = Livewire::test('pages::settings.delete-user-modal')
-            ->set('password', 'password')
-            ->call('deleteUser');
-
-        $response
-            ->assertHasNoErrors()
-            ->assertRedirect('/');
-
-        $this->assertNull($user->fresh());
-        $this->assertFalse(auth()->check());
+        return ['user ID' => ['user_id'], 'role' => ['role']];
     }
 
-    public function test_correct_password_must_be_provided_to_delete_account(): void
+    #[DataProvider('extraProperties')]
+    public function test_profile_rejects_properties_outside_the_form(string $property): void
     {
         $user = User::factory()->create();
-
+        $other = User::factory()->create();
         $this->actingAs($user);
 
-        $response = Livewire::test('pages::settings.delete-user-modal')
-            ->set('password', 'wrong-password')
-            ->call('deleteUser');
+        $this->expectException(PublicPropertyNotFoundException::class);
 
-        $response->assertHasErrors(['password']);
+        try {
+            Livewire::test('pages::settings.profile')
+                ->set([
+                    'name' => 'Unexpected change',
+                    $property => $property === 'user_id' ? $other->id : UserRole::Admin->value,
+                ])
+                ->call('updateProfileInformation');
+        } finally {
+            $this->assertSame($user->name, $user->fresh()->name);
+            $this->assertSame($other->name, $other->fresh()->name);
+            $this->assertSame(UserRole::Customer, $user->fresh()->role);
+        }
+    }
 
-        $this->assertNotNull($user->fresh());
+    public function test_the_old_delete_action_forbids_self_deletion(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Livewire::test('pages::settings.delete-user-modal')
+            ->call('deleteUser')
+            ->assertStatus(403);
+
+        $this->assertModelExists($user);
+        $this->assertAuthenticatedAs($user);
     }
 }

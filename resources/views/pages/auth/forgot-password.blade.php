@@ -12,6 +12,7 @@
             <flux:input
                 name="email"
                 :label="__('Email address')"
+                :value="is_string(old('email')) ? old('email') : ''"
                 type="email"
                 required
                 autofocus
@@ -23,7 +24,7 @@
             </flux:button>
         </form>
 
-        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-400">
+        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-terrasse-muted">
             <span>{{ __('Or, return to') }}</span>
             <flux:link :href="route('login')" wire:navigate>{{ __('log in') }}</flux:link>
         </div>
