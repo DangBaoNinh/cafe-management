@@ -15,7 +15,7 @@
                 <a href="{{ route('login') }}">Đăng nhập</a><a href="{{ route('register') }}">Đăng ký</a>
             @endauth
         </div></nav>
-        <div><h2>HẸN NHAU Ở TOÀN</h2><p>Mở cửa 07:00–23:00<br>Nhận lịch hẹn 07:00–22:30</p><p>Đặt bàn trước ít nhất 60 phút. Nhận món sau ít nhất 15 phút.</p></div>
+        <div><h2>HẸN NHAU Ở TOÀN</h2><p>Mở cửa 07:00–23:00<br>Nhận lịch đặt bàn 07:00–22:30</p><p>Đặt bàn trước ít nhất 60 phút.</p></div>
     </div>
     <div class="container footer-bottom"><span>© {{ now('Asia/Ho_Chi_Minh')->year }} Toàn Café &amp; Jardin</span><span>Un café. Un jardin. Un moment à soi.</span><a href="#store-header">Về đầu trang</a></div>
 </footer>

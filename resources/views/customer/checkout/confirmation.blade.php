@@ -13,7 +13,7 @@
         <x-customer.order-totals :subtotal="$order->subtotal_vnd" :discount="$order->discount_vnd"
             :delivery-fee="$order->delivery_fee_vnd" :total="$order->total_vnd" />
 
-        @if ($payment->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details !== null && $order->total_vnd === 0)
+        @if ($order->total_vnd === 0)
             <p role="status" class="rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">Tổng tiền bằng 0 ₫. Bạn không cần chuyển khoản.</p>
         @elseif ($payment->status === \App\Enums\PaymentStatus::Pending && $payment->transfer_details !== null)
             <div class="space-y-3 rounded-xl border border-terrasse-ink/15 bg-terrasse-paper p-4">

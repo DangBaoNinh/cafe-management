@@ -1,5 +1,7 @@
 # Coffee Shop
 
+Ngày 23/11/2026, đã xác nhận bỏ hẹn giờ nhận đồ uống cho đơn mới. Checkout không tạo phiếu hẹn; các lịch cũ tiếp tục được bảo toàn và xử lý. Xem [quyết định UC26](docs/use-cases/UC26.md) và [phụ lục Word](docs/reports/QUYET_DINH_UC26_2026-11-23.docx). Đặt bàn và phòng UC27 tiếp tục hoạt động.
+
 Coffee Shop là đồ án môn Mã nguồn mở về website đặt cà phê trực tuyến. Giai đoạn 01 cung cấp trang chủ, xác thực khách hàng, trang tài khoản và layout quản trị dành cho giai đoạn phân quyền.
 
 ## Công nghệ và môi trường

@@ -8,6 +8,7 @@ use App\Models\Coupon;
 use App\Models\User;
 use App\Services\ShoppingCart;
 use Carbon\CarbonImmutable;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -15,6 +16,8 @@ class CheckoutTest extends MySqlTestCase
 {
     public function test_checkout_locks_the_coupon_before_reading_redemptions_and_rejects_the_second_order(): void
     {
+        $this->app->instance('env', 'production');
+        $this->withoutMiddleware(PreventRequestForgery::class);
         DB::setDefaultConnection($this->primary->getName());
         $this->travelTo(CarbonImmutable::parse('2026-11-23 10:00', 'Asia/Ho_Chi_Minh')->utc());
         config(['checkout.bank_transfer' => [
@@ -61,7 +64,7 @@ class CheckoutTest extends MySqlTestCase
             $order = $first->orders()->sole();
             $this->assertSame(30000, $order->total_vnd);
             $this->assertSame('bank_transfer', $order->payment()->sole()->method->value);
-            $this->assertSame('10:15', $order->scheduledPickup()->sole()->scheduled_at->setTimezone('Asia/Ho_Chi_Minh')->format('H:i'));
+            $this->assertNull($order->scheduledPickup);
             $this->assertSame(0, $first->cart()->sole()->items()->count());
             $this->assertSame(1, $second->cart()->sole()->items()->count());
             $this->assertFalse($second->orders()->exists());
