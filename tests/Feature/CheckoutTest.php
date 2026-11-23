@@ -17,6 +17,7 @@ use App\Models\UserAddress;
 use App\Services\OrderNumbers;
 use App\Services\ShoppingCart;
 use Carbon\CarbonImmutable;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -44,9 +45,25 @@ class CheckoutTest extends TestCase
         ];
     }
 
+    public function test_demo_pickup_without_time_is_paid_and_customer_cancellation_refunds_it(): void
+    {
+        [$user] = $this->basket();
+        $user->forceFill(['linked_bank' => ['bank_name' => 'Demo', 'account_number' => '0123456789', 'account_holder' => 'KHACH']])->save();
+        $submission = $this->review($user, ['fulfillment_type' => 'pickup', 'method' => 'bank_transfer', 'pickup_time' => null]);
+        $this->post(route('checkout.store'), $submission)->assertStatus(303);
+        $order = $user->orders()->sole();
+        $this->assertSame(PaymentStatus::Paid, $order->payment->status);
+        $this->assertNotNull($order->payment->paid_at);
+        $this->assertNull($order->scheduledPickup);
+        $this->post(route('orders.cancel', $order->order_number), ['expected_status' => 'pending', 'confirm' => '1'])->assertStatus(303);
+        $this->assertSame(PaymentStatus::Refunded, $order->payment->fresh()->status);
+    }
+
     #[DataProvider('combinations')]
     public function test_checkout_saves_snapshots_pending_records_and_totals(string $fulfillment, string $method, int $fee): void
     {
+        $this->app->instance('env', 'production');
+        $this->withoutMiddleware(PreventRequestForgery::class);
         [$user, $product, $topping, $address] = $this->basket();
         $coupon = $this->coupon();
         $this->delivery();
@@ -288,8 +305,8 @@ class CheckoutTest extends TestCase
         $this->app->instance('env', 'testing');
         $this->post(route('checkout.store'), $this->review($user, $details))->assertStatus(303);
         $order = $user->orders()->sole();
-        $this->assertDatabaseHas('payments', ['order_id' => $order->id, 'method' => 'demo_gateway', 'status' => 'pending']);
-        $this->get(route('checkout.confirmation', $order->order_number))->assertOk()->assertSee('Mở cổng thanh toán mô phỏng');
+        $this->assertDatabaseHas('payments', ['order_id' => $order->id, 'method' => 'demo_gateway', 'status' => 'paid']);
+        $this->get(route('checkout.confirmation', $order->order_number))->assertOk()->assertDontSee('Mở cổng thanh toán mô phỏng');
     }
 
     private function review(User $user, array $overrides = []): array
@@ -334,7 +351,7 @@ class CheckoutTest extends TestCase
         app(OrderNumbers::class)->next();
     }
 
-    public function test_pickup_requires_online_method_linked_bank_and_a_15_minute_lead(): void
+    public function test_pickup_requires_online_method_and_linked_bank_without_an_appointment(): void
     {
         $this->travelTo(CarbonImmutable::parse('2026-11-23 10:00:00', 'Asia/Ho_Chi_Minh'));
         [$user] = $this->basket();
@@ -342,8 +359,8 @@ class CheckoutTest extends TestCase
         $this->actingAs($user);
         $data = $this->details(['method' => 'bank_transfer', 'pickup_time' => '2026-11-23 10:15']);
         $this->postJson(route('checkout.review'), [...$data, 'method' => 'cod'])->assertUnprocessable()->assertJsonValidationErrors('method');
-        $this->postJson(route('checkout.review'), [...$data, 'pickup_time' => '2026-11-23 10:10'])->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
-        $this->postJson(route('checkout.review'), [...$data, 'pickup_time' => null])->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
+        $this->postJson(route('checkout.review'), [...$data, 'pickup_time' => '2026-11-23 10:10'])->assertOk();
+        $this->postJson(route('checkout.review'), [...$data, 'pickup_time' => null])->assertOk();
         $user->forceFill(['linked_bank' => null])->save();
         $this->postJson(route('checkout.review'), [...$data, 'method' => 'demo_gateway'])->assertUnprocessable()->assertJsonValidationErrors('refund');
         $this->post(route('checkout.review'), $data)->assertOk();

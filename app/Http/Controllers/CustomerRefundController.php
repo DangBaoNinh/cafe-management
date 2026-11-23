@@ -6,6 +6,7 @@ use App\Enums\PaymentStatus;
 use App\Models\CustomerRefundRequest;
 use App\Models\Order;
 use App\Models\ReservationDeposit;
+use App\Services\RefundHistory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,9 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class CustomerRefundController extends Controller
 {
-    public function index(): View
+    public function index(RefundHistory $history): View
     {
-        return view('operations.refunds', ['refunds' => CustomerRefundRequest::query()->latest('id')->paginate(20)]);
+        return view('operations.refunds', ['refunds' => $history->listing()]);
     }
 
     public function complete(Request $request, CustomerRefundRequest $refund): RedirectResponse

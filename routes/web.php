@@ -203,6 +203,7 @@ Route::prefix('operations/reservations')->name('operations.reservations.')->midd
     Route::post('lookup', [ReservationOperationsController::class, 'lookup'])->name('lookup');
     Route::get('{code}', [ReservationOperationsController::class, 'show'])->name('show');
     Route::post('{code}/check-in', [ReservationOperationsController::class, 'checkIn'])->name('check-in');
+    Route::post('{code}/no-show', [ReservationOperationsController::class, 'noShow'])->name('no-show');
     Route::post('{code}/release', [ReservationOperationsController::class, 'release'])->name('release');
     Route::post('{code}/cancel', [ReservationOperationsController::class, 'cancel'])->middleware('can:access-admin')->name('cancel');
     Route::post('{code}/collect', [ReservationOperationsController::class, 'collect'])->name('collect');

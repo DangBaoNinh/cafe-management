@@ -20,52 +20,30 @@ class ScheduledPickupTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_checkout_enforces_slots_preserves_cart_and_reuses_the_original_ticket(): void
+    public function test_checkout_no_longer_offers_or_creates_appointments_even_with_legacy_fields(): void
     {
         $this->at('06:00');
         $customer = User::factory()->create();
         $details = $this->basket($customer);
         $this->actingAs($customer)->get(route('checkout.create'))->assertOk()
-            ->assertSeeHtml('value="07:00"')->assertSeeHtml('value="22:30"')
-            ->assertDontSeeHtml('value="22:35"')->assertDontSeeHtml('value="07:01"');
-        foreach (['06:55', '07:01', '22:35'] as $time) {
-            $this->postJson(route('checkout.review'), [...$details, 'pickup_time' => "2026-11-21 $time"])
-                ->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
-        }
-        $this->postJson(route('checkout.review'), [...$details, 'fulfillment_type' => 'delivery', 'address_id' => 1, 'pickup_time' => '2026-11-21 07:00'])
-            ->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
+            ->assertDontSeeHtml('name="pickup_date"')->assertDontSeeHtml('name="pickup_clock"');
         $input = $this->review([...$details, 'pickup_mode' => 'scheduled', 'pickup_date' => '2026-11-21', 'pickup_clock' => '07:00']);
         $this->travel(46)->minutes();
-        $this->postJson(route('checkout.store'), $input)->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
-        $this->assertSame(1, $customer->cart()->sole()->items()->count());
-        $this->assertDatabaseCount('orders', 0);
-        $this->at('06:00');
         $this->post(route('checkout.store'), $input)->assertStatus(303);
         $order = $customer->orders()->sole();
-        $pickup = $order->scheduledPickup()->sole();
-        $this->assertSame('00:00', $pickup->scheduled_at->format('H:i'));
+        $this->assertNull($order->scheduledPickup);
         $this->assertSame(0, $order->delivery_fee_vnd);
-        $this->travel(1)->hour();
+        $this->assertSame(0, $customer->cart()->sole()->items()->count());
         $this->post(route('checkout.store'), $input)->assertRedirectToRoute('checkout.confirmation', $order->order_number);
-        $this->postJson(route('checkout.store'), [...$input, 'pickup_time' => '2026-11-21 22:30'])
-            ->assertConflict()->assertJsonValidationErrors('checkout_key');
-        $this->assertDatabaseCount('scheduled_pickups', 1);
-        $this->get(route('orders.show', $order->order_number))->assertOk()->assertSee($pickup->code);
-        $other = User::factory()->create();
-        $this->actingAs($other)->get(route('orders.show', $order->order_number))->assertNotFound();
-        $this->get(route('operations.pickups.show', $pickup->code))->assertForbidden();
-        $this->actingAs(User::factory()->create(['role' => UserRole::Staff, 'is_active' => false]))
-            ->postJson(route('operations.pickups.arrive', $pickup->code), ['channel' => 'counter'])->assertForbidden();
+        $this->assertDatabaseCount('orders', 1);
+        $this->assertDatabaseCount('scheduled_pickups', 0);
     }
 
-    public function test_closing_slot_has_no_capacity_limit_and_location_filters_use_vietnam_time(): void
+    public function test_existing_appointments_remain_searchable_using_vietnam_time(): void
     {
         $this->at('21:30');
         for ($i = 0; $i < 2; $i++) {
-            $customer = User::factory()->create();
-            $this->actingAs($customer);
-            $this->post(route('checkout.store'), $this->review([...$this->basket($customer), 'pickup_time' => '2026-11-21 22:30']))
-                ->assertStatus(303);
+            $this->scheduled('22:30');
         }
         $this->assertDatabaseCount('scheduled_pickups', 2);
         $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
@@ -195,8 +173,8 @@ class ScheduledPickupTest extends TestCase
         $this->assertSame('2026-11-28 16:00', $customer->booking_blocked_until->format('Y-m-d H:i'));
         $details = $this->basket($customer);
         $this->actingAs($customer)->postJson(route('checkout.review'), [...$details, 'pickup_time' => '2026-11-22 07:00'])
-            ->assertJsonValidationErrors('pickup_time');
-        $this->postJson(route('checkout.review'), $details)->assertUnprocessable()->assertJsonValidationErrors('pickup_time');
+            ->assertOk();
+        $this->postJson(route('checkout.review'), $details)->assertOk();
         $this->assertSame(0, $customer->orders()->whereDoesntHave('scheduledPickup')->count());
         $this->travel(7)->days();
         $this->post(route('checkout.review'), [...$this->basket($customer), 'pickup_time' => '2026-11-29 07:00'])->assertOk();

@@ -37,6 +37,8 @@ Mỗi quy tắc có mã ổn định để đặc tả UC tham chiếu. Các quy
 
 ## Quy tắc mở rộng UC26 và UC27
 
+Ngày 23/11/2026, người dùng xác nhận ngừng tạo lịch hẹn nhận đồ uống UC26 từ checkout. Các quy tắc giờ hẹn, đổi lịch và không đến của UC26 bên dưới chỉ còn áp dụng cho lịch cũ; UC27 tiếp tục hoạt động. Checkout mới không tạo phiếu hẹn và không chịu hạn chế đặt lịch theo BR28.
+
 Các quy tắc dưới đây áp dụng cho hai UC mới. Thông số vận hành đã được người dùng xác nhận.
 
 | Mã | Quy tắc |

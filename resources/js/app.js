@@ -3,6 +3,7 @@ import './french-theme';
 import './table-order';
 import './table-pos';
 import './admin-order-confirmation';
+import './admin-deposits';
 
 const appearanceKey = 'flux.appearance';
 const systemAppearance = window.matchMedia('(prefers-color-scheme: dark)');
@@ -49,7 +50,7 @@ window.addEventListener('pageshow', (event) => {
 
 const pickupCheckout = document.querySelector('[data-checkout-pickup]');
 
-if (pickupCheckout) {
+if (pickupCheckout && pickupCheckout.elements.pickup_mode) {
     const { fulfillment_type: fulfillment, pickup_mode: mode, pickup_date: date, pickup_clock: time } = pickupCheckout.elements;
     const options = pickupCheckout.querySelector('[data-pickup-mode]');
     const slot = pickupCheckout.querySelector('[data-pickup-slot]');

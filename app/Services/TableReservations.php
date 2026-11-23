@@ -176,7 +176,7 @@ class TableReservations
         $this->finish($reservation, ReservationStatus::Completed, $reservation->completed_at, $staff);
     }
 
-    public function expire(int $id, CarbonImmutable $asOf): bool
+    public function expire(int $id, CarbonImmutable $asOf, ?User $actor = null): bool
     {
         $target = Reservation::query()->findOrFail($id);
 

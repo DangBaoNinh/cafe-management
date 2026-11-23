@@ -12,7 +12,6 @@ use App\Models\Order;
 use App\Models\Topping;
 use App\Models\User;
 use App\Models\UserAddress;
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -37,7 +36,7 @@ class Checkout
     /** @return Quote */
     public function preview(User $user, CheckoutDetails $details): array
     {
-        $this->pickupSlot($user, $details);
+        $this->validatePickup($user, $details);
 
         return DB::transaction(fn (): array => $this->price(
             $user,
@@ -71,20 +70,13 @@ class Checkout
                 return $existing;
             }
 
-            $slot = $this->pickupSlot($customer, $details);
+            $this->validatePickup($customer, $details);
             $quote = $this->price($customer, $cart, $details, $coupon);
             if ($quote['order']['total_vnd'] !== $acceptedTotal || ! hash_equals($quote['hash'], $quoteHash)) {
                 throw $this->invalid('accepted_total_vnd', 'Thông tin hoặc giá đã thay đổi. Vui lòng xem lại tổng tiền trước khi đặt hàng.', 409);
             }
 
             $order = $this->saveOrder($customer, $details, $quote, $key, $requestHash);
-            if ($slot !== null) {
-                $order->scheduledPickup()->create([
-                    'code' => strtoupper(bin2hex(random_bytes(8))),
-                    'scheduled_at' => $slot,
-                    'arrival_deadline' => $slot->addMinutes(30),
-                ]);
-            }
             $cart->items()->delete();
             $cart->increment('version');
 
@@ -92,7 +84,7 @@ class Checkout
         }, 5);
     }
 
-    private function pickupSlot(User $user, CheckoutDetails $details): ?CarbonImmutable
+    private function validatePickup(User $user, CheckoutDetails $details): void
     {
         if ($details->fulfillment === FulfillmentType::Pickup) {
             if ($details->method === PaymentMethod::Cod) {
@@ -101,22 +93,6 @@ class Checkout
             if ($details->method === PaymentMethod::DemoGateway) {
                 CustomerRefunds::requireBank($user);
             }
-            if ($details->pickupTime === null) {
-                throw $this->invalid('pickup_time', 'Chọn giờ nhận ít nhất 15 phút sau khi đặt.');
-            }
-        } elseif ($details->pickupTime === null) {
-            return null;
-        }
-        if ($details->fulfillment !== FulfillmentType::Pickup) {
-            throw $this->invalid('pickup_time', 'Hẹn giờ chỉ áp dụng khi nhận tại quán.');
-        }
-
-        try {
-            BookingRules::authorizeBooking($user);
-
-            return BookingRules::slot($details->pickupTime, 15);
-        } catch (ValidationException $exception) {
-            throw $exception->redirectTo(route('checkout.create'));
         }
     }
 
@@ -278,14 +254,18 @@ class Checkout
         $order->inventory_snapshot = $this->recipes->snapshot($order);
         $order->save();
 
+        $paid = DemoPaymentGateway::enabled() && $details->method !== PaymentMethod::Cod;
         $payment = $order->payment()->create([
             'method' => $details->method,
-            'status' => PaymentStatus::Pending,
+            'status' => $paid ? PaymentStatus::Paid : PaymentStatus::Pending,
             'amount_vnd' => $order->total_vnd,
             'transfer_details' => $quote['transferDetails'],
         ]);
+        if ($paid) {
+            $payment->forceFill(['paid_at' => now()])->save();
+        }
         $order->statusHistories()->create(['actor_id' => $user->id, 'to_status' => OrderStatus::Pending->value]);
-        $payment->statusHistories()->create(['actor_id' => $user->id, 'to_status' => PaymentStatus::Pending->value]);
+        $payment->statusHistories()->create(['actor_id' => $user->id, 'to_status' => $payment->status->value]);
 
         return $order;
     }

@@ -372,6 +372,23 @@
 - Chi tiết chỗ đã giữ công khai ngày giờ hẹn sắp tới theo giờ Việt Nam. Sơ đồ cập nhật theo lần lấy trạng thái kế tiếp sau khi đổi hoặc hủy. Chỗ đang sử dụng chỉ hiển thị trạng thái, không có giờ trống dự kiến.
 - Sau tích hợp, 218 bài SQLite với 3.511 assertion, 29 bài MySQL với 526 assertion, Pint, PHPStan, build và kiểm tra cú pháp JS đều đạt. Trình duyệt với SQLite riêng giữ đúng phòng T2-PH sau đăng nhập, chọn sẵn phòng, thấy giờ mới sau khi đổi và trả chỗ khi hủy qua form.
 
+### Đồng bộ kiểm thử MySQL với nghiệp vụ hiện tại — 23/11/2026
+
+- Nhánh `feature/customer-experience-support`, HEAD `5114181`; thay đổi chưa commit/merge/push. Bảo toàn tài liệu Word chưa được theo dõi có sẵn trong checkout.
+- Sửa bốn kiểm thử tích hợp còn dùng kỳ vọng cũ: khách đăng nhập về trang chủ; checkout nhận tại quán dùng chuyển khoản, giờ nhận sau 15 phút và có ngân hàng liên kết khi hủy; ca hoàn tiền thủ công chủ động tắt hoàn tự động demo; lịch ngày mai chưa chiếm bàn hôm nay.
+- Giữ các kiểm tra khóa coupon trước khi đọc lượt sử dụng, hoàn tác/giới hạn lượt dùng và tham chiếu thanh toán duy nhất. Bổ sung xác minh lịch tương lai vẫn chặn đặt trùng ngày dù `active_seat_id` rỗng, hiển thị Đã đặt vào đúng ngày và chỉ giữ con trỏ hiện tại khi nhận bàn.
+- PASS: `php artisan test --testsuite=MySQL --compact` đạt 29/29 bài, 534 assertion trên MySQL 8.4.3, schema `coffee_shop_test`, tài khoản thử riêng. Phiên này không có `.env.mysql-testing`, nên dựng một máy chủ MySQL tạm với data directory dưới `storage/app` và cổng riêng; đã tắt máy chủ sau kiểm tra. Không dùng tài khoản root hay schema vận hành để chạy PHPUnit.
+- Pint, PHPStan và `git diff --check` đạt. Chưa chạy lại bộ SQLite vì chỉ thay đổi bốn file kiểm thử MySQL; không sửa code nghiệp vụ, `.env`, hoặc cấu hình kiểm thử MySQL của người dùng. Chạy lại trên môi trường Laragon của người dùng bằng `php artisan test --testsuite=MySQL`.
+
+### Nghiệm thu và tích hợp PR #7 — 23/11/2026
+
+- Người dùng nghiệm thu nhánh `feature/customer-experience-support` và yêu cầu tích hợp lên GitHub qua PR #7 vào `develop`. UC31 đã có trong `develop` qua PR #6, được ghi nhận ACCEPTED theo yêu cầu nghiệm thu lần này.
+- Người dùng xác nhận bỏ hẹn giờ nhận cho đơn mới. Loại mã tạo lịch không còn dùng trong checkout; giữ dữ liệu và xử lý lịch cũ. Đã đồng bộ đặc tả UC26, quy tắc chung, README và [phụ lục Word](reports/QUYET_DINH_UC26_2026-11-23.docx), xuất PDF bằng Word và kiểm tra trang hiển thị tiếng Việt.
+- Đồng bộ kiểm thử với thanh toán demo tự ghi paid; các ca chuyển khoản thật chạy ở môi trường production mô phỏng và tiếp tục kiểm tra pending, snapshot, khóa coupon và hủy đơn. Khôi phục thông báo đơn tổng tiền 0 cho cả thanh toán đã ghi nhận.
+- PASS tại local: `composer ci:check` đạt Pint, PHPStan và 302 bài SQLite với 4.654 assertion; `npm run build` và `git diff --check` đạt. Kiểm thử trọng tâm checkout/lịch cũ đạt 28 bài với 560 assertion. MySQL của bản tích hợp sẽ được kiểm tra trên CI có schema thử riêng trước khi merge PR.
+- Bảo toàn file có sẵn `docs/NhomSix_LTMNM_ST3.docx`, không đưa vào commit. Không chạy migration hoặc kiểm thử trên database cửa hàng.
+- CI GitHub tại `3c39639` đạt build, Pint, PHPStan, 302 bài SQLite với 4.654 assertion và 29 bài MySQL với 534 assertion trên schema thử riêng. [Lượt chạy CI](https://github.com/DangBaoNinh/cafe-management/actions/runs/45105079804). Sau đồng bộ `develop`, 18 bài hồi quy vận hành tại local cũng đạt với 387 assertion. Đủ điều kiện tích hợp PR #7, giữ nhánh nguồn.
+
 ### Font mã đơn ở khu vận hành — đã nghiệm thu
 
 - Ngày 23/11/2026, người dùng nghiệm thu bản sửa `805e2e8` trên `fix/order-code-font`. Đã tích hợp vào `develop` tại `3dd5916`. Mã đơn dùng font đơn cách với số 0 có gạch chéo ở hàng đợi, chi tiết đơn và màn hình đối chiếu thanh toán.
@@ -379,11 +396,11 @@
 
 ## Việc còn lại
 
-### Trải nghiệm khách hàng và liên hệ cửa hàng — đang chờ nghiệm thu
+### Trải nghiệm khách hàng và liên hệ cửa hàng — đã nghiệm thu ngày 23/11/2026
 
 - Nhánh `feature/customer-experience-support` bổ sung số điện thoại vào hồ sơ khách để làm giá trị gợi ý cho checkout và giữ chỗ, nhưng vẫn giữ snapshot người nhận trên đơn/lịch theo BR03 và BR18.
 - Customer đăng nhập trực tiếp được đưa về trang chủ; admin và staff giữ luồng chuyển hướng workspace hiện có. Màn đặt chỗ hiển thị lại sơ đồ 3D/2D tương tác ngay trong hành trình tạo lịch; lõi UC26/UC27 không đổi.
-- Bổ sung UC31: khách tạo/xem/phản hồi cuộc trao đổi của mình, staff/admin phản hồi hoặc đóng; có kiểm tra ownership, quyền vận hành, giới hạn nội dung và lịch sử tin nhắn. Đã chạy 50 bài kiểm thử trọng tâm với 769 assertion và `npm run build`. Ngày 22/11/2026, migration UC31 đã chạy trên MySQL local; chưa được nghiệm thu/tích hợp vào `develop`.
+- Bổ sung UC31: khách tạo/xem/phản hồi cuộc trao đổi của mình, staff/admin phản hồi hoặc đóng; có kiểm tra ownership, quyền vận hành, giới hạn nội dung và lịch sử tin nhắn. Đã chạy 50 bài kiểm thử trọng tâm với 769 assertion và `npm run build`. Ngày 22/11/2026, migration UC31 đã chạy trên MySQL local; đã có trong `develop` qua PR #6. Ngày 23/11/2026, người dùng nghiệm thu và yêu cầu tích hợp các điều chỉnh tiếp theo qua PR #7.
 - Không triển khai tích điểm vì chưa có chính sách tích/đổi điểm, hết hạn và hoàn điểm khi hủy đơn được chốt.
 
 - Điền thông số giao hàng và tài khoản nhận chuyển khoản khi cấu hình cửa hàng.

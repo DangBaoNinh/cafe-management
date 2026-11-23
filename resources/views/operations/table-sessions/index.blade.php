@@ -28,7 +28,7 @@
                             @endif
                             @if($seat->activeReservation && $seat->activeReservation->status === ReservationStatus::Confirmed)
                                 <flux:link :href="route('operations.reservations.show', $seat->activeReservation->code)">Xem lịch đặt / nhận khách</flux:link>
-                            @else
+                            @endif
                                 <form method="POST" action="{{ route('operations.table-sessions.table.status', $seat->code) }}" class="flex flex-wrap items-end gap-2">
                                     @csrf<input type="hidden" name="expected" value="{{ $state }}">
                                     <label class="grid flex-1 gap-1 text-sm">Trạng thái bàn<select class="pos-input w-full" name="status" aria-label="Trạng thái {{ $seat->code }}">
@@ -39,7 +39,6 @@
                                     </select></label>
                                     <flux:button type="submit" size="sm" :disabled="$state === 'inactive' && !auth()->user()->can('access-admin')">Cập nhật</flux:button>
                                 </form>
-                            @endif
                             @if($seat->activeTableSession && $seat->activeTableSession->billing_mode === 'prepaid')
                                 <details class="text-sm"><summary class="cursor-pointer">QR cho khách tự gọi món</summary><img class="mt-3 bg-white" src="{{ route('operations.table-sessions.qr', $seat->code) }}" width="180" height="180" alt="QR gọi món bàn {{ $seat->code }}"></details>
                             @endif

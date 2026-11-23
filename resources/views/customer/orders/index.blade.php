@@ -1,5 +1,5 @@
 <x-layouts::customer title="Đơn của tôi">
-    <section class="mx-auto max-w-3xl space-y-6">
+    <section class="customer-order-history mx-auto max-w-3xl space-y-6">
         <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Đơn của tôi</h1>
 
         <nav aria-label="Lọc đơn theo trạng thái" class="flex flex-wrap gap-2">

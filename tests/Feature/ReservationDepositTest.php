@@ -33,6 +33,20 @@ class ReservationDepositTest extends TestCase
         config(['checkout.reservation_deposit_demo' => true]);
     }
 
+    public function test_staff_no_show_confirmation_releases_reserved_flag_and_order_warning(): void
+    {
+        $booking = $this->book(User::factory()->create());
+        $this->pay($booking);
+        $staff = User::factory()->create(['role' => UserRole::Staff]);
+        $this->actingAs($staff)->postJson(route('operations.reservations.no-show', $booking->code), ['confirm' => 1])->assertConflict();
+        $this->travelTo(CarbonImmutable::parse('2026-11-23 12:31:00', BookingRules::TIMEZONE));
+        $this->post(route('operations.reservations.no-show', $booking->code), ['confirm' => 1])->assertRedirect();
+        $this->assertSame(ReservationStatus::NoShow, $booking->fresh()->status);
+        $this->assertNull($booking->fresh()->active_seat_id);
+        $this->assertSame('free', $booking->seat->fresh()->availability());
+        $this->get(route('operations.table-sessions.index'))->assertOk()->assertDontSee('B?n c? l?ch ??t h?m nay l?c 12:00');
+    }
+
     private function book(User $customer, string $seat = 'T1-B01', array $overrides = []): Reservation
     {
         $this->actingAs($customer)->post(route('reservations.store'), [

@@ -84,6 +84,17 @@ class ReservationOperationsController extends Controller
         return $this->result($code, 'Đã ghi nhận khách đến và chốt phụ phí.');
     }
 
+    public function noShow(Request $request, string $code, TableReservations $bookings): RedirectResponse
+    {
+        $request->validate(['confirm' => ['accepted']]);
+        $reservation = Reservation::where('code', $code)->firstOrFail();
+        if ($reservation->status !== ReservationStatus::NoShow) {
+            abort_unless($bookings->expire($reservation->id, CarbonImmutable::now(), $this->actor($request)), 409, 'Ch? x?c nh?n kh?ng ??n khi ?? qu? h?n nh?n b?n.');
+        }
+
+        return $this->result($code, '?? ghi nh?n kh?ch kh?ng ??n, b? c? ??t b?n v? th?ng b?o nh?c l?ch.');
+    }
+
     public function release(Request $request, string $code, TableReservations $bookings): RedirectResponse
     {
         $bookings->release($this->actor($request), $code);
