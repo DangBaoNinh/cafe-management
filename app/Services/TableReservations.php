@@ -180,7 +180,7 @@ class TableReservations
     {
         $target = Reservation::query()->findOrFail($id);
 
-        return DB::transaction(function () use ($target, $asOf, $actor): bool {
+        return DB::transaction(function () use ($target, $asOf): bool {
             [$customer, , $reservation] = $this->lock($target);
             if ($reservation->status !== ReservationStatus::Confirmed || $reservation->arrival_deadline->gt($asOf)) {
                 return false;

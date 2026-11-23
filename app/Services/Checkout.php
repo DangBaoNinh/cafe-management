@@ -101,6 +101,7 @@ class Checkout
             if ($details->method === PaymentMethod::DemoGateway) {
                 CustomerRefunds::requireBank($user);
             }
+
             return null;
         }
 
